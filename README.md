@@ -6,8 +6,12 @@
 - [Fedora Workstation](#fedora-workstation)
   - [System Installation](#system-installation)
   - [System Setup](#system-setup)
-    - [Prerequisites](#prerequisites)
+    - [System Upgrade](#system-upgrade)
     - [System Drivers](#system-drivers)
+    - [Nvidia Drivers](#nvidia-drivers)
+      - [Prerequisites](#prerequisites)
+      - [Auto Kernel Signing](#auto-kernel-signing)
+      - [Installation](#installation)
 
 ## System Installation
 
@@ -27,7 +31,7 @@ Make sure the UEFI Secure Boot is **enabled**, then boot from the USB installati
 
 ## System Setup
 
-### Prerequisites
+### System Upgrade
 
 Perform a full system upgrade:
 
@@ -78,3 +82,71 @@ sudo dnf install --assumeyes fwupd
 sudo fwupdmgr refresh --assume-yes --force
 sudo fwupdmgr get-updates --assume-yes
 ```
+
+### Nvidia Drivers
+
+#### Prerequisites
+
+Install the following prerequisites:
+
+```bash
+sudo dnf install --assumeyes \
+    akmods \
+    acpid \
+    curl \
+    dkms \
+    gcc \
+    git \
+    kernel-devel \
+    kernel-headers \
+    libglvnd-glx \
+    libglvnd-opengl \
+    libglvnd-devel \
+    make \
+    mokutil \
+    openssl \
+    pkgconfig \
+    vim \
+    wget
+```
+
+#### Auto Kernel Signing
+
+Enable Nvidia kernel module auto-signing:
+
+```bash
+sudo kmodgenca --auto
+sudo mokutil --import /etc/pki/akmods/certs/public_key.der
+```
+
+> :warning: A reboot is required after this point.
+
+At reboot, choose `Enroll MOK`, `Continue`, `Yes`, then enter the selected password, and reboot.
+
+#### Installation
+
+Install the latest Nvidia drivers:
+
+```bash
+sudo dnf config-manager --set-enable rpmfusion-nonfree-nvidia-driver
+
+sudo dnf install --assumeyes \
+    akmod-nvidia \
+    libva-utils \
+    libva-vdpau-driver \
+    vdpauinfo \
+    xorg-x11-drv-nvidia \
+    xorg-x11-drv-nvidia-cuda \
+    xorg-x11-drv-nvidia-cuda-libs \
+    xorg-x11-drv-nvidia-libs \
+    xorg-x11-drv-nvidia-libs.i686 \
+    vulkan-loader
+
+echo "%global _with_kmod_nvidia_open 1" | sudo tee --append /etc/rpm/macros-nvidia-kmod
+sudo akmods --force
+
+sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1'
+sudo dracut --force
+```
+
+> :warning: A reboot is required after this point.
