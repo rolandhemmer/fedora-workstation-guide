@@ -32,14 +32,24 @@ Details provided here are mostly for educational and information purposes, and t
 
 **:information_source: Disclamer**
 
-*The examples and code samples from this repository are provided "as is" without warranty of any kind, either express or implied.*  
-*No advice or information, whether oral or written, obtained by you from the author or from this repository shall create any warranty of any kind.*
+The examples and code samples from this repository are provided "as is" without warranty of any kind, either express or implied.  
+No advice or information, whether oral or written, obtained by you from the author or from this repository shall create any warranty of any kind.
 
-*The use of the software and scripts downloaded on this repository is done at your own discretion and risk and with agreement that you will be solely responsible for any damage to your computer system or loss of data that results from such activities.*  
-*You are solely responsible for adequate protection and backup of the data and equipment used in connection with any of the software, and the author will not be liable for any damages that you may suffer in connection with using, modifying or distributing any of this software.*
+The use of the software and scripts downloaded on this repository is done at your own discretion and risk and with agreement that you will be solely responsible for any damage to your computer system or loss of data that results from such activities.  
+You are solely responsible for adequate protection and backup of the data and equipment used in connection with any of the software, and the author will not be liable for any damages that you may suffer in connection with using, modifying or distributing any of this software.
 
-*The author assume no responsibility for errors or omissions in the software or documentation available from this repository.*  
-*In no event shall the author be liable to you or any third parties for any special, punitive, incidental, indirect or consequential damages of any kind, or any damages whatsoever, including, without limitation, those resulting from loss of use, data or profits, and on any theory of liability, arising out of or in connection with the use of this software.*
+The author assume no responsibility for errors or omissions in the software or documentation available from this repository.  
+In no event shall the author be liable to you or any third parties for any special, punitive, incidental, indirect or consequential damages of any kind, or any damages whatsoever, including, without limitation, those resulting from loss of use, data or profits, and on any theory of liability, arising out of or in connection with the use of this software.
+
+**:information_source: License**
+
+This repository is available under the MIT license.  
+It also includes external libraries that are available under a variety of licenses.
+
+See the [LICENSE.md](LICENSE.md) file for the full license text.
+
+Fedora and the Fedora logo are trademarks or registered trademarks of Red Hat, Inc.  
+All other trademarks and copyrights are property of their respective owners and are only mentioned for informative purposes.
 
 ---
 
