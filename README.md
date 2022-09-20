@@ -83,6 +83,11 @@ All other trademarks and copyrights are property of their respective owners and 
     - [4.2. Desktop Settings](#42-desktop-settings)
       - [4.2.1. Global](#421-global)
       - [4.2.1. Fonts](#421-fonts)
+    - [4.3. Desktop Theme](#43-desktop-theme)
+      - [4.3.1 Prerequisites](#431-prerequisites)
+      - [4.3.2. Shell Theme](#432-shell-theme)
+      - [4.3.3. Icon Theme](#433-icon-theme)
+      - [4.3.4. Cursor Theme](#434-cursor-theme)
 
 ## 2. System Installation
 
@@ -233,7 +238,7 @@ sudo dnf install --assumeyes \
 echo "%global _with_kmod_nvidia_open 1" | sudo tee --append /etc/rpm/macros-nvidia-kmod
 sudo akmods --force
 
-sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1'
+sudo grubby --update-kernel=ALL --args="nvidia-drm.modeset=1"
 sudo dracut --force
 ```
 
@@ -296,12 +301,13 @@ Use the following to configure the Pantheon settings:
 ```bash
 gsettings set .io.elementary.terminal.settings unsafe-paste-alert false
 
-gsettings set org.gnome.desktop.wm.preferences button-layout 'close,minimize:maximize'
+gsettings set org.gnome.desktop.calendar show-weekdate true
+gsettings set org.gnome.desktop.interface clock-show-date true
+gsettings set org.gnome.desktop.interface clock-show-weekday true
 
-gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "{'Gtk/DialogsUseHeader': <0>, 'Gtk/ShellShowsAppMenu': <0>, 'Gtk/EnablePrimaryPaste': <0>, 'Gtk/DecorationLayout': <'close,minimize,maximize:menu'>}"
+gsettings set org.gnome.mutter center-new-windows true
 
-gsettings set org.pantheon.desktop.gala.appearance button-layout 'close,minimize:maximize'
-gsettings set org.pantheon.desktop.gala.behavior hotcorner-topleft 'show-workspace-view'
+gsettings set org.pantheon.desktop.gala.behavior hotcorner-topleft "show-workspace-view"
 ```
 
 <div align="center">
@@ -323,10 +329,83 @@ sudo dnf install --assumeyes \
   google-roboto-fonts \
   google-roboto-mono-fonts
 
-gsettings set org.gnome.desktop.interface document-font-name 'Roboto 10'
-gsettings set org.gnome.desktop.interface font-name 'Roboto 9'
-gsettings set org.gnome.desktop.interface monospace-font-name 'Roboto Mono 10'
-gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Roboto 10'
+gsettings set org.gnome.desktop.interface document-font-name "Roboto 10"
+gsettings set org.gnome.desktop.interface font-name "Roboto 9"
+gsettings set org.gnome.desktop.interface monospace-font-name "Roboto Mono 10"
+gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 10"
+```
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
+
+### 4.3. Desktop Theme
+
+#### 4.3.1 Prerequisites
+
+```bash
+mkdir --parents ~/.themes/_sources/WhiteSur
+
+sudo dnf install --assumeyes \
+  glib2-devel \
+  inkscape \
+  libxml2 \
+  optipng \
+  sassc
+```
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
+
+#### 4.3.2. Shell Theme
+
+Use the following commands to install the [WhiteSur GTK theme](https://github.com/vinceliuice/WhiteSur-gtk-theme):
+
+```bash
+cd ~/.themes/_sources/WhiteSur
+
+git clone "https://github.com/vinceliuice/WhiteSur-gtk-theme.git" shell
+cd shell
+
+./install.sh \
+  --icon fedora \
+  --libadwaita \
+  --monterey \
+  --opacity solid
+
+gsettings set org.gnome.desktop.interface gtk-theme "WhiteSur-Dark-solid"
+gsettings set org.gnome.shell.extensions.user-theme name "WhiteSur-Dark-solid"
+```
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
+
+#### 4.3.3. Icon Theme
+
+Use the following commands to install the [WhiteSur icon theme](https://github.com/vinceliuice/WhiteSur-icon-theme):
+
+```bash
+cd ~/.themes/_sources/WhiteSur
+
+git clone "https://github.com/vinceliuice/WhiteSur-icon-theme.git" icons
+cd icons
+
+./install.sh
+
+gsettings set org.gnome.desktop.interface icon-theme "WhiteSur-dark"
+```
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
+
+#### 4.3.4. Cursor Theme
+
+Use the following commands to install the [WhiteSur cursor theme](https://github.com/vinceliuice/WhiteSur-cursors):
+
+```bash
+cd ~/.themes/_sources/WhiteSur
+
+git clone "https://github.com/vinceliuice/WhiteSur-cursors.git" cursors
+cd cursors
+
+./install.sh
+
+gsettings set org.gnome.desktop.interface cursor-theme "WhiteSur-cursors"
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
