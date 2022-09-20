@@ -81,8 +81,8 @@ All other trademarks and copyrights are property of their respective owners and 
   - [4. Environment Setup](#4-environment-setup)
     - [4.1. Desktop Setup](#41-desktop-setup)
     - [4.2. Desktop Settings](#42-desktop-settings)
-    - [4.2.1. Global](#421-global)
-    - [4.2.1. Fonts](#421-fonts)
+      - [4.2.1. Global](#421-global)
+      - [4.2.1. Fonts](#421-fonts)
 
 ## 2. System Installation
 
@@ -198,11 +198,16 @@ sudo kmodgenca --auto
 sudo mokutil --import /etc/pki/akmods/certs/public_key.der
 ```
 
-**:warning: Reboot is required** after this point.
+<div align="center">
 
-| :red_circle: **Manual action**                                                                   |
-| ------------------------------------------------------------------------------------------------ |
-| At reboot, choose `Enroll MOK`, `Continue`, `Yes`, then enter the selected password, and reboot. |
+  | :warning: A reboot is required after this point |
+  | ----------------------------------------------- |
+
+  | :red_circle: Manual actions                                                                      |
+  | ------------------------------------------------------------------------------------------------ |
+  | At reboot, choose `Enroll MOK`, `Continue`, `Yes`, then enter the selected password, and reboot. |
+
+</div>
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
@@ -232,7 +237,12 @@ sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1'
 sudo dracut --force
 ```
 
-**:warning: Reboot is required** after this point.
+<div align="center">
+
+  | :warning: A reboot is required after this point |
+  | ----------------------------------------------- |
+
+</div>
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
@@ -268,20 +278,24 @@ sudo systemctl disable gdm
 sudo systemctl enable lightdm
 ```
 
-**:warning: Reboot is required** after this point.
+<div align="center">
+
+  | :warning: A reboot is required after this point |
+  | ----------------------------------------------- |
+
+</div>
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
 ### 4.2. Desktop Settings
 
-### 4.2.1. Global
+#### 4.2.1. Global
 
 Use the following to configure the Pantheon settings:
 
 ```bash
 gsettings set .io.elementary.terminal.settings unsafe-paste-alert false
 
-gsettings set org.gnome.desktop.interface gtk-theme 'io.elementary.stylesheet.blueberry'
 gsettings set org.gnome.desktop.wm.preferences button-layout 'close,minimize:maximize'
 
 gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "{'Gtk/DialogsUseHeader': <0>, 'Gtk/ShellShowsAppMenu': <0>, 'Gtk/EnablePrimaryPaste': <0>, 'Gtk/DecorationLayout': <'close,minimize,maximize:menu'>}"
@@ -290,15 +304,17 @@ gsettings set org.pantheon.desktop.gala.appearance button-layout 'close,minimize
 gsettings set org.pantheon.desktop.gala.behavior hotcorner-topleft 'show-workspace-view'
 ```
 
-| :red_circle: **Manual actions**                             |
-| ----------------------------------------------------------- |
-| Go to `System Settings`, `Tweaks`, and in `Window Control`: |
-| - select `Force to use dark stylesheet`                     |
-| - select `Layout: macOS`                                    |
+<div align="center">
+
+| :red_circle: Manual actions                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Go to `System Settings`, `Tweaks`, and in the `Window Control` page:<br>- select `Force to use dark stylesheet`<br>- select `Layout: macOS` |
+
+</div>
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 4.2.1. Fonts
+#### 4.2.1. Fonts
 
 Set up the following fonts:
 
