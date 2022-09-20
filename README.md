@@ -3,6 +3,8 @@
 > Installation guide  
 > Updated for Fedora Workstation 36
 
+---
+
 - [Fedora Workstation](#fedora-workstation)
   - [System Installation](#system-installation)
   - [System Setup](#system-setup)
@@ -12,10 +14,13 @@
       - [Prerequisites](#prerequisites)
       - [Auto Kernel Signing](#auto-kernel-signing)
       - [Installation](#installation)
+    - [Multimedia Codecs](#multimedia-codecs)
+
+---
 
 ## System Installation
 
-This installation guide requires an UEFI platform.
+This installation guide requires an UEFI platform.  
 Having a password to access the UEFI menu is **strongly recommended**.
 
 Make sure the UEFI Secure Boot is **enabled**, then boot from the USB installation media.
@@ -119,7 +124,7 @@ sudo kmodgenca --auto
 sudo mokutil --import /etc/pki/akmods/certs/public_key.der
 ```
 
-> :warning: A reboot is required after this point.
+:warning: A reboot is required after this point.
 
 At reboot, choose `Enroll MOK`, `Continue`, `Yes`, then enter the selected password, and reboot.
 
@@ -149,4 +154,21 @@ sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1'
 sudo dracut --force
 ```
 
-> :warning: A reboot is required after this point.
+ :warning: A reboot is required after this point.
+
+### Multimedia Codecs
+
+Install the multimedia codecs for DRM-protected content:
+
+```bash
+sudo dnf install --assumeyes \
+    ffmpeg \
+    gstreamer1-libav \
+    gstreamer1-plugins-{bad-\*,good-\*,base} \
+    gstreamer1-plugin-openh264 \
+    lame\* \
+    --exclude=gstreamer1-plugins-bad-free-devel \
+    --exclude=lame-devel
+
+sudo dnf group upgrade --assumeyes --with-optional Multimedia
+```
