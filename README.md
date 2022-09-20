@@ -1,24 +1,20 @@
 # Fedora Workstation
 
-> Installation guide  
-> Updated for Fedora Workstation 36
-
----
+Installation guide and **personal** post-installation steps  
+Updated for Fedora Workstation 36
 
 - [Fedora Workstation](#fedora-workstation)
-  - [System Installation](#system-installation)
-  - [System Setup](#system-setup)
-    - [System Upgrade](#system-upgrade)
-    - [System Drivers](#system-drivers)
-    - [Nvidia Drivers](#nvidia-drivers)
-      - [Prerequisites](#prerequisites)
-      - [Auto Kernel Signing](#auto-kernel-signing)
-      - [Installation](#installation)
-    - [Multimedia Codecs](#multimedia-codecs)
+  - [1. System Installation](#1-system-installation)
+  - [2. System Setup](#2-system-setup)
+    - [2.1. System Upgrade](#21-system-upgrade)
+    - [2.2. System Drivers](#22-system-drivers)
+    - [2.3. Nvidia Drivers](#23-nvidia-drivers)
+      - [2.3.1. Prerequisites](#231-prerequisites)
+      - [2.3.2. Auto Kernel Signing](#232-auto-kernel-signing)
+      - [2.3.3. Installation](#233-installation)
+    - [2.4. Multimedia Codecs](#24-multimedia-codecs)
 
----
-
-## System Installation
+## 1. System Installation
 
 This installation guide requires an UEFI platform.  
 Having a password to access the UEFI menu is **strongly recommended**.
@@ -34,9 +30,11 @@ Make sure the UEFI Secure Boot is **enabled**, then boot from the USB installati
   - disable `Automatic Problem Reporting`
   - enable `Third-Party Repositories`
 
-## System Setup
+**[:arrow_up: back to top](#fedora-workstation)**
 
-### System Upgrade
+## 2. System Setup
+
+### 2.1. System Upgrade
 
 Perform a full system upgrade:
 
@@ -78,7 +76,9 @@ sudo dnf install --assumeyes \
 sudo dnf group update core --assumeyes
 ```
 
-### System Drivers
+**[:arrow_up: back to top](#fedora-workstation)**
+
+### 2.2. System Drivers
 
 Add the `fwupd` command, and run it to check for driver and firmware updates:
 
@@ -88,9 +88,11 @@ sudo fwupdmgr refresh --assume-yes --force
 sudo fwupdmgr get-updates --assume-yes
 ```
 
-### Nvidia Drivers
+**[:arrow_up: back to top](#fedora-workstation)**
 
-#### Prerequisites
+### 2.3. Nvidia Drivers
+
+#### 2.3.1. Prerequisites
 
 Install the following prerequisites:
 
@@ -115,7 +117,9 @@ sudo dnf install --assumeyes \
     wget
 ```
 
-#### Auto Kernel Signing
+**[:arrow_up: back to top](#fedora-workstation)**
+
+#### 2.3.2. Auto Kernel Signing
 
 Enable Nvidia kernel module auto-signing:
 
@@ -128,7 +132,9 @@ sudo mokutil --import /etc/pki/akmods/certs/public_key.der
 
 At reboot, choose `Enroll MOK`, `Continue`, `Yes`, then enter the selected password, and reboot.
 
-#### Installation
+**[:arrow_up: back to top](#fedora-workstation)**
+
+#### 2.3.3. Installation
 
 Install the latest Nvidia drivers:
 
@@ -156,7 +162,9 @@ sudo dracut --force
 
  :warning: A reboot is required after this point.
 
-### Multimedia Codecs
+**[:arrow_up: back to top](#fedora-workstation)**
+
+### 2.4. Multimedia Codecs
 
 Install the multimedia codecs for DRM-protected content:
 
@@ -172,3 +180,5 @@ sudo dnf install --assumeyes \
 
 sudo dnf group upgrade --assumeyes --with-optional Multimedia
 ```
+
+**[:arrow_up: back to top](#fedora-workstation)**
