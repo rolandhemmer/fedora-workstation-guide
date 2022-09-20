@@ -190,7 +190,9 @@ sudo mokutil --import /etc/pki/akmods/certs/public_key.der
 
 **:warning: Reboot is required** after this point.
 
-At reboot, choose `Enroll MOK`, `Continue`, `Yes`, then enter the selected password, and reboot.
+| :red_circle: **Manual action**                                                                   |
+| ------------------------------------------------------------------------------------------------ |
+| At reboot, choose `Enroll MOK`, `Continue`, `Yes`, then enter the selected password, and reboot. |
 
 **[:arrow_up: back to top](#0-table-of-contents)**
 
@@ -277,6 +279,10 @@ gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "{'Gtk/Dialo
 gsettings set org.pantheon.desktop.gala.appearance button-layout 'close,minimize:maximize'
 gsettings set org.pantheon.desktop.gala.behavior hotcorner-topleft 'show-workspace-view'
 ```
+
+| :red_circle: **Manual action**                                                     |
+| ---------------------------------------------------------------------------------- |
+| Go to `System Settings`, `Tweaks`, and in `Window Control`, select `Layout: macOS` |
 
 **[:arrow_up: back to top](#0-table-of-contents)**
 
