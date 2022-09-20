@@ -1,11 +1,18 @@
 <div align="center">
   <br>
-  <img src="images/fedora-logo.png" alt="Fedora" width="350"/>
+  <br>
+  <br>
+  <img src="images/fedora-logo.png" alt="Fedora" width="450"/>
+  <br>
   <br>
   <br>
 </div>
 
 # Workstation Installation Guide
+
+**[:arrow_down: Go to Main Content](#1-table-of-contents)**
+
+## 0. Introduction
 
 Installation guide and **personal** post-installation steps.  
 This purpose of this document is to provide a quick, clean and minimal Fedora-based setup.
@@ -13,6 +20,8 @@ This purpose of this document is to provide a quick, clean and minimal Fedora-ba
 This installation represents a **personal point-of-view**, with a private workstation in mind.  
 It does not cover all the use-cases one can expect, or suit a specific need with a specific machine.  
 Details provided here are mostly for educational and information purposes, and to complete a personal vision of what a personal operating system should be.
+
+<div align="center">
 
 |                                           |                                                                         |
 | ----------------------------------------- | ----------------------------------------------------------------------- |
@@ -28,11 +37,9 @@ Details provided here are mostly for educational and information purposes, and t
 | Secure Boot                               | :heavy_check_mark: Enabled                                              |
 | Disk Encryption                           | :heavy_check_mark: Enabled (LUKS)                                       |
 
-**[:arrow_down: go to content](#0-table-of-contents)**
+</div>
 
-<br>
-
-**:information_source: Disclamer**
+### 0.1. Disclaimer
 
 The examples and code samples from this repository are provided "as is" without warranty of any kind, either express or implied.  
 No advice or information, whether oral or written, obtained by you from the author or from this repository shall create any warranty of any kind.
@@ -43,7 +50,7 @@ You are solely responsible for adequate protection and backup of the data and eq
 The author assume no responsibility for errors or omissions in the software or documentation available from this repository.  
 In no event shall the author be liable to you or any third parties for any special, punitive, incidental, indirect or consequential damages of any kind, or any damages whatsoever, including, without limitation, those resulting from loss of use, data or profits, and on any theory of liability, arising out of or in connection with the use of this software.
 
-**:information_source: License**
+### 0.2. License
 
 This repository is available under the MIT license.  
 It also includes external libraries that are available under a variety of licenses.
@@ -55,26 +62,29 @@ All other trademarks and copyrights are property of their respective owners and 
 
 ---
 
-## 0. Table of Contents
+## 1. Table of Contents
 
 - [Workstation Installation Guide](#workstation-installation-guide)
-  - [0. Table of Contents](#0-table-of-contents)
-  - [1. System Installation](#1-system-installation)
-  - [2. System Setup](#2-system-setup)
-    - [2.1. System Upgrade](#21-system-upgrade)
-    - [2.2. System Drivers](#22-system-drivers)
-    - [2.3. Nvidia Drivers](#23-nvidia-drivers)
-      - [2.3.1. Prerequisites](#231-prerequisites)
-      - [2.3.2. Auto Kernel Signing](#232-auto-kernel-signing)
-      - [2.3.3. Installation](#233-installation)
-    - [2.4. Multimedia Codecs](#24-multimedia-codecs)
-  - [3. Environment Setup](#3-environment-setup)
-    - [3.1 Desktop Setup](#31-desktop-setup)
-    - [3.2. Desktop Settings](#32-desktop-settings)
-    - [3.2.1. Global](#321-global)
-    - [3.2.1. Fonts](#321-fonts)
+  - [0. Introduction](#0-introduction)
+    - [0.1. Disclaimer](#01-disclaimer)
+    - [0.2. License](#02-license)
+  - [1. Table of Contents](#1-table-of-contents)
+  - [2. System Installation](#2-system-installation)
+  - [3. System Setup](#3-system-setup)
+    - [3.1. System Upgrade](#31-system-upgrade)
+    - [3.2. System Drivers](#32-system-drivers)
+    - [3.3. Nvidia Drivers](#33-nvidia-drivers)
+      - [3.3.1. Prerequisites](#331-prerequisites)
+      - [3.3.2. Auto Kernel Signing](#332-auto-kernel-signing)
+      - [3.3.3. Installation](#333-installation)
+    - [3.4. Multimedia Codecs](#34-multimedia-codecs)
+  - [4. Environment Setup](#4-environment-setup)
+    - [4.1. Desktop Setup](#41-desktop-setup)
+    - [4.2. Desktop Settings](#42-desktop-settings)
+    - [4.2.1. Global](#421-global)
+    - [4.2.1. Fonts](#421-fonts)
 
-## 1. System Installation
+## 2. System Installation
 
 This installation guide requires an UEFI platform.  
 Having a password to access the UEFI menu is **strongly recommended**.
@@ -90,11 +100,11 @@ Make sure the UEFI Secure Boot is **enabled**, then boot from the USB installati
   - disable `Automatic Problem Reporting`
   - enable `Third-Party Repositories`
 
-**[:arrow_up: back to top](#0-table-of-contents)**
+**[:arrow_up: Back to Top](#1-table-of-contents)**
 
-## 2. System Setup
+## 3. System Setup
 
-### 2.1. System Upgrade
+### 3.1. System Upgrade
 
 Perform a full system upgrade:
 
@@ -136,9 +146,9 @@ sudo dnf install --assumeyes \
 sudo dnf group update core --assumeyes
 ```
 
-**[:arrow_up: back to top](#0-table-of-contents)**
+**[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 2.2. System Drivers
+### 3.2. System Drivers
 
 Add the `fwupd` command, and run it to check for driver and firmware updates:
 
@@ -148,11 +158,11 @@ sudo fwupdmgr refresh --assume-yes --force
 sudo fwupdmgr get-updates --assume-yes
 ```
 
-**[:arrow_up: back to top](#0-table-of-contents)**
+**[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 2.3. Nvidia Drivers
+### 3.3. Nvidia Drivers
 
-#### 2.3.1. Prerequisites
+#### 3.3.1. Prerequisites
 
 Install the following prerequisites:
 
@@ -177,9 +187,9 @@ sudo dnf install --assumeyes \
     wget
 ```
 
-**[:arrow_up: back to top](#0-table-of-contents)**
+**[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 2.3.2. Auto Kernel Signing
+#### 3.3.2. Auto Kernel Signing
 
 Enable Nvidia kernel module auto-signing:
 
@@ -194,9 +204,9 @@ sudo mokutil --import /etc/pki/akmods/certs/public_key.der
 | ------------------------------------------------------------------------------------------------ |
 | At reboot, choose `Enroll MOK`, `Continue`, `Yes`, then enter the selected password, and reboot. |
 
-**[:arrow_up: back to top](#0-table-of-contents)**
+**[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 2.3.3. Installation
+#### 3.3.3. Installation
 
 Install the latest Nvidia drivers:
 
@@ -224,9 +234,9 @@ sudo dracut --force
 
 **:warning: Reboot is required** after this point.
 
-**[:arrow_up: back to top](#0-table-of-contents)**
+**[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 2.4. Multimedia Codecs
+### 3.4. Multimedia Codecs
 
 Install the multimedia codecs for DRM-protected content:
 
@@ -243,11 +253,11 @@ sudo dnf install --assumeyes \
 sudo dnf group upgrade --assumeyes --with-optional Multimedia
 ```
 
-**[:arrow_up: back to top](#0-table-of-contents)**
+**[:arrow_up: Back to Top](#1-table-of-contents)**
 
-## 3. Environment Setup
+## 4. Environment Setup
 
-### 3.1 Desktop Setup
+### 4.1. Desktop Setup
 
 Install the Pantheon desktop from elementaryOS:
 
@@ -260,11 +270,11 @@ sudo systemctl enable lightdm
 
 **:warning: Reboot is required** after this point.
 
-**[:arrow_up: back to top](#0-table-of-contents)**
+**[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 3.2. Desktop Settings
+### 4.2. Desktop Settings
 
-### 3.2.1. Global
+### 4.2.1. Global
 
 Use the following to configure the Pantheon settings:
 
@@ -280,13 +290,15 @@ gsettings set org.pantheon.desktop.gala.appearance button-layout 'close,minimize
 gsettings set org.pantheon.desktop.gala.behavior hotcorner-topleft 'show-workspace-view'
 ```
 
-| :red_circle: **Manual action**                                                     |
-| ---------------------------------------------------------------------------------- |
-| Go to `System Settings`, `Tweaks`, and in `Window Control`, select `Layout: macOS` |
+| :red_circle: **Manual actions**                             |
+| ----------------------------------------------------------- |
+| Go to `System Settings`, `Tweaks`, and in `Window Control`: |
+| - select `Force to use dark stylesheet`                     |
+| - select `Layout: macOS`                                    |
 
-**[:arrow_up: back to top](#0-table-of-contents)**
+**[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 3.2.1. Fonts
+### 4.2.1. Fonts
 
 Set up the following fonts:
 
@@ -301,4 +313,4 @@ gsettings set org.gnome.desktop.interface monospace-font-name 'Roboto Mono 10'
 gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Roboto 10'
 ```
 
-**[:arrow_up: back to top](#0-table-of-contents)**
+**[:arrow_up: Back to Top](#1-table-of-contents)**
