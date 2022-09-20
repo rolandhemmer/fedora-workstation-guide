@@ -28,6 +28,8 @@ Details provided here are mostly for educational and information purposes, and t
 | Secure Boot                               | :heavy_check_mark: Enabled                                              |
 | Disk Encryption                           | :heavy_check_mark: Enabled (LUKS)                                       |
 
+**[:arrow_down: go to content](#0-table-of-contents)**
+
 <br>
 
 **:information_source: Disclamer**
@@ -66,6 +68,11 @@ All other trademarks and copyrights are property of their respective owners and 
       - [2.3.2. Auto Kernel Signing](#232-auto-kernel-signing)
       - [2.3.3. Installation](#233-installation)
     - [2.4. Multimedia Codecs](#24-multimedia-codecs)
+  - [3. Environment Setup](#3-environment-setup)
+    - [3.1 Desktop Setup](#31-desktop-setup)
+    - [3.2. Desktop Settings](#32-desktop-settings)
+    - [3.2.1. Global](#321-global)
+    - [3.2.1. Fonts](#321-fonts)
 
 ## 1. System Installation
 
@@ -181,7 +188,7 @@ sudo kmodgenca --auto
 sudo mokutil --import /etc/pki/akmods/certs/public_key.der
 ```
 
-:warning: A **reboot is required** after this point.
+**:warning: Reboot is required** after this point.
 
 At reboot, choose `Enroll MOK`, `Continue`, `Yes`, then enter the selected password, and reboot.
 
@@ -213,7 +220,7 @@ sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1'
 sudo dracut --force
 ```
 
-:warning: A **reboot is required** after this point.
+**:warning: Reboot is required** after this point.
 
 **[:arrow_up: back to top](#0-table-of-contents)**
 
@@ -232,6 +239,60 @@ sudo dnf install --assumeyes \
     --exclude=lame-devel
 
 sudo dnf group upgrade --assumeyes --with-optional Multimedia
+```
+
+**[:arrow_up: back to top](#0-table-of-contents)**
+
+## 3. Environment Setup
+
+### 3.1 Desktop Setup
+
+Install the Pantheon desktop from elementaryOS:
+
+```bash
+sudo dnf group install --assumeyes "Pantheon Desktop"
+sudo dnf install --assumeyes lightdm
+sudo systemctl disable gdm
+sudo systemctl enable lightdm
+```
+
+**:warning: Reboot is required** after this point.
+
+**[:arrow_up: back to top](#0-table-of-contents)**
+
+### 3.2. Desktop Settings
+
+### 3.2.1. Global
+
+Use the following to configure the Pantheon settings:
+
+```bash
+gsettings set .io.elementary.terminal.settings unsafe-paste-alert false
+
+gsettings set org.gnome.desktop.interface gtk-theme 'io.elementary.stylesheet.blueberry'
+gsettings set org.gnome.desktop.wm.preferences button-layout 'close,minimize:maximize'
+
+gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "{'Gtk/DialogsUseHeader': <0>, 'Gtk/ShellShowsAppMenu': <0>, 'Gtk/EnablePrimaryPaste': <0>, 'Gtk/DecorationLayout': <'close,minimize,maximize:menu'>}"
+
+gsettings set org.pantheon.desktop.gala.appearance button-layout 'close,minimize:maximize'
+gsettings set org.pantheon.desktop.gala.behavior hotcorner-topleft 'show-workspace-view'
+```
+
+**[:arrow_up: back to top](#0-table-of-contents)**
+
+### 3.2.1. Fonts
+
+Set up the following fonts:
+
+```bash
+sudo dnf install --assumeyes \
+  google-roboto-fonts \
+  google-roboto-mono-fonts
+
+gsettings set org.gnome.desktop.interface document-font-name 'Roboto 10'
+gsettings set org.gnome.desktop.interface font-name 'Roboto 9'
+gsettings set org.gnome.desktop.interface monospace-font-name 'Roboto Mono 10'
+gsettings set org.gnome.desktop.wm.preferences titlebar-font 'Roboto 10'
 ```
 
 **[:arrow_up: back to top](#0-table-of-contents)**
