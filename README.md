@@ -1,4 +1,11 @@
-# Fedora Workstation Installation Guide
+<div align="center">
+  <br>
+  <img src="images/fedora-logo.png" alt="Fedora" width="350"/>
+  <br>
+  <br>
+</div>
+
+# Workstation Installation Guide
 
 Installation guide and **personal** post-installation steps.  
 This purpose of this document is to provide a quick, clean and minimal Fedora-based setup.
@@ -38,7 +45,7 @@ Details provided here are mostly for educational and information purposes, and t
 
 ## 0. Table of Contents
 
-- [Fedora Workstation Installation Guide](#fedora-workstation-installation-guide)
+- [Workstation Installation Guide](#workstation-installation-guide)
   - [0. Table of Contents](#0-table-of-contents)
   - [1. System Installation](#1-system-installation)
   - [2. System Setup](#2-system-setup)
