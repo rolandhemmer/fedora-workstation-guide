@@ -253,19 +253,24 @@ sudo dracut --force
 
 ### 3.4. Multimedia Codecs
 
-Install the multimedia codecs for DRM-protected content:
+Install the multimedia codecs for hardware-acceleration and content playback:
 
 ```bash
+sudo dnf config-manager --set-enable fedora-cisco-openh264
+
 sudo dnf install --assumeyes \
     ffmpeg \
+    ffmpeg-libs \
     gstreamer1-libav \
     gstreamer1-plugins-{bad-\*,good-\*,base} \
     gstreamer1-plugin-openh264 \
+    mozilla-openh264 \
     lame\* \
     --exclude=gstreamer1-plugins-bad-free-devel \
     --exclude=lame-devel
 
-sudo dnf group upgrade --assumeyes --with-optional Multimedia
+sudo dnf group update --assumeyes --with-optional multimedia
+flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
