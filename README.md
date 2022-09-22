@@ -78,21 +78,22 @@ All other trademarks and copyrights are property of their respective owners and 
       - [3.3.2. Auto Kernel Signing](#332-auto-kernel-signing)
       - [3.3.3. Installation](#333-installation)
     - [3.4. Multimedia Codecs](#34-multimedia-codecs)
-  - [4. Desktop Setup](#4-desktop-setup)
-    - [4.1. Desktop Settings](#41-desktop-settings)
-      - [4.1.1. Global](#411-global)
-      - [4.1.2. Fonts](#412-fonts)
-    - [4.2. Desktop Extensions](#42-desktop-extensions)
-      - [4.2.1. Prerequisites](#421-prerequisites)
-      - [4.2.2. Extensions List](#422-extensions-list)
-    - [4.3. Desktop Theme](#43-desktop-theme)
-      - [4.3.1. Prerequisites](#431-prerequisites)
-      - [4.3.2. Shell Theme](#432-shell-theme)
-      - [4.3.3. Icon Theme](#433-icon-theme)
-      - [4.3.4. Cursor Theme](#434-cursor-theme)
-  - [5. Terminal Setup](#5-terminal-setup)
-    - [5.1. Terminal Settings](#51-terminal-settings)
-    - [5.2. Terminal Theme](#52-terminal-theme)
+  - [5. System Hardening](#5-system-hardening)
+  - [6. Terminal Setup](#6-terminal-setup)
+    - [6.1. Terminal Settings](#61-terminal-settings)
+    - [6.2. Terminal Theme](#62-terminal-theme)
+  - [7. Desktop Setup](#7-desktop-setup)
+    - [7.1. Desktop Settings](#71-desktop-settings)
+      - [7.1.1. Global](#711-global)
+      - [7.1.2. Fonts](#712-fonts)
+    - [7.2. Desktop Extensions](#72-desktop-extensions)
+      - [7.2.1. Prerequisites](#721-prerequisites)
+      - [7.2.2. Extensions List](#722-extensions-list)
+    - [7.3. Desktop Theme](#73-desktop-theme)
+      - [7.3.1. Prerequisites](#731-prerequisites)
+      - [7.3.2. Shell Theme](#732-shell-theme)
+      - [7.3.3. Icon Theme](#733-icon-theme)
+      - [7.3.4. Cursor Theme](#734-cursor-theme)
 
 ## 2. System Installation
 
@@ -282,11 +283,59 @@ flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-## 4. Desktop Setup
+## 5. System Hardening
 
-### 4.1. Desktop Settings
+<WIP>
 
-#### 4.1.1. Global
+## 6. Terminal Setup
+
+### 6.1. Terminal Settings
+
+Install `zsh` and `oh-my-zsh`:
+
+```bash
+sudo dnf install --assumeyes \
+  neofetch \
+  util-linux-user \
+  zsh
+
+sudo usermod --shell /bin/zsh $USER
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+<div align="center">
+
+  | :warning: A reboot is required after this point |
+  | ----------------------------------------------- |
+  | `sudo reboot`                                   |
+
+</div>
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
+
+### 6.2. Terminal Theme
+
+Install the [Monokai terminal theme](https://github.com/0xcomposure/monokai-gnome-terminal):
+
+```bash
+sudo dnf install --assumeyes dconf
+
+mkdir --parents ~/.themes/_sources/Monokai
+cd ~/.themes/_sources/Monokai
+
+git clone "https://github.com/0xComposure/monokai-gnome-terminal" terminal
+cd terminal
+
+echo "1\nYES\n" | ./install.sh
+```
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
+
+## 7. Desktop Setup
+
+### 7.1. Desktop Settings
+
+#### 7.1.1. Global
 
 Use the following to configure GNOME settings:
 
@@ -310,7 +359,7 @@ gsettings set org.gtk.Settings.FileChooser show-hidden true
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 4.1.2. Fonts
+#### 7.1.2. Fonts
 
 Set up the following fonts:
 
@@ -327,9 +376,9 @@ gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 11"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 4.2. Desktop Extensions
+### 7.2. Desktop Extensions
 
-#### 4.2.1. Prerequisites
+#### 7.2.1. Prerequisites
 
 Install the GNOME extension manager:
 
@@ -357,7 +406,7 @@ sudo mv --verbose gnome-shell-extension-installer /usr/bin/
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 4.2.2. Extensions List
+#### 7.2.2. Extensions List
 
 - Alphabetical App Grid
 
@@ -497,9 +546,9 @@ gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 4.3. Desktop Theme
+### 7.3. Desktop Theme
 
-#### 4.3.1. Prerequisites
+#### 7.3.1. Prerequisites
 
 ```bash
 mkdir --parents ~/.themes/_sources/Colloid
@@ -511,7 +560,7 @@ sudo dnf install --assumeyes \
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 4.3.2. Shell Theme
+#### 7.3.2. Shell Theme
 
 Use the following commands to install the [Colloid GTK theme](https://github.com/vinceliuice/Colloid-gtk-theme):
 
@@ -532,7 +581,7 @@ gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 4.3.3. Icon Theme
+#### 7.3.3. Icon Theme
 
 Use the following commands to install the [Colloid icon theme](https://github.com/vinceliuice/Colloid-icon-theme):
 
@@ -551,7 +600,7 @@ gsettings set org.gnome.desktop.interface icon-theme "Colloid"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 4.3.4. Cursor Theme
+#### 7.3.4. Cursor Theme
 
 Use the following commands to install the [Colloid cursor theme](https://github.com/vinceliuice/Colloid-icon-theme):
 
@@ -564,50 +613,6 @@ cd cursors/cursors
 ./install.sh
 
 gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
-```
-
-**[:arrow_up: Back to Top](#1-table-of-contents)**
-
-## 5. Terminal Setup
-
-### 5.1. Terminal Settings
-
-Install `zsh` and `oh-my-zsh`:
-
-```bash
-sudo dnf install --assumeyes \
-  neofetch \
-  util-linux-user \
-  zsh
-
-sudo usermod --shell /bin/zsh $USER
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-```
-
-<div align="center">
-
-  | :warning: A reboot is required after this point |
-  | ----------------------------------------------- |
-  | `sudo reboot`                                   |
-
-</div>
-
-**[:arrow_up: Back to Top](#1-table-of-contents)**
-
-### 5.2. Terminal Theme
-
-Install the [Monokai terminal theme](https://github.com/0xcomposure/monokai-gnome-terminal):
-
-```bash
-sudo dnf install --assumeyes dconf
-
-mkdir --parents ~/.themes/_sources/Monokai
-cd ~/.themes/_sources/Monokai
-
-git clone "https://github.com/0xComposure/monokai-gnome-terminal" terminal
-cd terminal
-
-echo "1\nYES\n" | ./install.sh
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
