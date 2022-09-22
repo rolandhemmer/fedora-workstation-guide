@@ -78,7 +78,7 @@ All other trademarks and copyrights are property of their respective owners and 
       - [3.3.2. Auto Kernel Signing](#332-auto-kernel-signing)
       - [3.3.3. Installation](#333-installation)
     - [3.4. Multimedia Codecs](#34-multimedia-codecs)
-  - [4. Environment Setup](#4-environment-setup)
+  - [4. Desktop Setup](#4-desktop-setup)
     - [4.1. Desktop Settings](#41-desktop-settings)
       - [4.2.1. Global](#421-global)
       - [4.2.1. Fonts](#421-fonts)
@@ -90,6 +90,9 @@ All other trademarks and copyrights are property of their respective owners and 
       - [4.4.2. Shell Theme](#442-shell-theme)
       - [4.4.3. Icon Theme](#443-icon-theme)
       - [4.4.4. Cursor Theme](#444-cursor-theme)
+  - [5. Terminal Setup](#5-terminal-setup)
+    - [5.1. Terminal Settings](#51-terminal-settings)
+    - [5.2. Terminal Theme](#52-terminal-theme)
 
 ## 2. System Installation
 
@@ -279,7 +282,7 @@ flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-## 4. Environment Setup
+## 4. Desktop Setup
 
 ### 4.1. Desktop Settings
 
@@ -568,6 +571,50 @@ cd cursors
 ./install.sh
 
 gsettings set org.gnome.desktop.interface cursor-theme "WhiteSur-cursors"
+```
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
+
+## 5. Terminal Setup
+
+### 5.1. Terminal Settings
+
+Install `zsh` and `oh-my-zsh`:
+
+```bash
+sudo dnf install --assumeyes \
+  neofetch \
+  util-linux-user \
+  zsh
+
+sudo usermod --shell /bin/zsh $USER
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+<div align="center">
+
+  | :warning: A reboot is required after this point |
+  | ----------------------------------------------- |
+  | `sudo reboot`                                   |
+
+</div>
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
+
+### 5.2. Terminal Theme
+
+Install the [Monokai terminal theme](https://github.com/0xcomposure/monokai-gnome-terminal):
+
+```bash
+sudo dnf install --assumeyes dconf
+
+mkdir --parents ~/.themes/_sources/Monokai
+cd ~/.themes/_sources/Monokai
+
+git clone "https://github.com/0xComposure/monokai-gnome-terminal" terminal
+cd terminal
+
+echo "1\nYES\n" | ./install.sh
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
