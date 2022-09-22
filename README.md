@@ -27,7 +27,7 @@ Details provided here are mostly for educational and information purposes, and t
 | ----------------------------------------- | ----------------------------------------------------------------------- |
 | Operating System                          | [Fedora Workstation 36](https://getfedora.org/en/workstation/download/) |
 | Operating System Version                  | 36 (x86_x64)                                                            |
-| Desktop Environment                       | [Pantheon](https://elementary.io/)                                      |
+| Desktop Environment                       | [Gnome](https://www.gnome.org/)                                         |
 | Desktop Theme                             | [WhiteSur](https://github.com/vinceliuice/WhiteSur-gtk-theme)           |
 | Preferred Application Installation Method | [Flatpak](https://flatpak.org/)                                         |
 |                                           |                                                                         |
@@ -79,15 +79,17 @@ All other trademarks and copyrights are property of their respective owners and 
       - [3.3.3. Installation](#333-installation)
     - [3.4. Multimedia Codecs](#34-multimedia-codecs)
   - [4. Environment Setup](#4-environment-setup)
-    - [4.1. Desktop Setup](#41-desktop-setup)
-    - [4.2. Desktop Settings](#42-desktop-settings)
+    - [4.1. Desktop Settings](#41-desktop-settings)
       - [4.2.1. Global](#421-global)
       - [4.2.1. Fonts](#421-fonts)
-    - [4.3. Desktop Theme](#43-desktop-theme)
-      - [4.3.1 Prerequisites](#431-prerequisites)
-      - [4.3.2. Shell Theme](#432-shell-theme)
-      - [4.3.3. Icon Theme](#433-icon-theme)
-      - [4.3.4. Cursor Theme](#434-cursor-theme)
+    - [4.3. Desktop Extensions](#43-desktop-extensions)
+      - [4.3.1. Prerequisites](#431-prerequisites)
+      - [4.3.2. Extensions List](#432-extensions-list)
+    - [4.4. Desktop Theme](#44-desktop-theme)
+      - [4.4.1 Prerequisites](#441-prerequisites)
+      - [4.4.2. Shell Theme](#442-shell-theme)
+      - [4.4.3. Icon Theme](#443-icon-theme)
+      - [4.4.4. Cursor Theme](#444-cursor-theme)
 
 ## 2. System Installation
 
@@ -207,6 +209,7 @@ sudo mokutil --import /etc/pki/akmods/certs/public_key.der
 
   | :warning: A reboot is required after this point |
   | ----------------------------------------------- |
+  | `sudo reboot`                                   |
 
   | :red_circle: Manual actions                                                                      |
   | ------------------------------------------------------------------------------------------------ |
@@ -246,6 +249,7 @@ sudo dracut --force
 
   | :warning: A reboot is required after this point |
   | ----------------------------------------------- |
+  | `sudo reboot`                                   |
 
 </div>
 
@@ -277,51 +281,29 @@ flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08
 
 ## 4. Environment Setup
 
-### 4.1. Desktop Setup
-
-Install the Pantheon desktop from elementaryOS:
-
-```bash
-sudo dnf group install --assumeyes "Pantheon Desktop"
-sudo dnf install --assumeyes lightdm
-sudo systemctl disable gdm
-sudo systemctl enable lightdm
-```
-
-<div align="center">
-
-  | :warning: A reboot is required after this point |
-  | ----------------------------------------------- |
-
-</div>
-
-**[:arrow_up: Back to Top](#1-table-of-contents)**
-
-### 4.2. Desktop Settings
+### 4.1. Desktop Settings
 
 #### 4.2.1. Global
 
-Use the following to configure the Pantheon settings:
+Use the following to configure GNOME settings:
 
 ```bash
-gsettings set .io.elementary.terminal.settings unsafe-paste-alert false
-
 gsettings set org.gnome.desktop.calendar show-weekdate true
 gsettings set org.gnome.desktop.interface clock-show-date true
 gsettings set org.gnome.desktop.interface clock-show-weekday true
+gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+gsettings set org.gnome.desktop.interface enable-hot-corners true
+gsettings set org.gnome.desktop.wm.preferences button-layout "close,minimize,maximize:appmenu"
 
 gsettings set org.gnome.mutter center-new-windows true
 
-gsettings set org.pantheon.desktop.gala.behavior hotcorner-topleft "show-workspace-view"
+gsettings set org.gnome.nautilus.preferences default-folder-viewer "list-view"
+gsettings set org.gnome.nautilus.preferences show-hidden-files true
+gsettings set org.gnome.nautilus.window-state sidebar-width 220
+
+gsettings set org.gnome.desktop.interface font-antialiasing "rgba"
+gsettings set org.gtk.Settings.FileChooser show-hidden true
 ```
-
-<div align="center">
-
-| :red_circle: Manual actions                                                                                                                 |
-| ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Go to `System Settings`, `Tweaks`, and in the `Window Control` page:<br>- select `Force to use dark stylesheet`<br>- select `Layout: macOS` |
-
-</div>
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
@@ -334,17 +316,187 @@ sudo dnf install --assumeyes \
   google-roboto-fonts \
   google-roboto-mono-fonts
 
-gsettings set org.gnome.desktop.interface document-font-name "Roboto 10"
-gsettings set org.gnome.desktop.interface font-name "Roboto 9"
+gsettings set org.gnome.desktop.interface document-font-name "Roboto 11"
+gsettings set org.gnome.desktop.interface font-name "Roboto 11"
 gsettings set org.gnome.desktop.interface monospace-font-name "Roboto Mono 10"
-gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 10"
+gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 11"
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 4.3. Desktop Theme
+### 4.3. Desktop Extensions
 
-#### 4.3.1 Prerequisites
+#### 4.3.1. Prerequisites
+
+Install the GNOME extension manager:
+
+```bash
+sudo flatpak install --assumeyes flathub org.gnome.Extensions
+sudo flatpak override --filesystem=home org.gnome.Extensions
+sudo flatpak override --device=dri org.gnome.Extensions
+```
+
+Install the GNOME extension installer:
+
+```bash
+sudo dnf install --assumeyes \
+  bash \
+  curl \
+  dbus \
+  git \
+  less \
+  perl
+
+wget "https://github.com/brunelli/gnome-shell-extension-installer/raw/master/gnome-shell-extension-installer"
+chmod +x gnome-shell-extension-installer
+sudo mv --verbose gnome-shell-extension-installer /usr/bin/
+```
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
+
+#### 4.3.2. Extensions List
+
+- Alphabetical App Grid
+
+```bash
+cd /usr/share/glib-2.0/schemas
+sudo wget "https://raw.githubusercontent.com/stuarthayhurst/alphabetical-grid-extension/master/extension/schemas/org.gnome.shell.extensions.AlphabeticalAppGrid.gschema.xml"
+sudo glib-compile-schemas .
+
+gnome-shell-extension-installer --yes 4269
+```
+
+- Blur my Shell
+
+```bash
+cd /usr/share/glib-2.0/schemas
+sudo wget "https://raw.githubusercontent.com/aunetx/blur-my-shell/master/schemas/org.gnome.shell.extensions.blur-my-shell.gschema.xml"
+sudo glib-compile-schemas .
+
+gnome-shell-extension-installer --yes 3193
+```
+
+- Dash-to-Dock
+
+```bash
+cd /usr/share/glib-2.0/schemas
+sudo wget "https://raw.githubusercontent.com/micheleg/dash-to-dock/master/schemas/org.gnome.shell.extensions.dash-to-dock.gschema.xml"
+sudo glib-compile-schemas .
+
+gnome-shell-extension-installer --yes 307
+```
+
+- GNOME User Themes
+
+```bash
+cd /usr/share/glib-2.0/schemas
+sudo wget "https://gitlab.gnome.org/GNOME/gnome-shell-extensions/-/raw/main/extensions/user-theme/org.gnome.shell.extensions.user-theme.gschema.xml"
+sudo glib-compile-schemas .
+
+gnome-shell-extension-installer --yes 19
+```
+
+- Hide Top Bar
+
+```bash
+cd /usr/share/glib-2.0/schemas
+sudo wget "https://raw.githubusercontent.com/tuxor1337/hidetopbar/master/schemas/org.gnome.shell.extensions.hidetopbar.gschema.xml"
+sudo glib-compile-schemas .
+
+gnome-shell-extension-installer --yes 545
+```
+
+- Tray Icons: Reloaded
+
+```bash
+cd /usr/share/glib-2.0/schemas
+sudo wget "https://raw.githubusercontent.com/MartinPL/Tray-Icons-Reloaded/master/schemas/org.gnome.shell.extensions.trayIconsReloaded.gschema.xml"
+sudo glib-compile-schemas .
+
+gnome-shell-extension-installer --yes 2890
+```
+
+<div align="center">
+
+  | :warning: A logout is required after this point |
+  | ----------------------------------------------- |
+  | `gnome-session-quit --no-prompt`                |
+
+</div>
+
+Once logged back in, run the following commands to:
+
+- enable all the previously installed extensions:
+
+```bash
+gnome-extensions disable background-logo@fedorahosted.org
+
+gnome-extensions enable AlphabeticalAppGrid@stuarthayhurst
+gnome-extensions enable blur-my-shell@aunetx
+gnome-extensions enable dash-to-dock@micxgx.gmail.com
+gnome-extensions enable hidetopbar@mathieu.bidon.ca
+gnome-extensions enable trayIconsReloaded@selfmade.pl
+gnome-extensions enable user-theme@gnome-shell-extensions.gcampax.github.com
+```
+
+- configure them automatically:
+
+```bash
+gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-position "alphabetical"
+gsettings set org.gnome.shell.extensions.alphabetical-app-grid logging-enabled false
+gsettings set org.gnome.shell.extensions.alphabetical-app-grid sort-folder-contents true
+
+gsettings set org.gnome.shell.extensions.blur-my-shell brightness 1.0
+gsettings set org.gnome.shell.extensions.blur-my-shell color-and-noise false
+gsettings set org.gnome.shell.extensions.blur-my-shell hacks-level 1
+gsettings set org.gnome.shell.extensions.blur-my-shell sigma 200
+gsettings set org.gnome.shell.extensions.blur-my-shell.appfolder customize false
+gsettings set org.gnome.shell.extensions.blur-my-shell.applications blur false
+gsettings set org.gnome.shell.extensions.blur-my-shell.applications blur-on-overview false
+gsettings set org.gnome.shell.extensions.blur-my-shell.applications customize false
+gsettings set org.gnome.shell.extensions.blur-my-shell.applications enable-all false
+gsettings set org.gnome.shell.extensions.blur-my-shell.applications opacity 255
+gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur false
+gsettings set org.gnome.shell.extensions.blur-my-shell.hidetopbar compatibility false
+gsettings set org.gnome.shell.extensions.blur-my-shell.overview style-components 0
+gsettings set org.gnome.shell.extensions.blur-my-shell.panel brightness 1.0
+gsettings set org.gnome.shell.extensions.blur-my-shell.panel override-background-dynamically true
+gsettings set org.gnome.shell.extensions.blur-my-shell.panel sigma 0
+gsettings set org.gnome.shell.extensions.blur-my-shell.panel unblur-in-overview true
+gsettings set org.gnome.shell.extensions.blur-my-shell.screenshot blur false
+
+gsettings set org.gnome.shell.extensions.dash-to-dock apply-custom-theme false
+gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 0.0
+gsettings set org.gnome.shell.extensions.dash-to-dock click-action "minimize"
+gsettings set org.gnome.shell.extensions.dash-to-dock custom-background-color false
+gsettings set org.gnome.shell.extensions.dash-to-dock custom-theme-customize-running-dots true
+gsettings set org.gnome.shell.extensions.dash-to-dock custom-theme-running-dots-border-color 'rgb(36,36,36)'
+gsettings set org.gnome.shell.extensions.dash-to-dock custom-theme-shrink true
+gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 42
+gsettings set org.gnome.shell.extensions.dash-to-dock disable-overview-on-startup true
+gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
+gsettings set org.gnome.shell.extensions.dash-to-dock height-fraction 1.0
+gsettings set org.gnome.shell.extensions.dash-to-dock intellihide-mode "MAXIMIZED_WINDOWS"
+gsettings set org.gnome.shell.extensions.dash-to-dock show-mounts-only-mounted false
+gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "FIXED"
+
+gsettings set org.gnome.shell.extensions.hidetopbar enable-active-window true
+gsettings set org.gnome.shell.extensions.hidetopbar enable-intellihide true
+gsettings set org.gnome.shell.extensions.hidetopbar hot-corner true
+gsettings set org.gnome.shell.extensions.hidetopbar keep-round-corners true
+gsettings set org.gnome.shell.extensions.hidetopbar mouse-sensitive false
+gsettings set org.gnome.shell.extensions.hidetopbar mouse-sensitive-fullscreen-window false
+gsettings set org.gnome.shell.extensions.hidetopbar mouse-triggers-overview true
+gsettings set org.gnome.shell.extensions.hidetopbar show-in-overview true
+
+gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
+```
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
+
+### 4.4. Desktop Theme
+
+#### 4.4.1 Prerequisites
 
 ```bash
 mkdir --parents ~/.themes/_sources/WhiteSur
@@ -359,7 +511,7 @@ sudo dnf install --assumeyes \
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 4.3.2. Shell Theme
+#### 4.4.2. Shell Theme
 
 Use the following commands to install the [WhiteSur GTK theme](https://github.com/vinceliuice/WhiteSur-gtk-theme):
 
@@ -377,11 +529,15 @@ cd shell
 
 gsettings set org.gnome.desktop.interface gtk-theme "WhiteSur-Dark-solid"
 gsettings set org.gnome.shell.extensions.user-theme name "WhiteSur-Dark-solid"
+
+sudo ./tweaks.sh \
+  --gdm \
+  --icon fedora
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 4.3.3. Icon Theme
+#### 4.4.3. Icon Theme
 
 Use the following commands to install the [WhiteSur icon theme](https://github.com/vinceliuice/WhiteSur-icon-theme):
 
@@ -391,14 +547,15 @@ cd ~/.themes/_sources/WhiteSur
 git clone "https://github.com/vinceliuice/WhiteSur-icon-theme.git" icons
 cd icons
 
-./install.sh
+./install.sh \
+  --bold
 
 gsettings set org.gnome.desktop.interface icon-theme "WhiteSur-dark"
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 4.3.4. Cursor Theme
+#### 4.4.4. Cursor Theme
 
 Use the following commands to install the [WhiteSur cursor theme](https://github.com/vinceliuice/WhiteSur-cursors):
 
