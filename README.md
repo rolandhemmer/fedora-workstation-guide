@@ -78,23 +78,23 @@ All other trademarks and copyrights are property of their respective owners and 
       - [3.3.2. Auto Kernel Signing](#332-auto-kernel-signing)
       - [3.3.3. Installation](#333-installation)
     - [3.4. Multimedia Codecs](#34-multimedia-codecs)
-  - [5. System Hardening](#5-system-hardening)
-    - [5.1. Kernel Hardening](#51-kernel-hardening)
-  - [6. Terminal Setup](#6-terminal-setup)
-    - [6.1. Terminal Settings](#61-terminal-settings)
-    - [6.2. Terminal Theme](#62-terminal-theme)
-  - [7. Desktop Setup](#7-desktop-setup)
-    - [7.1. Desktop Settings](#71-desktop-settings)
-      - [7.1.1. Global](#711-global)
-      - [7.1.2. Fonts](#712-fonts)
-    - [7.2. Desktop Extensions](#72-desktop-extensions)
-      - [7.2.1. Prerequisites](#721-prerequisites)
-      - [7.2.2. Extensions List](#722-extensions-list)
-    - [7.3. Desktop Theme](#73-desktop-theme)
-      - [7.3.1. Prerequisites](#731-prerequisites)
-      - [7.3.2. Shell Theme](#732-shell-theme)
-      - [7.3.3. Icon Theme](#733-icon-theme)
-      - [7.3.4. Cursor Theme](#734-cursor-theme)
+  - [4. System Hardening](#4-system-hardening)
+    - [4.1. Kernel Hardening](#41-kernel-hardening)
+  - [5. Terminal Setup](#5-terminal-setup)
+    - [5.1. Terminal Settings](#51-terminal-settings)
+    - [5.2. Terminal Theme](#52-terminal-theme)
+  - [6. Desktop Setup](#6-desktop-setup)
+    - [6.1. Desktop Settings](#61-desktop-settings)
+      - [6.1.1. Global](#611-global)
+      - [6.1.2. Fonts](#612-fonts)
+    - [6.2. Desktop Extensions](#62-desktop-extensions)
+      - [6.2.1. Prerequisites](#621-prerequisites)
+      - [6.2.2. Extensions List](#622-extensions-list)
+    - [6.3. Desktop Theme](#63-desktop-theme)
+      - [6.3.1. Prerequisites](#631-prerequisites)
+      - [6.3.2. Shell Theme](#632-shell-theme)
+      - [6.3.3. Icon Theme](#633-icon-theme)
+      - [6.3.4. Cursor Theme](#634-cursor-theme)
 
 ## 2. System Installation
 
@@ -287,9 +287,9 @@ flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-## 5. System Hardening
+## 4. System Hardening
 
-### 5.1. Kernel Hardening
+### 4.1. Kernel Hardening
 
 Update the following kernel settings:
 
@@ -400,9 +400,9 @@ sudo sysctl -p
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-## 6. Terminal Setup
+## 5. Terminal Setup
 
-### 6.1. Terminal Settings
+### 5.1. Terminal Settings
 
 Install `zsh` and `oh-my-zsh`:
 
@@ -426,7 +426,7 @@ sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 6.2. Terminal Theme
+### 5.2. Terminal Theme
 
 Install the [Monokai terminal theme](https://github.com/0xcomposure/monokai-gnome-terminal):
 
@@ -444,11 +444,11 @@ echo "1\nYES\n" | ./install.sh
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-## 7. Desktop Setup
+## 6. Desktop Setup
 
-### 7.1. Desktop Settings
+### 6.1. Desktop Settings
 
-#### 7.1.1. Global
+#### 6.1.1. Global
 
 Use the following to configure GNOME settings:
 
@@ -472,7 +472,7 @@ gsettings set org.gtk.Settings.FileChooser show-hidden true
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 7.1.2. Fonts
+#### 6.1.2. Fonts
 
 Set up the following fonts:
 
@@ -489,9 +489,9 @@ gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 11"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 7.2. Desktop Extensions
+### 6.2. Desktop Extensions
 
-#### 7.2.1. Prerequisites
+#### 6.2.1. Prerequisites
 
 Install the GNOME extension manager:
 
@@ -519,7 +519,7 @@ sudo mv --verbose gnome-shell-extension-installer /usr/bin/
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 7.2.2. Extensions List
+#### 6.2.2. Extensions List
 
 - Alphabetical App Grid
 
@@ -659,9 +659,9 @@ gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 7.3. Desktop Theme
+### 6.3. Desktop Theme
 
-#### 7.3.1. Prerequisites
+#### 6.3.1. Prerequisites
 
 ```bash
 mkdir --parents ~/.themes/_sources/Colloid
@@ -673,7 +673,7 @@ sudo dnf install --assumeyes \
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 7.3.2. Shell Theme
+#### 6.3.2. Shell Theme
 
 Use the following commands to install the [Colloid GTK theme](https://github.com/vinceliuice/Colloid-gtk-theme):
 
@@ -694,7 +694,7 @@ gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 7.3.3. Icon Theme
+#### 6.3.3. Icon Theme
 
 Use the following commands to install the [Colloid icon theme](https://github.com/vinceliuice/Colloid-icon-theme):
 
@@ -713,7 +713,7 @@ gsettings set org.gnome.desktop.interface icon-theme "Colloid"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 7.3.4. Cursor Theme
+#### 6.3.4. Cursor Theme
 
 Use the following commands to install the [Colloid cursor theme](https://github.com/vinceliuice/Colloid-icon-theme):
 
