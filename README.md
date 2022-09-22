@@ -80,16 +80,16 @@ All other trademarks and copyrights are property of their respective owners and 
     - [3.4. Multimedia Codecs](#34-multimedia-codecs)
   - [4. Desktop Setup](#4-desktop-setup)
     - [4.1. Desktop Settings](#41-desktop-settings)
-      - [4.2.1. Global](#421-global)
-      - [4.2.1. Fonts](#421-fonts)
-    - [4.3. Desktop Extensions](#43-desktop-extensions)
+      - [4.1.1. Global](#411-global)
+      - [4.1.2. Fonts](#412-fonts)
+    - [4.2. Desktop Extensions](#42-desktop-extensions)
+      - [4.2.1. Prerequisites](#421-prerequisites)
+      - [4.2.2. Extensions List](#422-extensions-list)
+    - [4.3. Desktop Theme](#43-desktop-theme)
       - [4.3.1. Prerequisites](#431-prerequisites)
-      - [4.3.2. Extensions List](#432-extensions-list)
-    - [4.4. Desktop Theme](#44-desktop-theme)
-      - [4.4.1 Prerequisites](#441-prerequisites)
-      - [4.4.2. Shell Theme](#442-shell-theme)
-      - [4.4.3. Icon Theme](#443-icon-theme)
-      - [4.4.4. Cursor Theme](#444-cursor-theme)
+      - [4.3.2. Shell Theme](#432-shell-theme)
+      - [4.3.3. Icon Theme](#433-icon-theme)
+      - [4.3.4. Cursor Theme](#434-cursor-theme)
   - [5. Terminal Setup](#5-terminal-setup)
     - [5.1. Terminal Settings](#51-terminal-settings)
     - [5.2. Terminal Theme](#52-terminal-theme)
@@ -286,7 +286,7 @@ flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08
 
 ### 4.1. Desktop Settings
 
-#### 4.2.1. Global
+#### 4.1.1. Global
 
 Use the following to configure GNOME settings:
 
@@ -310,7 +310,7 @@ gsettings set org.gtk.Settings.FileChooser show-hidden true
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 4.2.1. Fonts
+#### 4.1.2. Fonts
 
 Set up the following fonts:
 
@@ -327,9 +327,9 @@ gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 11"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 4.3. Desktop Extensions
+### 4.2. Desktop Extensions
 
-#### 4.3.1. Prerequisites
+#### 4.2.1. Prerequisites
 
 Install the GNOME extension manager:
 
@@ -357,7 +357,7 @@ sudo mv --verbose gnome-shell-extension-installer /usr/bin/
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 4.3.2. Extensions List
+#### 4.2.2. Extensions List
 
 - Alphabetical App Grid
 
@@ -497,9 +497,9 @@ gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 4.4. Desktop Theme
+### 4.3. Desktop Theme
 
-#### 4.4.1 Prerequisites
+#### 4.3.1. Prerequisites
 
 ```bash
 mkdir --parents ~/.themes/_sources/WhiteSur
@@ -514,7 +514,7 @@ sudo dnf install --assumeyes \
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 4.4.2. Shell Theme
+#### 4.3.2. Shell Theme
 
 Use the following commands to install the [WhiteSur GTK theme](https://github.com/vinceliuice/WhiteSur-gtk-theme):
 
@@ -540,7 +540,7 @@ sudo ./tweaks.sh \
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 4.4.3. Icon Theme
+#### 4.3.3. Icon Theme
 
 Use the following commands to install the [WhiteSur icon theme](https://github.com/vinceliuice/WhiteSur-icon-theme):
 
@@ -558,7 +558,7 @@ gsettings set org.gnome.desktop.interface icon-theme "WhiteSur-dark"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 4.4.4. Cursor Theme
+#### 4.3.4. Cursor Theme
 
 Use the following commands to install the [WhiteSur cursor theme](https://github.com/vinceliuice/WhiteSur-cursors):
 
