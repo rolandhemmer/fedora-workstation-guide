@@ -326,9 +326,6 @@ kernel.kexec_load_disabled=1
 # Disable the SysRq key completely
 kernel.sysrq=0
 
-# Disable user namespaces to reduce attack surface for privileges escalation
-user.max_user_namespaces=0
-
 # Restrict most of the performance events to the CAP_PERFMON capability
 kernel.perf_event_paranoid=2
 
@@ -344,33 +341,8 @@ net.ipv4.tcp_rfc1337=1
 net.ipv4.conf.all.rp_filter=1
 net.ipv4.conf.default.rp_filter=1
 
-# Prevent man-in-the-middle attacks and minimize information disclosure
-net.ipv4.conf.all.accept_redirects=0
-net.ipv4.conf.default.accept_redirects=0
-net.ipv4.conf.all.secure_redirects=0
-net.ipv4.conf.default.secure_redirects=0
-net.ipv6.conf.all.accept_redirects=0
-net.ipv6.conf.default.accept_redirects=0
-net.ipv4.conf.all.send_redirects=0
-net.ipv4.conf.default.send_redirects=0
-
 # Avoid Smurf attacks and prevent clock fingerprinting through ICMP timestamps
 net.ipv4.icmp_echo_ignore_all=1
-
-# Disable source routing to avoid man-in-the-middle attacks
-net.ipv4.conf.all.accept_source_route=0
-net.ipv4.conf.default.accept_source_route=0
-net.ipv6.conf.all.accept_source_route=0
-net.ipv6.conf.default.accept_source_route=0
-
-# Disable IPv6 router advertisements to avoid man-in-the-middle attacks
-net.ipv6.conf.all.accept_ra=0
-net.ipv6.conf.default.accept_ra=0
-
-# Disable TCP SACK
-net.ipv4.tcp_sack=0
-net.ipv4.tcp_dsack=0
-net.ipv4.tcp_fack=0
 
 ## User Space Protection
 
