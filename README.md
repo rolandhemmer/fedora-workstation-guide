@@ -28,7 +28,7 @@ Details provided here are mostly for educational and information purposes, and t
 | Operating System                          | [Fedora Workstation 36](https://getfedora.org/en/workstation/download/) |
 | Operating System Version                  | 36 (x86_x64)                                                            |
 | Desktop Environment                       | [Gnome](https://www.gnome.org/)                                         |
-| Desktop Theme                             | [WhiteSur](https://github.com/vinceliuice/WhiteSur-gtk-theme)           |
+| Desktop Theme                             | [Colloid](https://github.com/vinceliuice/Colloid-gtk-theme)             |
 | Preferred Application Installation Method | [Flatpak](https://flatpak.org/)                                         |
 |                                           |                                                                         |
 | UEFI                                      | :heavy_check_mark: Enabled                                              |
@@ -502,75 +502,68 @@ gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
 #### 4.3.1. Prerequisites
 
 ```bash
-mkdir --parents ~/.themes/_sources/WhiteSur
+mkdir --parents ~/.themes/_sources/Colloid
 
 sudo dnf install --assumeyes \
-  glib2-devel \
-  inkscape \
-  libxml2 \
-  optipng \
-  sassc
+  gnome-themes-extra \
+  gtk-murrine-engine
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
 #### 4.3.2. Shell Theme
 
-Use the following commands to install the [WhiteSur GTK theme](https://github.com/vinceliuice/WhiteSur-gtk-theme):
+Use the following commands to install the [Colloid GTK theme](https://github.com/vinceliuice/Colloid-gtk-theme):
 
 ```bash
-cd ~/.themes/_sources/WhiteSur
+cd ~/.themes/_sources/Colloid
 
-git clone "https://github.com/vinceliuice/WhiteSur-gtk-theme.git" shell
+git clone "https://github.com/vinceliuice/Colloid-gtk-theme.git" shell
 cd shell
 
 ./install.sh \
-  --icon fedora \
-  --libadwaita \
-  --monterey \
-  --opacity solid
+  --color dark \
+  --theme default \
+  --tweaks black rimless
 
-gsettings set org.gnome.desktop.interface gtk-theme "WhiteSur-Dark-solid"
-gsettings set org.gnome.shell.extensions.user-theme name "WhiteSur-Dark-solid"
-
-sudo ./tweaks.sh \
-  --gdm \
-  --icon fedora
+gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
+gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
 #### 4.3.3. Icon Theme
 
-Use the following commands to install the [WhiteSur icon theme](https://github.com/vinceliuice/WhiteSur-icon-theme):
+Use the following commands to install the [Colloid icon theme](https://github.com/vinceliuice/Colloid-icon-theme):
 
 ```bash
-cd ~/.themes/_sources/WhiteSur
+cd ~/.themes/_sources/Colloid
 
-git clone "https://github.com/vinceliuice/WhiteSur-icon-theme.git" icons
+git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" icons
 cd icons
 
 ./install.sh \
-  --bold
+  --scheme default \
+  --theme default
 
-gsettings set org.gnome.desktop.interface icon-theme "WhiteSur-dark"
+gsettings set org.gnome.desktop.interface icon-theme "Colloid"
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
 #### 4.3.4. Cursor Theme
 
-Use the following commands to install the [WhiteSur cursor theme](https://github.com/vinceliuice/WhiteSur-cursors):
+Use the following commands to install the [Colloid cursor theme](https://github.com/vinceliuice/Colloid-icon-theme):
 
 ```bash
-cd ~/.themes/_sources/WhiteSur
+cd ~/.themes/_sources/Colloid
 
-git clone "https://github.com/vinceliuice/WhiteSur-cursors.git" cursors
-cd cursors
+git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" cursors
+cd cursors/cursors
 
 ./install.sh
 
-gsettings set org.gnome.desktop.interface cursor-theme "WhiteSur-cursors"
+gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
