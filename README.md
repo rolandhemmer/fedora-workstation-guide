@@ -79,6 +79,7 @@ All other trademarks and copyrights are property of their respective owners and 
       - [3.3.3. Installation](#333-installation)
     - [3.4. Multimedia Codecs](#34-multimedia-codecs)
   - [5. System Hardening](#5-system-hardening)
+    - [5.1. Kernel Hardening](#51-kernel-hardening)
   - [6. Terminal Setup](#6-terminal-setup)
     - [6.1. Terminal Settings](#61-terminal-settings)
     - [6.2. Terminal Theme](#62-terminal-theme)
@@ -122,9 +123,12 @@ Perform a full system upgrade:
 ```bash
 gsettings reset org.gnome.desktop.input-sources xkb-options
 
-echo "deltarpm=true" | sudo tee --append /etc/dnf/dnf.conf
-echo "fastestmirror=1" | sudo tee --append /etc/dnf/dnf.conf
-echo "max_parallel_downloads=20" | sudo tee --append /etc/dnf/dnf.conf
+sudo tee --append /etc/dnf/dnf.conf > /dev/null << EOT
+
+deltarpm=true
+fastestmirror=1
+max_parallel_downloads=20
+EOT
 
 sudo dnf upgrade --assumeyes --refresh
 
@@ -211,7 +215,7 @@ sudo mokutil --import /etc/pki/akmods/certs/public_key.der
 
 <div align="center">
 
-  | :warning: A reboot is required after this point |
+  | :warning: A reboot is required for this section |
   | ----------------------------------------------- |
   | `sudo reboot`                                   |
 
@@ -251,7 +255,7 @@ sudo dracut --force
 
 <div align="center">
 
-  | :warning: A reboot is required after this point |
+  | :warning: A reboot is required for this section |
   | ----------------------------------------------- |
   | `sudo reboot`                                   |
 
@@ -285,7 +289,116 @@ flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08
 
 ## 5. System Hardening
 
-<WIP>
+### 5.1. Kernel Hardening
+
+Update the following kernel settings:
+
+```bash
+sudo tee --append /etc/sysctl.conf > /dev/null << EOT
+
+## Kernel Self-Protection
+
+# Reduce buffer overflows attacks
+kernel.randomize_va_space=1
+
+# Mitigate kernel pointer leaks
+kernel.kptr_restrict=2
+
+# Restrict the kernel log to the CAP_SYSLOG capability
+kernel.dmesg_restrict=1
+kernel.printk=3 3 3 3
+
+# Restricts eBPF and reduce its attack surface
+kernel.unprivileged_bpf_disabled=1
+
+# Enable JIT hardening techniques
+net.core.bpf_jit_harden=2
+
+# Restrict loading TTY line disciplines to the CAP_SYS_MODULE capability
+dev.tty.ldisc_autoload=0
+
+# Restrict the userfaultfd() syscall to the CAP_SYS_PTRACE capability
+vm.unprivileged_userfaultfd=0
+
+# Disable the kexec system call to avoid abuses
+kernel.kexec_load_disabled=1
+
+# Disable the SysRq key completely
+kernel.sysrq=0
+
+# Disable user namespaces to reduce attack surface for privileges escalation
+user.max_user_namespaces=0
+
+# Restrict most of the performance events to the CAP_PERFMON capability
+kernel.perf_event_paranoid=2
+
+## Network Protection
+
+# Protect against SYN flood attacks
+net.ipv4.tcp_syncookies=1
+
+# Protect against time-wait assassination
+net.ipv4.tcp_rfc1337=1
+
+# Protect against IP spoofing
+net.ipv4.conf.all.rp_filter=1
+net.ipv4.conf.default.rp_filter=1
+
+# Prevent man-in-the-middle attacks and minimize information disclosure
+net.ipv4.conf.all.accept_redirects=0
+net.ipv4.conf.default.accept_redirects=0
+net.ipv4.conf.all.secure_redirects=0
+net.ipv4.conf.default.secure_redirects=0
+net.ipv6.conf.all.accept_redirects=0
+net.ipv6.conf.default.accept_redirects=0
+net.ipv4.conf.all.send_redirects=0
+net.ipv4.conf.default.send_redirects=0
+
+# Avoid Smurf attacks and prevent clock fingerprinting through ICMP timestamps
+net.ipv4.icmp_echo_ignore_all=1
+
+# Disable source routing to avoid man-in-the-middle attacks
+net.ipv4.conf.all.accept_source_route=0
+net.ipv4.conf.default.accept_source_route=0
+net.ipv6.conf.all.accept_source_route=0
+net.ipv6.conf.default.accept_source_route=0
+
+# Disable IPv6 router advertisements to avoid man-in-the-middle attacks
+net.ipv6.conf.all.accept_ra=0
+net.ipv6.conf.default.accept_ra=0
+
+# Disable TCP SACK
+net.ipv4.tcp_sack=0
+net.ipv4.tcp_dsack=0
+net.ipv4.tcp_fack=0
+
+## User Space Protection
+
+# Restrict usage of ptrace to the CAP_SYS_PTRACE capability
+kernel.yama.ptrace_scope=2
+
+# Prevents hard links from being created by users that do not have read/write access to the source file, and prevent common TOCTOU races
+fs.protected_symlinks=1
+fs.protected_hardlinks=1
+
+# Prevent creating files in potentially attacker-controlled environments
+fs.protected_fifos=2
+fs.protected_regular=2
+
+EOT
+
+sudo sysctl -p
+```
+
+<div align="center">
+
+  | :warning: A reboot is required for this section |
+  | ----------------------------------------------- |
+  | `sudo reboot`                                   |
+
+</div>
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
 
 ## 6. Terminal Setup
 
@@ -305,7 +418,7 @@ sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.
 
 <div align="center">
 
-  | :warning: A reboot is required after this point |
+  | :warning: A reboot is required for this section |
   | ----------------------------------------------- |
   | `sudo reboot`                                   |
 
@@ -470,7 +583,7 @@ gnome-shell-extension-installer --yes 2890
 
 <div align="center">
 
-  | :warning: A logout is required after this point |
+  | :warning: A logout is required for this section |
   | ----------------------------------------------- |
   | `gnome-session-quit --no-prompt`                |
 
