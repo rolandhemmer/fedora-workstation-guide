@@ -85,7 +85,6 @@ All other trademarks and copyrights are property of their respective owners and 
     - [4.2. Boot Hardening](#42-boot-hardening)
   - [5. Terminal Setup](#5-terminal-setup)
     - [5.1. Terminal Settings](#51-terminal-settings)
-    - [5.2. Terminal Theme](#52-terminal-theme)
   - [6. Desktop Setup](#6-desktop-setup)
     - [6.1. Desktop Settings](#61-desktop-settings)
       - [6.1.1. Global](#611-global)
@@ -98,6 +97,7 @@ All other trademarks and copyrights are property of their respective owners and 
       - [6.3.2. Shell Theme](#632-shell-theme)
       - [6.3.3. Icon Theme](#633-icon-theme)
       - [6.3.4. Cursor Theme](#634-cursor-theme)
+      - [6.3.5. Terminal Theme](#635-terminal-theme)
 
 ## 2. System Installation
 
@@ -429,24 +429,6 @@ sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 5.2. Terminal Theme
-
-Install the [Monokai terminal theme](https://github.com/0xcomposure/monokai-gnome-terminal):
-
-```bash
-sudo dnf install --assumeyes dconf
-
-mkdir --parents ~/.themes/_sources/Monokai
-cd ~/.themes/_sources/Monokai
-
-git clone "https://github.com/0xComposure/monokai-gnome-terminal" terminal
-cd terminal
-
-echo "1\nYES\n" | ./install.sh
-```
-
-**[:arrow_up: Back to Top](#1-table-of-contents)**
-
 ## 6. Desktop Setup
 
 ### 6.1. Desktop Settings
@@ -486,7 +468,7 @@ sudo dnf install --assumeyes \
 
 gsettings set org.gnome.desktop.interface document-font-name "Roboto 11"
 gsettings set org.gnome.desktop.interface font-name "Roboto 11"
-gsettings set org.gnome.desktop.interface monospace-font-name "Roboto Mono 10"
+gsettings set org.gnome.desktop.interface monospace-font-name "Roboto Mono 11"
 gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 11"
 ```
 
@@ -732,6 +714,16 @@ cd cursors/cursors
 ./install.sh
 
 gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
+```
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
+
+#### 6.3.5. Terminal Theme
+
+Install the [Tokyo-Night terminal theme](https://github.com/nathanroark/tokyo-night-gnome-terminal):
+
+```bash
+sh -c "$(curl --fail --location --silent --show-error https://raw.githubusercontent.com/nathanroark/tokyo-night-gnome-terminal/main/tokyo-night.sh)"
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
