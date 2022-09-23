@@ -347,9 +347,6 @@ net.ipv4.icmp_echo_ignore_all=1
 
 ## User Space Protection
 
-# Restricts usage of ptrace to the CAP_SYS_PTRACE capability
-kernel.yama.ptrace_scope=2
-
 # Prevents hard links from being created by users that do not have read/write access to the source file, and prevent common TOCTOU races
 fs.protected_symlinks=1
 fs.protected_hardlinks=1
