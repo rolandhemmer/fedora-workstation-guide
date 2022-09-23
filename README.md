@@ -80,6 +80,7 @@ All other trademarks and copyrights are property of their respective owners and 
     - [3.4. Multimedia Codecs](#34-multimedia-codecs)
   - [4. System Hardening](#4-system-hardening)
     - [4.1. Kernel Hardening](#41-kernel-hardening)
+    - [4.2. Boot Hardening](#42-boot-hardening)
   - [5. Terminal Setup](#5-terminal-setup)
     - [5.1. Terminal Settings](#51-terminal-settings)
     - [5.2. Terminal Theme](#52-terminal-theme)
@@ -250,7 +251,7 @@ echo "%global _with_kmod_nvidia_open 1" | sudo tee --append /etc/rpm/macros-nvid
 sudo akmods --force
 
 sudo grubby --update-kernel=ALL --args="nvidia-drm.modeset=1"
-sudo dracut --force
+sudo dracut --regenerate-all --force
 ```
 
 <div align="center">
@@ -298,68 +299,98 @@ sudo tee --append /etc/sysctl.conf > /dev/null << EOT
 
 ## Kernel Self-Protection
 
-# Reduce buffer overflows attacks
+# Reduces buffer overflows attacks
 kernel.randomize_va_space=1
 
-# Mitigate kernel pointer leaks
+# Mitigates kernel pointer leaks
 kernel.kptr_restrict=2
 
-# Restrict the kernel log to the CAP_SYSLOG capability
+# Restricts the kernel log to the CAP_SYSLOG capability
 kernel.dmesg_restrict=1
 kernel.printk=3 3 3 3
 
 # Restricts eBPF and reduce its attack surface
 kernel.unprivileged_bpf_disabled=1
 
-# Enable JIT hardening techniques
+# Enables JIT hardening techniques
 net.core.bpf_jit_harden=2
 
-# Restrict loading TTY line disciplines to the CAP_SYS_MODULE capability
+# Restricts loading TTY line disciplines to the CAP_SYS_MODULE capability
 dev.tty.ldisc_autoload=0
 
-# Restrict the userfaultfd() syscall to the CAP_SYS_PTRACE capability
+# Restricts the userfaultfd() syscall to the CAP_SYS_PTRACE capability
 vm.unprivileged_userfaultfd=0
 
-# Disable the kexec system call to avoid abuses
+# Disables the kexec system call to avoid abuses
 kernel.kexec_load_disabled=1
 
-# Disable the SysRq key completely
+# Disables the SysRq key completely
 kernel.sysrq=0
 
-# Restrict most of the performance events to the CAP_PERFMON capability
+# Restricts most of the performance events to the CAP_PERFMON capability
 kernel.perf_event_paranoid=2
 
 ## Network Protection
 
-# Protect against SYN flood attacks
+# Protects against SYN flood attacks
 net.ipv4.tcp_syncookies=1
 
-# Protect against time-wait assassination
+# Protects against time-wait assassination
 net.ipv4.tcp_rfc1337=1
 
-# Protect against IP spoofing
+# Protects against IP spoofing
 net.ipv4.conf.all.rp_filter=1
 net.ipv4.conf.default.rp_filter=1
 
-# Avoid Smurf attacks and prevent clock fingerprinting through ICMP timestamps
+# Avoids Smurf attacks and prevent clock fingerprinting through ICMP timestamps
 net.ipv4.icmp_echo_ignore_all=1
 
 ## User Space Protection
 
-# Restrict usage of ptrace to the CAP_SYS_PTRACE capability
+# Restricts usage of ptrace to the CAP_SYS_PTRACE capability
 kernel.yama.ptrace_scope=2
 
 # Prevents hard links from being created by users that do not have read/write access to the source file, and prevent common TOCTOU races
 fs.protected_symlinks=1
 fs.protected_hardlinks=1
 
-# Prevent creating files in potentially attacker-controlled environments
+# Prevents creating files in potentially attacker-controlled environments
 fs.protected_fifos=2
 fs.protected_regular=2
 
 EOT
 
 sudo sysctl -p
+```
+
+<div align="center">
+
+  | :warning: A reboot is required for this section |
+  | ----------------------------------------------- |
+  | `sudo reboot`                                   |
+
+</div>
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
+
+### 4.2. Boot Hardening
+
+Update the following boot settings:
+
+```bash
+# "debugfs=off" -> removes sensitive kernel information during boot
+# "init_on_alloc=1 init_on_free=1" -> mitigates use-after-free vulnerabilities and erases sensitive information in memory
+# "lockdown=confidentiality" -> reduces kernel privileges escalation methods via user space (implies "module.sig_enforce=1")
+# "loglevel=0" -> prevents information leaks during boot (implies "quiet" on boot, and "kernel.kptr_restrict=2" on sysctl.conf)
+# "module.sig_enforce=1" -> only allows kernel modules that have been signed with a valid key
+# "page_alloc.shuffle=1" -> improves security by making page allocations less predictable, and improves performance
+# "pti=on" -> mitigates Meltdown and prevents some KASLR bypasses
+# "randomize_kstack_offset=on" -> reduces attacks that rely on deterministic kernel stack layout
+# "slab_nomerge" -> prevents overwriting objects from merged caches
+# "spectre_v2=on spec_store_bypass_disable=on tsx=off tsx_async_abort=full,nosmt mds=full,nosmt l1tf=full,force nosmt=force kvm.nx_huge_pages=force" -> enables all built-in mitigations for all known CPU vulnerabilities (microcode updates should be installed to reduce performance impact)
+# "vsyscall=none" -> disables vsyscalls (obsolete, and replaced by vDSO)
+
+sudo grubby --update-kernel=ALL --args="debugfs=off init_on_alloc=1 init_on_free=1 lockdown=confidentiality loglevel=0 module.sig_enforce=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on slab_nomerge spectre_v2=on spec_store_bypass_disable=on tsx=off tsx_async_abort=full,nosmt mds=full,nosmt l1tf=full,force nosmt=force kvm.nx_huge_pages=force vsyscall=none"
 ```
 
 <div align="center">
