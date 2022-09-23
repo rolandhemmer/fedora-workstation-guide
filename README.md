@@ -689,7 +689,7 @@ cd shell
 ./install.sh \
   --color dark \
   --theme default \
-  --tweaks black rimless
+  --tweaks rimless
 
 gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
 gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
