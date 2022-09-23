@@ -23,21 +23,21 @@ Details provided here are mostly for educational and information purposes, and t
 
 <div align="center">
 
-|                                           |                                                                              |
-| ----------------------------------------- | ---------------------------------------------------------------------------- |
-| Operating System                          | [Fedora Workstation 36](https://getfedora.org/en/workstation/download/)      |
-| Operating System Version                  | 36 (x86_x64)                                                                 |
-| Desktop Environment                       | [Gnome](https://www.gnome.org/)                                              |
-| GNOME Cursor Theme                        | [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)                 |
-| GNOME Icon Theme                          | [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)                 |
-| GNOME Shell Theme                         | [Tokyo-Night](https://github.com/Fausto-Korpsvart/Tokyo-Night-GTK-Theme.git) |
-| Preferred Application Installation Method | [Flatpak](https://flatpak.org/)                                              |
-|                                           |                                                                              |
-| UEFI                                      | :heavy_check_mark: Enabled                                                   |
-| UEFI Password                             | :heavy_check_mark: Enabled                                                   |
-| TPM                                       | :heavy_check_mark: Enabled (v1.2+)                                           |
-| Secure Boot                               | :heavy_check_mark: Enabled                                                   |
-| Disk Encryption                           | :heavy_check_mark: Enabled (LUKS)                                            |
+|                                           |                                                                         |
+| ----------------------------------------- | ----------------------------------------------------------------------- |
+| Operating System                          | [Fedora Workstation 36](https://getfedora.org/en/workstation/download/) |
+| Operating System Version                  | 36 (x86_x64)                                                            |
+| Desktop Environment                       | [Gnome](https://www.gnome.org/)                                         |
+| GNOME Cursor Theme                        | [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)            |
+| GNOME Icon Theme                          | [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)            |
+| GNOME Shell Theme                         | [Colloid](https://github.com/vinceliuice/Colloid-gtk-theme.git)         |
+| Preferred Application Installation Method | [Flatpak](https://flatpak.org/)                                         |
+|                                           |                                                                         |
+| UEFI                                      | :heavy_check_mark: Enabled                                              |
+| UEFI Password                             | :heavy_check_mark: Enabled                                              |
+| TPM                                       | :heavy_check_mark: Enabled (v1.2+)                                      |
+| Secure Boot                               | :heavy_check_mark: Enabled                                              |
+| Disk Encryption                           | :heavy_check_mark: Enabled (LUKS)                                       |
 
 </div>
 
@@ -285,7 +285,6 @@ sudo dnf install --assumeyes \
 
 sudo dnf group update --assumeyes --with-optional multimedia
 sudo flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08
-sudo flatpak override --device=dri
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
@@ -653,23 +652,22 @@ gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
 
 #### 6.3.1. Shell Theme
 
-Use the following commands to install the [Tokyo-Night GTK theme](https://github.com/Fausto-Korpsvart/Tokyo-Night-GTK-Theme):
+Use the following commands to install the [Colloid GTK theme](https://github.com/vinceliuice/Colloid-gtk-theme):
 
 ```bash
-mkdir --parents ~/.themes/_sources/Tokyo-Night
-cd ~/.themes/_sources/Tokyo-Night
+mkdir --parents ~/.themes/_sources/Colloid
+cd ~/.themes/_sources/Colloid
 
-git clone "https://github.com/Fausto-Korpsvart/Tokyo-Night-GTK-Theme.git" shell
+git clone "https://github.com/vinceliuice/Colloid-gtk-theme.git" shell
 cd shell
 
-cd themes
-cp --recursive Tokyonight-Dark-BL ~/.themes/
+./install.sh \
+  --color dark \
+  --theme default \
+  --tweaks rimless
 
-cd Gnome42
-cp Tokyonight-Dark-BL.css ~/.config/gtk-4.0/gtk.css
-
-gsettings set org.gnome.desktop.interface gtk-theme "Tokyonight-Dark-BL"
-gsettings set org.gnome.shell.extensions.user-theme name "Tokyonight-Dark-BL"
+gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
+gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
@@ -714,10 +712,18 @@ gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
 
 #### 6.3.4. Terminal Theme
 
-Install the [Tokyo-Night terminal theme](https://github.com/nathanroark/tokyo-night-gnome-terminal):
+Install the [Monokai terminal theme](https://github.com/0xcomposure/monokai-gnome-terminal):
 
 ```bash
-sh -c "$(curl --fail --location --silent --show-error https://raw.githubusercontent.com/nathanroark/tokyo-night-gnome-terminal/main/tokyo-night.sh)"
+sudo dnf install --assumeyes dconf
+
+mkdir --parents ~/.themes/_sources/Monokai
+cd ~/.themes/_sources/Monokai
+
+git clone "https://github.com/0xComposure/monokai-gnome-terminal" terminal
+cd terminal
+
+echo "1\nYES\n" | ./install.sh
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
