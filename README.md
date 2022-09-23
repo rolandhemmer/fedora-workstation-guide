@@ -23,19 +23,21 @@ Details provided here are mostly for educational and information purposes, and t
 
 <div align="center">
 
-|                                           |                                                                         |
-| ----------------------------------------- | ----------------------------------------------------------------------- |
-| Operating System                          | [Fedora Workstation 36](https://getfedora.org/en/workstation/download/) |
-| Operating System Version                  | 36 (x86_x64)                                                            |
-| Desktop Environment                       | [Gnome](https://www.gnome.org/)                                         |
-| Desktop Theme                             | [Colloid](https://github.com/vinceliuice/Colloid-gtk-theme)             |
-| Preferred Application Installation Method | [Flatpak](https://flatpak.org/)                                         |
-|                                           |                                                                         |
-| UEFI                                      | :heavy_check_mark: Enabled                                              |
-| UEFI Password                             | :heavy_check_mark: Enabled                                              |
-| TPM                                       | :heavy_check_mark: Enabled (v1.2+)                                      |
-| Secure Boot                               | :heavy_check_mark: Enabled                                              |
-| Disk Encryption                           | :heavy_check_mark: Enabled (LUKS)                                       |
+|                                           |                                                                              |
+| ----------------------------------------- | ---------------------------------------------------------------------------- |
+| Operating System                          | [Fedora Workstation 36](https://getfedora.org/en/workstation/download/)      |
+| Operating System Version                  | 36 (x86_x64)                                                                 |
+| Desktop Environment                       | [Gnome](https://www.gnome.org/)                                              |
+| GNOME Cursor Theme                        | [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)                 |
+| GNOME Icon Theme                          | [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)                 |
+| GNOME Shell Theme                         | [Tokyo-Night](https://github.com/Fausto-Korpsvart/Tokyo-Night-GTK-Theme.git) |
+| Preferred Application Installation Method | [Flatpak](https://flatpak.org/)                                              |
+|                                           |                                                                              |
+| UEFI                                      | :heavy_check_mark: Enabled                                                   |
+| UEFI Password                             | :heavy_check_mark: Enabled                                                   |
+| TPM                                       | :heavy_check_mark: Enabled (v1.2+)                                           |
+| Secure Boot                               | :heavy_check_mark: Enabled                                                   |
+| Disk Encryption                           | :heavy_check_mark: Enabled (LUKS)                                            |
 
 </div>
 
@@ -283,7 +285,8 @@ sudo dnf install --assumeyes \
     --exclude=lame-devel
 
 sudo dnf group update --assumeyes --with-optional multimedia
-flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08
+sudo flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08
+sudo flatpak override --device=dri
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
@@ -493,12 +496,18 @@ gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 11"
 
 #### 6.2.1. Prerequisites
 
+Install GNOME tweaks:
+
+```bash
+sudo dnf install --assumeyes gnome-tweaks
+sudo flatpak override --filesystem=xdg-config/gtk-3.0
+sudo flatpak override --filesystem=xdg-config/gtk-4.0
+```
+
 Install the GNOME extension manager:
 
 ```bash
 sudo flatpak install --assumeyes flathub org.gnome.Extensions
-sudo flatpak override --filesystem=home org.gnome.Extensions
-sudo flatpak override --device=dri org.gnome.Extensions
 ```
 
 Install the GNOME extension installer:
@@ -664,32 +673,29 @@ gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
 #### 6.3.1. Prerequisites
 
 ```bash
-mkdir --parents ~/.themes/_sources/Colloid
-
-sudo dnf install --assumeyes \
-  gnome-themes-extra \
-  gtk-murrine-engine
+mkdir --parents ~/.themes/_sources/Tokyo-Night
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
 #### 6.3.2. Shell Theme
 
-Use the following commands to install the [Colloid GTK theme](https://github.com/vinceliuice/Colloid-gtk-theme):
+Use the following commands to install the [Tokyo-Night GTK theme](https://github.com/Fausto-Korpsvart/Tokyo-Night-GTK-Theme):
 
 ```bash
-cd ~/.themes/_sources/Colloid
+cd ~/.themes/_sources/Tokyo-Night
 
-git clone "https://github.com/vinceliuice/Colloid-gtk-theme.git" shell
+git clone "https://github.com/Fausto-Korpsvart/Tokyo-Night-GTK-Theme.git" shell
 cd shell
 
-./install.sh \
-  --color dark \
-  --theme default \
-  --tweaks rimless
+cd themes
+cp --recursive Tokyonight-Dark-BL ~/.themes/
 
-gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
-gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
+cd Gnome42
+cp Tokyonight-Dark-BL.css ~/.config/gtk-4.0/gtk.css
+
+gsettings set org.gnome.desktop.interface gtk-theme "Tokyonight-Dark-BL"
+gsettings set org.gnome.shell.extensions.user-theme name "Tokyonight-Dark-BL"
 ```
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
