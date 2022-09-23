@@ -93,11 +93,10 @@ All other trademarks and copyrights are property of their respective owners and 
       - [6.2.1. Prerequisites](#621-prerequisites)
       - [6.2.2. Extensions List](#622-extensions-list)
     - [6.3. Desktop Theme](#63-desktop-theme)
-      - [6.3.1. Prerequisites](#631-prerequisites)
-      - [6.3.2. Shell Theme](#632-shell-theme)
-      - [6.3.3. Icon Theme](#633-icon-theme)
-      - [6.3.4. Cursor Theme](#634-cursor-theme)
-      - [6.3.5. Terminal Theme](#635-terminal-theme)
+      - [6.3.1. Shell Theme](#631-shell-theme)
+      - [6.3.2. Icon Theme](#632-icon-theme)
+      - [6.3.3. Cursor Theme](#633-cursor-theme)
+      - [6.3.4. Terminal Theme](#634-terminal-theme)
 
 ## 2. System Installation
 
@@ -652,19 +651,12 @@ gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
 
 ### 6.3. Desktop Theme
 
-#### 6.3.1. Prerequisites
-
-```bash
-mkdir --parents ~/.themes/_sources/Tokyo-Night
-```
-
-**[:arrow_up: Back to Top](#1-table-of-contents)**
-
-#### 6.3.2. Shell Theme
+#### 6.3.1. Shell Theme
 
 Use the following commands to install the [Tokyo-Night GTK theme](https://github.com/Fausto-Korpsvart/Tokyo-Night-GTK-Theme):
 
 ```bash
+mkdir --parents ~/.themes/_sources/Tokyo-Night
 cd ~/.themes/_sources/Tokyo-Night
 
 git clone "https://github.com/Fausto-Korpsvart/Tokyo-Night-GTK-Theme.git" shell
@@ -682,11 +674,12 @@ gsettings set org.gnome.shell.extensions.user-theme name "Tokyonight-Dark-BL"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 6.3.3. Icon Theme
+#### 6.3.2. Icon Theme
 
 Use the following commands to install the [Colloid icon theme](https://github.com/vinceliuice/Colloid-icon-theme):
 
 ```bash
+mkdir --parents ~/.themes/_sources/Colloid
 cd ~/.themes/_sources/Colloid
 
 git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" icons
@@ -701,11 +694,12 @@ gsettings set org.gnome.desktop.interface icon-theme "Colloid"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 6.3.4. Cursor Theme
+#### 6.3.3. Cursor Theme
 
 Use the following commands to install the [Colloid cursor theme](https://github.com/vinceliuice/Colloid-icon-theme):
 
 ```bash
+mkdir --parents ~/.themes/_sources/Colloid
 cd ~/.themes/_sources/Colloid
 
 git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" cursors
@@ -718,7 +712,7 @@ gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 6.3.5. Terminal Theme
+#### 6.3.4. Terminal Theme
 
 Install the [Tokyo-Night terminal theme](https://github.com/nathanroark/tokyo-night-gnome-terminal):
 
