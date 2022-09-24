@@ -22,21 +22,21 @@ Details provided here are mostly for educational and information purposes, and t
 
 <div align="center">
 
-|                                           |                                                                         |
-| ----------------------------------------- | ----------------------------------------------------------------------- |
-| Operating System                          | [Fedora Workstation 36](https://getfedora.org/en/workstation/download/) |
-| Operating System Version                  | 36 (x86_x64)                                                            |
-| Desktop Environment                       | [Gnome](https://www.gnome.org/)                                         |
-| GNOME Cursor Theme                        | [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)            |
-| GNOME Icon Theme                          | [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)            |
-| GNOME Shell Theme                         | [Colloid](https://github.com/vinceliuice/Colloid-gtk-theme.git)         |
-| Preferred Application Installation Method | [Flatpak](https://flatpak.org/)                                         |
-|                                           |                                                                         |
-| UEFI                                      | :heavy_check_mark: Enabled                                              |
-| UEFI Password                             | :heavy_check_mark: Enabled                                              |
-| TPM                                       | :heavy_check_mark: Enabled (v1.2+)                                      |
-| Secure Boot                               | :heavy_check_mark: Enabled                                              |
-| Disk Encryption                           | :heavy_check_mark: Enabled (LUKS)                                       |
+|                                           |                                                                      |
+| ----------------------------------------- | -------------------------------------------------------------------- |
+| Operating System                          | [Fedora Workstation](https://getfedora.org/en/workstation/download/) |
+| Operating System Version                  | 36 (x86_x64)                                                         |
+| Desktop Environment                       | [Gnome](https://www.gnome.org/)                                      |
+| GNOME Cursor Theme                        | [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)         |
+| GNOME Icon Theme                          | [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)         |
+| GNOME Shell Theme                         | [Colloid](https://github.com/vinceliuice/Colloid-gtk-theme.git)      |
+| Preferred Application Installation Method | [Flatpak](https://flatpak.org/)                                      |
+|                                           |                                                                      |
+| UEFI                                      | :heavy_check_mark: Enabled                                           |
+| UEFI Password                             | :heavy_check_mark: Enabled                                           |
+| TPM                                       | :heavy_check_mark: Enabled (v2.0+)                                   |
+| Secure Boot                               | :heavy_check_mark: Enabled                                           |
+| Disk Encryption                           | :heavy_check_mark: Enabled (LUKS)                                    |
 
 </div>
 
@@ -70,6 +70,7 @@ See the [LICENSE.md](LICENSE.md) file for the full license text.
   - [4. System Hardening](#4-system-hardening)
     - [4.1. Kernel Hardening](#41-kernel-hardening)
     - [4.2. Boot Hardening](#42-boot-hardening)
+    - [4.3. LUKS Decryption With TPM](#43-luks-decryption-with-tpm)
   - [5. Terminal Setup](#5-terminal-setup)
     - [5.1. Terminal Settings](#51-terminal-settings)
   - [6. Desktop Setup](#6-desktop-setup)
@@ -113,7 +114,6 @@ Perform a full system upgrade:
 gsettings reset org.gnome.desktop.input-sources xkb-options
 
 sudo tee --append /etc/dnf/dnf.conf > /dev/null << EOT
-
 deltarpm=true
 fastestmirror=1
 max_parallel_downloads=20
@@ -271,6 +271,7 @@ sudo dnf install --assumeyes \
     --exclude=lame-devel
 
 sudo dnf group update --assumeyes --with-optional multimedia
+
 sudo flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08
 ```
 
@@ -284,7 +285,6 @@ Update the following kernel settings:
 
 ```bash
 sudo tee --append /etc/sysctl.conf > /dev/null << EOT
-
 ## Kernel Self-Protection
 
 # Reduces buffer overflows attacks
@@ -363,20 +363,81 @@ sudo sysctl -p
 Update the following boot settings:
 
 ```bash
-# "debugfs=off" -> removes sensitive kernel information during boot
-# "init_on_alloc=1 init_on_free=1" -> mitigates use-after-free vulnerabilities and erases sensitive information in memory
-# "lockdown=confidentiality" -> reduces kernel privileges escalation methods via user space (implies "module.sig_enforce=1")
-# "loglevel=0" -> prevents information leaks during boot (implies "quiet" on boot, and "kernel.kptr_restrict=2" on sysctl.conf)
-# "module.sig_enforce=1" -> only allows kernel modules that have been signed with a valid key
-# "page_alloc.shuffle=1" -> improves security by making page allocations less predictable, and improves performance
-# "pti=on" -> mitigates Meltdown and prevents some KASLR bypasses
-# "randomize_kstack_offset=on" -> reduces attacks that rely on deterministic kernel stack layout
-# "slab_nomerge" -> prevents overwriting objects from merged caches
-# "spectre_v2=on spec_store_bypass_disable=on tsx=off tsx_async_abort=full,nosmt mds=full,nosmt l1tf=full,force nosmt=force kvm.nx_huge_pages=force" -> enables all built-in mitigations for all known CPU vulnerabilities (microcode updates should be installed to reduce performance impact)
-# "vsyscall=none" -> disables vsyscalls (obsolete, and replaced by vDSO)
-
 sudo grubby --update-kernel=ALL --args="debugfs=off init_on_alloc=1 init_on_free=1 lockdown=confidentiality loglevel=0 module.sig_enforce=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on slab_nomerge spectre_v2=on spec_store_bypass_disable=on tsx=off tsx_async_abort=full,nosmt mds=full,nosmt l1tf=full,force nosmt=force kvm.nx_huge_pages=force vsyscall=none"
 ```
+
+Details:
+
+  - `debugfs=off`: removes sensitive kernel information during boot
+  - `init_on_alloc=1 init_on_free=1`: mitigates use-after-free vulnerabilities and erases sensitive information in memory
+  - `lockdown=confidentiality`: reduces kernel privileges escalation methods via user space (implies `module.sig_enforce=1`)
+  - `loglevel=0`: prevents information leaks during boot (implies `quiet` on boot, and `kernel.kptr_restrict=2` on sysctl.conf)
+  - `module.sig_enforce=1`: only allows kernel modules that have been signed with a valid key
+  - `page_alloc.shuffle=1`: improves security by making page allocations less predictable, and improves performance
+  - `pti=on`: mitigates Meltdown and prevents some KASLR bypasses
+  - `randomize_kstack_offset=on`: reduces attacks that rely on deterministic kernel stack layout
+  - `slab_nomerge`: prevents overwriting objects from merged caches
+  - `spectre_v2=on spec_store_bypass_disable=on tsx=off tsx_async_abort=full,nosmt mds=full,nosmt l1tf=full,force nosmt=force kvm.nx_huge_pages=force`: enables all built-in mitigations for all known CPU vulnerabilities (microcode updates should be installed to reduce performance impact)
+  - `vsyscall=none`: disables vsyscalls (obsolete, and replaced by vDSO)
+
+<div align="center">
+
+  | :warning: A reboot is required for this section |
+  | ----------------------------------------------- |
+  | `sudo reboot`                                   |
+
+</div>
+
+**[:arrow_up: Back to Top](#1-table-of-contents)**
+
+### 4.3. LUKS Decryption With TPM
+
+First, ensure that:
+
+- a **TPM 2.0 chip** is present and enabled in the UEFI settings
+- **Secure Boot** is enabled in the UEFI settings
+
+Run the following command to have confimation:
+
+```bash
+cat /sys/class/tpm/tpm0/device/description
+```
+
+> Expected result should be:  
+> `TPM 2.0 Device`
+
+Then, identify the **partition** that houses the LUKS container:
+
+```bash
+lsblk
+```
+
+The LUKS container should be named `luks-<GUID>`, of type `crypt`.  
+Once found, it will give you the **parition name**.
+
+> If the system has been installed on an NVMe disk alone, the partition name will likely be:  
+> `/dev/nvme0n1p3`
+
+With all these elements, run:
+
+```bash
+sudo dnf install --assumeyes tpm2-tools
+
+sudo systemd-cryptenroll \
+  --tpm2-device=auto \
+  --tpm2-pcrs=7+8 \
+  <$partition_name>
+
+sudo sed --in-place --expression \
+  "/^luks-/s/$/,tpm2-device=auto/" \
+  /etc/crypttab
+
+echo 'install_optional_items+=" /usr/lib64/libtss2* /usr/lib64/libfido2.so.* /usr/lib64/cryptsetup/libcryptsetup-token-systemd-tpm2.so "' | sudo tee --append /etc/dracut.conf.d/tss2.conf
+
+sudo dracut --regenerate-all --force
+```
+
+If the operation is a success, at next reboot, the LUKS container should be decrypted automatically.
 
 <div align="center">
 
@@ -396,7 +457,6 @@ Install `zsh` and `oh-my-zsh`:
 
 ```bash
 sudo dnf install --assumeyes \
-  neofetch \
   util-linux-user \
   zsh
 
@@ -467,8 +527,6 @@ Install GNOME tweaks:
 
 ```bash
 sudo dnf install --assumeyes gnome-tweaks
-sudo flatpak override --filesystem=xdg-config/gtk-3.0
-sudo flatpak override --filesystem=xdg-config/gtk-4.0
 ```
 
 Install the GNOME extension manager:
