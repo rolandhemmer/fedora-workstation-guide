@@ -78,52 +78,56 @@ print_help() {
 # Functions
 # --------------------------------
 
-log_progress() {
+_install_flatpak() {
+    sudo flatpak install --assumeyes flathub $1 >$NO_OUTPUT 2>&1
+    sudo flatpak override --user --filesystem=home $1
+    sudo flatpak override --user --device=dri $1
+}
+
+_log_progress() {
     echo -e "[ .. ]\t${ECHO_GREY}$1${ECHO_RESET}"
 }
 
-log_success() {
+_log_success() {
     echo -e "[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t${ECHO_GREY}$1${ECHO_RESET}"
 }
 
-log_success_and_replace() {
+_log_success_and_replace() {
     echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t${ECHO_GREY}$1${ECHO_RESET}"
 }
 
-log_title() {
+_log_title() {
     echo -e "${ECHO_BOLD}$1${ECHO_RESET}"
 }
 
 00_update_system() {
-    log_title "==> Updating system"
+    _log_title "==> Updating system"
 
     #
     # Updating DNF settings
     #
 
-    log_progress "Updating DNF settings"
+    _log_progress "Updating DNF settings"
     sudo tee --append /etc/dnf/dnf.conf >$NO_OUTPUT <<EOT
 deltarpm=true
 fastestmirror=1
 max_parallel_downloads=20
 EOT
-    log_success_and_replace "Updating DNF settings"
+    _log_success_and_replace "Updating DNF settings"
 
     #
-    # Enabling Flathub and the Fedora Flatpak registry
+    # Enabling the Flathub repository
     #
 
-    log_progress "Enabling Flathub and the Fedora Flatpak registry"
-    sudo flatpak remote-add --if-not-exists fedora oci+https://registry.fedoraproject.org >$NO_OUTPUT
+    _log_progress "Enabling the Flathub repository"
     sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo >$NO_OUTPUT
-
-    log_success_and_replace "Enabling Flathub and the Fedora Flatpak registry"
+    _log_success_and_replace "Enabling the Flathub repository"
 
     #
-    # Updating and cleaning currently installed Flatpaks
+    # Updating and cleaning currently installed applications
     #
 
-    log_progress "Updating and cleaning currently installed Flatpaks"
+    _log_progress "Updating and cleaning currently installed applications"
 
     flatpak repair --user >$NO_OUTPUT
     flatpak update --assumeyes --user >$NO_OUTPUT
@@ -135,13 +139,13 @@ EOT
 
     sudo flatpak override --reset
 
-    log_success_and_replace "Updating and cleaning currently installed Flatpaks"
+    _log_success_and_replace "Updating and cleaning currently installed applications"
 
     #
     # Enabling the RPM Fusion repositories
     #
 
-    log_progress "Enabling the RPM Fusion repositories"
+    _log_progress "Enabling the RPM Fusion repositories"
 
     sudo dnf install --assumeyes --quiet https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm >$NO_OUTPUT
     sudo dnf install --assumeyes --quiet https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm >$NO_OUTPUT
@@ -152,52 +156,84 @@ EOT
         rpmfusion-nonfree-appstream-data >$NO_OUTPUT
     sudo dnf group update core --assumeyes --quiet >$NO_OUTPUT
 
-    log_success_and_replace "Enabling the RPM Fusion repositories"
+    _log_success_and_replace "Enabling the RPM Fusion repositories"
 
     #
     # Performing a full system upgrade
     #
 
-    log_progress "Performing a full system upgrade"
+    _log_progress "Performing a full system upgrade"
     sudo dnf upgrade --assumeyes --quiet --refresh >$NO_OUTPUT
-    log_success_and_replace "Performing a full system upgrade"
-}
+    _log_success_and_replace "Performing a full system upgrade"
 
-01_update_system_drivers() {
-    log_title "\n==> Updating system drivers"
+    #
+    # Updating system drivers
+    #
+
+    _log_progress "Updating system drivers"
 
     sudo dnf install --assumeyes --quiet fwupd
-
-    log_progress "Fetching updates from the Linux Vendor Firmware Service (LVFS)"
 
     # The 'fwupdmgr' command exits with '1' (as failure) when no update is needed
     sudo fwupdmgr --assume-yes --force refresh >$NO_OUTPUT 2>&1 || true
     sudo fwupdmgr --assume-yes --force get-updates >$NO_OUTPUT 2>&1 || true
 
-    log_success_and_replace "Fetching updates from the Linux Vendor Firmware Service (LVFS)"
+    _log_success_and_replace "Updating system drivers"
+
+    #
+    # Installing Preload
+    #
+
+    _log_progress "Installing Preload"
+
+    sudo dnf copr enable --assumeyes elxreno/preload >$NO_OUTPUT 2>&1
+    sudo dnf install --assumeyes --quiet preload >$NO_OUTPUT
+    sudo systemctl start preload >$NO_OUTPUT
+    sudo systemctl enable preload >$NO_OUTPUT
+
+    _log_success_and_replace "Installing Preload"
 }
 
-02_install_nvidia_drivers() {
-    log_title "\n==> Installing Nvidia drivers"
+01_install_nvidia_drivers() {
+    _log_title "\n==> Installing Nvidia drivers"
 
     #
     # Enabling Nvidia kernel module auto-signing
     #
 
-    log_progress "Enabling Nvidia kernel module auto-signing"
+    _log_progress "Enabling Nvidia kernel module auto-signing"
 
     sudo kmodgenca --auto >$NO_OUTPUT
     sudo mokutil --import /etc/pki/akmods/certs/public_key.der >$NO_OUTPUT
-    sudo dnf config-manager --set-enable rpmfusion-nonfree-nvidia-driver >$NO_OUTPUT
 
-    log_success_and_replace "Enabling Nvidia kernel module auto-signing"
+    _log_success "Enabling Nvidia kernel module auto-signing"
 
     #
     # Installing Nvidia drivers
     #
 
-    log_progress "Installing Nvidia drivers"
+    _log_progress "Installing Nvidia drivers"
 
+    sudo dnf install --assumeyes --quiet \
+        akmods \
+        acpid \
+        curl \
+        dkms \
+        gcc \
+        git \
+        kernel-devel \
+        kernel-headers \
+        libglvnd-glx \
+        libglvnd-opengl \
+        libglvnd-devel \
+        make \
+        mokutil \
+        openssl \
+        pkgconfig \
+        vim \
+        wget >$NO_OUTPUT
+
+    sudo dnf config-manager --set-enable rpmfusion-nonfree-nvidia-driver >$NO_OUTPUT
     sudo dnf install --assumeyes --quiet \
         akmod-nvidia \
         libva-utils \
@@ -207,23 +243,30 @@ EOT
         xorg-x11-drv-nvidia-cuda \
         xorg-x11-drv-nvidia-cuda-libs \
         xorg-x11-drv-nvidia-libs \
-        xorg-x11-drv-nvidia-libs.i686 \
         vulkan-loader >$NO_OUTPUT
 
     echo "%global _with_kmod_nvidia_open 1" | sudo tee --append /etc/rpm/macros-nvidia-kmod >$NO_OUTPUT
     sudo akmods --force >$NO_OUTPUT
+    sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1' >$NO_OUTPUT
 
-    log_success_and_replace "Installing Nvidia drivers"
+    echo "options nvidia_drm modeset=1" | sudo tee --append /etc/modprobe.d/nvidia.conf >$NO_OUTPUT
+    sudo tee --append /etc/dracut.conf.d/nvidia.conf >$NO_OUTPUT <<EOT
+add_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "
+install_items+=" /etc/modprobe.d/nvidia.conf "
+EOT
+    sudo dracut --force
+
+    _log_success_and_replace "Installing Nvidia drivers"
 }
 
-03_harden_system() {
-    log_title "\n==> Hardening system"
+02_harden_system() {
+    _log_title "\n==> Hardening system"
 
     #
     # Enabling kernel self-protection parameters
     #
 
-    log_progress "Enabling kernel self-protection parameters"
+    _log_progress "Enabling kernel self-protection parameters"
 
     sudo tee --append /etc/sysctl.conf >$NO_OUTPUT <<EOT
 ## Kernel Self-Protection
@@ -287,21 +330,21 @@ fs.protected_regular=2
 EOT
 
     sudo sysctl -p >$NO_OUTPUT
-    log_success_and_replace "Enabling kernel self-protection parameters"
+    _log_success_and_replace "Enabling kernel self-protection parameters"
 
     #
     # Enabling recommended boot parameters
     #
 
-    log_progress "Enabling recommended boot parameters"
+    _log_progress "Enabling recommended boot parameters"
 
     sudo grubby --update-kernel=ALL --args="debugfs=off init_on_alloc=1 init_on_free=1 lockdown=confidentiality loglevel=0 module.sig_enforce=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on slab_nomerge spectre_v2=on spec_store_bypass_disable=on tsx=off tsx_async_abort=full,nosmt mds=full,nosmt l1tf=full,force nosmt=force kvm.nx_huge_pages=force vsyscall=none"
 
-    log_success_and_replace "Enabling recommended boot parameters"
+    _log_success_and_replace "Enabling recommended boot parameters"
 }
 
-04_setup_tpm() {
-    log_title "\n==> Setting up TPM for '${_arg_luks_partition}' auto-decryption"
+03_setup_tpm() {
+    _log_title "\n==> Setting up TPM for '${_arg_luks_partition}' auto-decryption"
 
     sudo dnf install --assumeyes --quiet tpm2-tools
 
@@ -309,7 +352,7 @@ EOT
     # Enrolling decryption key in TPM
     #
 
-    log_progress "Enrolling decryption key in TPM"
+    _log_progress "Enrolling decryption key in TPM"
 
     sudo systemd-cryptenroll \
         --tpm2-device=auto \
@@ -323,17 +366,17 @@ EOT
     echo 'install_optional_items+=" /usr/lib64/libtss2* /usr/lib64/libfido2.so.* /usr/lib64/cryptsetup/libcryptsetup-token-systemd-tpm2.so "' | sudo tee --append /etc/dracut.conf.d/tss2.conf >$NO_OUTPUT
     sudo dracut --force
 
-    log_success "Enrolling decryption key in TPM"
+    _log_success "Enrolling decryption key in TPM"
 }
 
-05_install_multimedia_codecs() {
-    log_title "\n==> Installing multimedia codecs"
+04_install_multimedia_codecs() {
+    _log_title "\n==> Installing multimedia codecs"
 
     #
     # Installing required sound and audio codecs
     #
 
-    log_progress "Installing required sound and audio codecs"
+    _log_progress "Installing required sound and audio codecs"
 
     sudo dnf config-manager --assumeyes --quiet --set-enable fedora-cisco-openh264 >$NO_OUTPUT
 
@@ -350,19 +393,17 @@ EOT
 
     sudo dnf group update --assumeyes --quiet --with-optional multimedia >$NO_OUTPUT
 
-    sudo flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08 >$NO_OUTPUT 2>&1
-
-    log_success_and_replace "Installing required sound and audio codecs"
+    _log_success_and_replace "Installing required sound and audio codecs"
 }
 
-06_install_desktop_theme() {
-    log_title "\n==> Installing desktop theme"
+05_install_desktop_theme() {
+    _log_title "\n==> Installing desktop theme"
 
     #
     # Configuring desktop settings
     #
 
-    log_progress "Configuring desktop settings"
+    _log_progress "Configuring desktop settings"
 
     gsettings set org.gnome.desktop.calendar show-weekdate true
     gsettings set org.gnome.desktop.interface clock-show-date true
@@ -377,13 +418,13 @@ EOT
     gsettings set org.gnome.desktop.interface font-antialiasing "rgba"
     gsettings set org.gtk.Settings.FileChooser show-hidden true
 
-    log_success_and_replace "Configuring desktop settings"
+    _log_success_and_replace "Configuring desktop settings"
 
     #
     # Configuring desktop fonts
     #
 
-    log_progress "Configuring desktop fonts"
+    _log_progress "Configuring desktop fonts"
 
     sudo dnf install --assumeyes --quiet \
         google-roboto-fonts \
@@ -394,13 +435,19 @@ EOT
     gsettings set org.gnome.desktop.interface monospace-font-name "Roboto Mono 11"
     gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 11"
 
-    log_success_and_replace "Configuring desktop fonts"
+    _log_success_and_replace "Configuring desktop fonts"
 
     #
     # Installing shell theme
     #
 
-    log_progress "Installing shell theme"
+    _log_progress "Installing shell theme"
+
+    sudo dnf install --assumeyes --quiet \
+        gtk-murrine-engine \
+        gnome-themes-extra \
+        gnome-themes-standard \
+        sassc >$NO_OUTPUT
 
     mkdir --parents ~/.themes/_sources/Colloid || true
 
@@ -416,13 +463,13 @@ EOT
     gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
     gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 
-    log_success_and_replace "Installing shell theme"
+    _log_success_and_replace "Installing shell theme"
 
     #
     # Installing icon theme
     #
 
-    log_progress "Installing icon theme"
+    _log_progress "Installing icon theme"
 
     cd ~/.themes/_sources/Colloid
     # 'git clone' fails is the folder already exists (which is not an error in our case here; allows for the script to be re-run multiple times)
@@ -434,13 +481,13 @@ EOT
         --theme default >$NO_OUTPUT 2>&1
     gsettings set org.gnome.desktop.interface icon-theme "Colloid"
 
-    log_success_and_replace "Installing icon theme"
+    _log_success_and_replace "Installing icon theme"
 
     #
     # Installing cursor theme
     #
 
-    log_progress "Installing cursor theme"
+    _log_progress "Installing cursor theme"
 
     cd ~/.themes/_sources/Colloid
     # 'git clone' fails is the folder already exists (which is not an error in our case here; allows for the script to be re-run multiple times)
@@ -450,20 +497,20 @@ EOT
     ./install.sh >$NO_OUTPUT
     gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
 
-    log_success_and_replace "Installing cursor theme"
+    _log_success_and_replace "Installing cursor theme"
 }
 
-07_install_desktop_extensions() {
-    log_title "\n==> Installing desktop extensions"
+06_install_desktop_extensions() {
+    _log_title "\n==> Installing desktop extensions"
 
     #
-    # Enabling GNOME extensions support
+    # Enabling desktop extensions support
     #
 
-    log_progress "Enabling GNOME extensions support"
+    _log_progress "Enabling desktop extensions support"
 
     sudo dnf install --assumeyes --quiet gnome-tweaks >$NO_OUTPUT
-    sudo flatpak install --assumeyes flathub org.gnome.Extensions >$NO_OUTPUT 2>&1
+    _install_flatpak "org.gnome.Extensions"
 
     sudo dnf install --assumeyes --quiet \
         bash \
@@ -477,13 +524,13 @@ EOT
     chmod +x gnome-shell-extension-installer
     sudo mv gnome-shell-extension-installer /usr/bin/
 
-    log_success_and_replace "Enabling GNOME extensions support"
+    _log_success_and_replace "Enabling desktop extensions support"
 
     #
-    # Installing GNOME extensions
+    # Installing desktop extensions
     #
 
-    log_progress "Installing GNOME extensions"
+    _log_progress "Installing desktop extensions"
 
     cd /usr/share/glib-2.0/schemas
     sudo wget --quiet "https://raw.githubusercontent.com/stuarthayhurst/alphabetical-grid-extension/master/extension/schemas/org.gnome.shell.extensions.AlphabeticalAppGrid.gschema.xml"
@@ -496,17 +543,17 @@ EOT
 
     gnome-shell-extension-installer --yes 4269 3193 307 19 545 2890 >$NO_OUTPUT
 
-    log_success_and_replace "Installing GNOME extensions"
+    _log_success_and_replace "Installing desktop extensions"
 }
 
-08_install_terminal_theme() {
-    log_title "\n==> Installing terminal theme"
+07_install_terminal_theme() {
+    _log_title "\n==> Installing terminal theme"
 
     #
     # Installing shell
     #
 
-    log_progress "Installing shell"
+    _log_progress "Installing shell"
 
     sudo dnf install --assumeyes --quiet \
         util-linux-user \
@@ -515,13 +562,13 @@ EOT
     sudo usermod --shell /bin/zsh $USER >$NO_OUTPUT
     sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" >$NO_OUTPUT 2>&1 || true
 
-    log_success_and_replace "Installing shell"
+    _log_success_and_replace "Installing shell"
 
     #
     # Installing shell theme
     #
 
-    log_progress "Installing shell theme"
+    _log_progress "Installing shell theme"
 
     sudo dnf install --assumeyes --quiet dconf >$NO_OUTPUT
 
@@ -532,7 +579,146 @@ EOT
     cd terminal
     echo "1\nYES\n" | ./install.sh >$NO_OUTPUT 2>&1 || true
 
-    log_success_and_replace "Installing shell theme"
+    _log_success_and_replace "Installing shell theme"
+}
+
+08_install_applications() {
+    _log_title "\n==> Installing applications"
+
+    #
+    # Installing Bleachbit
+    #
+
+    _log_progress "Installing Bleachbit"
+    sudo dnf install --assumeyes --quiet bleachbit >$NO_OUTPUT
+    _log_success_and_replace "Installing Bleachbit"
+
+    #
+    # Installing Discord
+    #
+
+    _log_progress "Installing Discord"
+    _install_flatpak "com.discordapp.Discord"
+    _log_success_and_replace "Installing Discord"
+
+    #
+    # Installing Flatseal
+    #
+
+    _log_progress "Installing Flatseal"
+    _install_flatpak "com.github.tchx84.Flatseal"
+    _log_success_and_replace "Installing Flatseal"
+
+    #
+    # Installing Mozilla Firefox
+    #
+
+    _log_progress "Installing Mozilla Firefox"
+
+    # 'killall' fails is there is no process of that name
+    sudo killall firefox >$NO_OUTPUT 2>&1 || true
+    rm --force --recursive ~/.mozilla
+
+    sudo dnf remove --assumeyes --quiet firefox >$NO_OUTPUT
+    _install_flatpak "org.mozilla.firefox"
+
+    _log_success_and_replace "Installing Mozilla Firefox"
+
+    #
+    # Installing ONLYOFFICE
+    #
+
+    _log_progress "Installing ONLYOFFICE"
+    _install_flatpak "org.onlyoffice.desktopeditors"
+    _log_success_and_replace "Installing ONLYOFFICE"
+
+    #
+    # Installing Visual Studio Code
+    #
+
+    _log_progress "Installing Visual Studio Code"
+
+    sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc >$NO_OUTPUT
+    sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo' >$NO_OUTPUT
+    sudo dnf install --assumeyes --quiet code >$NO_OUTPUT
+
+    _log_success_and_replace "Installing Visual Studio Code"
+
+    #
+    # Installing VLC
+    #
+
+    _log_progress "Installing VLC"
+    _install_flatpak "org.videolan.VLC"
+    _log_success_and_replace "Installing VLC"
+}
+
+09_install_gaming_requirements() {
+    _log_title "\n==> Installing gaming requirements"
+
+    #
+    # Installing required 32-bit libraries
+    #
+
+    _log_progress "Installing required 32-bit libraries"
+
+    sudo dnf install --assumeyes --quiet \
+        freetype.i686 \
+        gnutls.i686 \
+        libgpg-error.i686 \
+        openldap.i686 \
+        pulseaudio-libs.i686 \
+        sqlite2.i686 \
+        vulkan-loader.i686 \
+        xorg-x11-drv-nvidia-libs.i686 >$NO_OUTPUT
+
+    _log_success_and_replace "Installing required 32-bit libraries"
+
+    #
+    # Installing Lutris
+    #
+
+    _log_progress "Installing Lutris"
+    _install_flatpak "net.lutris.Lutris"
+    _log_success_and_replace "Installing Lutris"
+
+    #
+    # Installing Steam
+    #
+
+    _log_progress "Installing Steam"
+    _install_flatpak "com.valvesoftware.Steam"
+    _log_success_and_replace "Installing Steam"
+}
+
+10_cleanup() {
+    _log_title "\n==> Cleaning up"
+
+    _log_progress "Removing unneeded applications"
+
+    sudo dnf remove --assumeyes --quiet \
+        $(rpm --query --all | grep --ignore-case libreoffice) \
+        cheese \
+        evince \
+        gedit \
+        gnome-boxes \
+        gnome-calendar \
+        gnome-camera \
+        gnome-characters \
+        gnome-clocks \
+        gnome-connections \
+        gnome-contacts \
+        gnome-maps \
+        gnome-text-editor \
+        gnome-tour \
+        gnome-weather \
+        liveusb-creator \
+        mozilla-firefox \
+        rhythmbox \
+        totem \
+        yelp >$NO_OUTPUT
+
+    _log_success_and_replace "Removing unneeded applications"
 }
 
 # --------------------------------
@@ -561,21 +747,23 @@ cat <<"EOT"
 EOT
 
 00_update_system
-01_update_system_drivers
 
 if [ ${_arg_nvidia_drivers} = "on" ]; then
-    02_install_nvidia_drivers
+    01_install_nvidia_drivers
 fi
 
-03_harden_system
+02_harden_system
 
 if [ ${_arg_luks_partition} ]; then
-    04_setup_tpm
+    03_setup_tpm
 fi
 
-05_install_multimedia_codecs
-06_install_desktop_theme
-07_install_desktop_extensions
-08_install_terminal_theme
+04_install_multimedia_codecs
+05_install_desktop_theme
+06_install_desktop_extensions
+07_install_terminal_theme
+08_install_applications
+09_install_gaming_requirements
+10_cleanup
 
 echo -e "\n[ ${ECHO_BOLD}DONE${ECHO_RESET} ]"
