@@ -7,10 +7,13 @@
   <br>
 </div>
 
-# Workstation Installation Guide
+# Fedora Workstation Installation Guide
 
 Installation guide and **personal** post-installation steps.  
 This purpose of this document is to provide a quick, clean, minimalistic, gaming-ready, production-ready, Fedora setup.
+
+This installation represents a **personal point-of-view**, with a **private** workstation in mind.  
+Details provided here are mostly for educational and information purposes, and to complete a **personal** vision of what a personal operating system should be.
 
 ## Quick Start
 
@@ -66,11 +69,6 @@ After reboot, finish the installation with:
 
 Done!
 
-## About
-
-This installation represents a **personal point-of-view**, with a **private** workstation in mind.  
-Details provided here are mostly for educational and information purposes, and to complete a **personal** vision of what a personal operating system should be.
-
 ## License
 
 This repository is available under the MIT license.  
@@ -85,9 +83,8 @@ See the [LICENSE.md](LICENSE.md) file for the full license text.
 
 ## 0. Details
 
-- [Workstation Installation Guide](#workstation-installation-guide)
+- [Fedora Workstation Installation Guide](#fedora-workstation-installation-guide)
   - [Quick Start](#quick-start)
-  - [About](#about)
   - [License](#license)
   - [0. Details](#0-details)
   - [1. System Setup](#1-system-setup)
