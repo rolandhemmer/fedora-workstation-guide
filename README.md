@@ -1,8 +1,7 @@
 <div align="center">
   <br>
   <br>
-  <br>
-  <img src="images/fedora-logo.png" alt="Fedora" width="450"/>
+  <img src="images/fedora-logo.png" alt="Fedora" width="350"/>
   <br>
   <br>
   <br>
@@ -10,37 +9,69 @@
 
 # Workstation Installation Guide
 
-**[:arrow_down: Go to Main Content](#1-table-of-contents)**
-
-## 0. About
-
 Installation guide and **personal** post-installation steps.  
-This purpose of this document is to provide a quick, clean and minimal Fedora-based setup.
+This purpose of this document is to provide a quick, clean, minimalistic, gaming-ready, production-ready, Fedora setup.
+
+## Quick Start
+
+Requirements are:
+
+- an UEFI platform (the more up-to-date, the better)
+- the UEFI Secure Boot enabled
+- a TPM 2.0 chip
+- a fresher than fresh Fedora installation, with encryption enabled (LUKS)
+
+These scripts are better run right after the fresh Fedora installation.  
+On the very first reboot, after creating your account:
+
+- disable `Location Services`
+- disable `Automatic Problem Reporting`
+- enable `Third-Party Repositories`
+
+Then, run (**not** as `sudo`):
+
+> All script arguments can be combined.
+
+```bash
+./00_setup.sh
+```
+
+- If you have a Nvidia GPU, run:
+
+```bash
+./00_setup.sh --nvidia-drivers
+```
+
+- If you have an encrypted LUKS installation **and** a TPM 2.0 chip, run:
+
+```bash
+./00_setup.sh --luks-partition="<partition-name>"
+```
+
+> See [4.3. LUKS Decryption With TPM](#43-luks-decryption-with-tpm) on how to identify the correct partition name.  
+> If the system has been installed on an NVMe disk alone, the partition name will likely be:  
+> `/dev/nvme0n1p3`
+
+Once done, reboot to apply changes:
+
+```bash
+sudo reboot
+```
+
+After reboot, finish the installation with:
+
+```bash
+./01_setup.sh
+```
+
+Done!
+
+## About
 
 This installation represents a **personal point-of-view**, with a **private** workstation in mind.  
 Details provided here are mostly for educational and information purposes, and to complete a **personal** vision of what a personal operating system should be.
 
-<div align="center">
-
-|                                           |                                                                      |
-| ----------------------------------------- | -------------------------------------------------------------------- |
-| Operating System                          | [Fedora Workstation](https://getfedora.org/en/workstation/download/) |
-| Operating System Version                  | 36 (x86_x64)                                                         |
-| Desktop Environment                       | [Gnome](https://www.gnome.org/)                                      |
-| GNOME Cursor Theme                        | [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)         |
-| GNOME Icon Theme                          | [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)         |
-| GNOME Shell Theme                         | [Colloid](https://github.com/vinceliuice/Colloid-gtk-theme.git)      |
-| Preferred Application Installation Method | [Flatpak](https://flatpak.org/)                                      |
-|                                           |                                                                      |
-| UEFI                                      | :heavy_check_mark: Enabled                                           |
-| UEFI Password                             | :heavy_check_mark: Enabled                                           |
-| TPM                                       | :heavy_check_mark: Enabled (v2.0+)                                   |
-| Secure Boot                               | :heavy_check_mark: Enabled                                           |
-| Disk Encryption                           | :heavy_check_mark: Enabled (LUKS)                                    |
-
-</div>
-
-### 0.1. License
+## License
 
 This repository is available under the MIT license.  
 It also includes external libraries that are available under a variety of licenses.
@@ -52,61 +83,43 @@ See the [LICENSE.md](LICENSE.md) file for the full license text.
 
 ---
 
-## 1. Table of Contents
+## 0. Details
 
 - [Workstation Installation Guide](#workstation-installation-guide)
-  - [0. About](#0-about)
-    - [0.1. License](#01-license)
-  - [1. Table of Contents](#1-table-of-contents)
-  - [2. System Installation](#2-system-installation)
-  - [3. System Setup](#3-system-setup)
-    - [3.1. System Upgrade](#31-system-upgrade)
-    - [3.2. System Drivers](#32-system-drivers)
-    - [3.3. Nvidia Drivers](#33-nvidia-drivers)
-      - [3.3.1. Prerequisites](#331-prerequisites)
-      - [3.3.2. Auto Kernel Signing](#332-auto-kernel-signing)
-      - [3.3.3. Installation](#333-installation)
-    - [3.4. Multimedia Codecs](#34-multimedia-codecs)
-  - [4. System Hardening](#4-system-hardening)
-    - [4.1. Kernel Hardening](#41-kernel-hardening)
-    - [4.2. Boot Hardening](#42-boot-hardening)
-    - [4.3. LUKS Decryption With TPM](#43-luks-decryption-with-tpm)
-  - [5. Terminal Setup](#5-terminal-setup)
-    - [5.1. Terminal Settings](#51-terminal-settings)
-  - [6. Desktop Setup](#6-desktop-setup)
-    - [6.1. Desktop Settings](#61-desktop-settings)
-      - [6.1.1. Global](#611-global)
-      - [6.1.2. Fonts](#612-fonts)
-    - [6.2. Desktop Extensions](#62-desktop-extensions)
-      - [6.2.1. Prerequisites](#621-prerequisites)
-      - [6.2.2. Extensions List](#622-extensions-list)
-    - [6.3. Desktop Theme](#63-desktop-theme)
-      - [6.3.1. Shell Theme](#631-shell-theme)
-      - [6.3.2. Icon Theme](#632-icon-theme)
-      - [6.3.3. Cursor Theme](#633-cursor-theme)
-      - [6.3.4. Terminal Theme](#634-terminal-theme)
-
-## 2. System Installation
-
-This installation guide requires an UEFI platform.  
-Having a password to access the UEFI menu is **strongly recommended**.
-
-Make sure the UEFI Secure Boot is **enabled**, then boot from the USB installation media.
-
-- From the Fedora GRUB, use `Troubleshooting`, and select `Start Fedora-Workstation-Live in basic graphics mode`.
-- From the Fedora live instance, select a default, full-disk English (US) installation with:
-  - `BTRFS` as filesystem
-  - full `LUKS` disk encryption enabled
-- After first boot:
-  - disable `Location Services`
-  - disable `Automatic Problem Reporting`
-  - enable `Third-Party Repositories`
+  - [Quick Start](#quick-start)
+  - [About](#about)
+  - [License](#license)
+  - [0. Details](#0-details)
+  - [1. System Setup](#1-system-setup)
+    - [1.1. System Upgrade](#11-system-upgrade)
+    - [1.2. System Drivers](#12-system-drivers)
+    - [1.3. Nvidia Drivers](#13-nvidia-drivers)
+      - [1.3.1. Prerequisites](#131-prerequisites)
+      - [1.3.2. Kernel Module Auto-Signing](#132-kernel-module-auto-signing)
+      - [1.3.3. Installation](#133-installation)
+    - [1.4. Multimedia Codecs](#14-multimedia-codecs)
+  - [2. System Hardening](#2-system-hardening)
+    - [2.1. Kernel Hardening](#21-kernel-hardening)
+    - [2.2. Boot Hardening](#22-boot-hardening)
+    - [2.3. LUKS Decryption With TPM](#23-luks-decryption-with-tpm)
+  - [3. Desktop Setup](#3-desktop-setup)
+    - [3.1. Desktop Settings](#31-desktop-settings)
+      - [3.1.1. Global](#311-global)
+      - [3.1.2. Fonts](#312-fonts)
+    - [3.2. Desktop Extensions](#32-desktop-extensions)
+      - [3.2.1. Prerequisites](#321-prerequisites)
+      - [3.2.2. Extensions List](#322-extensions-list)
+    - [3.3. Desktop Theme](#33-desktop-theme)
+      - [3.3.1. Shell Theme](#331-shell-theme)
+      - [3.3.2. Icon Theme](#332-icon-theme)
+      - [3.3.3. Cursor Theme](#333-cursor-theme)
+      - [3.3.4. Terminal Theme](#334-terminal-theme)
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-## 3. System Setup
+## 1. System Setup
 
-### 3.1. System Upgrade
+### 1.1. System Upgrade
 
 Perform a full system upgrade:
 
@@ -152,7 +165,7 @@ sudo dnf group update core --assumeyes
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 3.2. System Drivers
+### 1.2. System Drivers
 
 Add the `fwupd` command, and run it to check for driver and firmware updates:
 
@@ -164,9 +177,9 @@ sudo fwupdmgr get-updates --assume-yes
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 3.3. Nvidia Drivers
+### 1.3. Nvidia Drivers
 
-#### 3.3.1. Prerequisites
+#### 1.3.1. Prerequisites
 
 Install the following prerequisites:
 
@@ -193,7 +206,7 @@ sudo dnf install --assumeyes \
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 3.3.2. Auto Kernel Signing
+#### 1.3.2. Kernel Module Auto-Signing
 
 Enable Nvidia kernel module auto-signing:
 
@@ -216,7 +229,7 @@ sudo mokutil --import /etc/pki/akmods/certs/public_key.der
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 3.3.3. Installation
+#### 1.3.3. Installation
 
 Install the latest Nvidia drivers:
 
@@ -252,7 +265,7 @@ sudo dracut --regenerate-all --force
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 3.4. Multimedia Codecs
+### 1.4. Multimedia Codecs
 
 Install the multimedia codecs for hardware-acceleration and content playback:
 
@@ -277,9 +290,9 @@ sudo flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-## 4. System Hardening
+## 2. System Hardening
 
-### 4.1. Kernel Hardening
+### 2.1. Kernel Hardening
 
 Update the following kernel settings:
 
@@ -358,7 +371,7 @@ sudo sysctl -p
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 4.2. Boot Hardening
+### 2.2. Boot Hardening
 
 Update the following boot settings:
 
@@ -390,7 +403,7 @@ Details:
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 4.3. LUKS Decryption With TPM
+### 2.3. LUKS Decryption With TPM
 
 First, ensure that:
 
@@ -437,7 +450,8 @@ echo 'install_optional_items+=" /usr/lib64/libtss2* /usr/lib64/libfido2.so.* /us
 sudo dracut --regenerate-all --force
 ```
 
-If the operation is a success, at next reboot, the LUKS container should be decrypted automatically.
+If the operation is a success, at next reboot, the LUKS container should be decrypted automatically.  
+Be aware, this operation might be repeated after every kernel update.
 
 <div align="center">
 
@@ -449,36 +463,11 @@ If the operation is a success, at next reboot, the LUKS container should be decr
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-## 5. Terminal Setup
+## 3. Desktop Setup
 
-### 5.1. Terminal Settings
+### 3.1. Desktop Settings
 
-Install `zsh` and `oh-my-zsh`:
-
-```bash
-sudo dnf install --assumeyes \
-  util-linux-user \
-  zsh
-
-sudo usermod --shell /bin/zsh $USER
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-```
-
-<div align="center">
-
-  | :warning: A reboot is required for this section |
-  | ----------------------------------------------- |
-  | `sudo reboot`                                   |
-
-</div>
-
-**[:arrow_up: Back to Top](#1-table-of-contents)**
-
-## 6. Desktop Setup
-
-### 6.1. Desktop Settings
-
-#### 6.1.1. Global
+#### 3.1.1. Global
 
 Use the following to configure GNOME settings:
 
@@ -502,7 +491,7 @@ gsettings set org.gtk.Settings.FileChooser show-hidden true
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 6.1.2. Fonts
+#### 3.1.2. Fonts
 
 Set up the following fonts:
 
@@ -519,9 +508,9 @@ gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 11"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 6.2. Desktop Extensions
+### 3.2. Desktop Extensions
 
-#### 6.2.1. Prerequisites
+#### 3.2.1. Prerequisites
 
 Install GNOME tweaks:
 
@@ -553,7 +542,7 @@ sudo mv --verbose gnome-shell-extension-installer /usr/bin/
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 6.2.2. Extensions List
+#### 3.2.2. Extensions List
 
 - Alphabetical App Grid
 
@@ -693,9 +682,9 @@ gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-### 6.3. Desktop Theme
+### 3.3. Desktop Theme
 
-#### 6.3.1. Shell Theme
+#### 3.3.1. Shell Theme
 
 Use the following commands to install the [Colloid GTK theme](https://github.com/vinceliuice/Colloid-gtk-theme):
 
@@ -717,7 +706,7 @@ gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 6.3.2. Icon Theme
+#### 3.3.2. Icon Theme
 
 Use the following commands to install the [Colloid icon theme](https://github.com/vinceliuice/Colloid-icon-theme):
 
@@ -737,7 +726,7 @@ gsettings set org.gnome.desktop.interface icon-theme "Colloid"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 6.3.3. Cursor Theme
+#### 3.3.3. Cursor Theme
 
 Use the following commands to install the [Colloid cursor theme](https://github.com/vinceliuice/Colloid-icon-theme):
 
@@ -755,7 +744,26 @@ gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
 
 **[:arrow_up: Back to Top](#1-table-of-contents)**
 
-#### 6.3.4. Terminal Theme
+#### 3.3.4. Terminal Theme
+
+Install `zsh` and `oh-my-zsh`:
+
+```bash
+sudo dnf install --assumeyes \
+  util-linux-user \
+  zsh
+
+sudo usermod --shell /bin/zsh $USER
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+```
+
+<div align="center">
+
+  | :warning: A reboot is required for this section |
+  | ----------------------------------------------- |
+  | `sudo reboot`                                   |
+
+</div>
 
 Install the [Monokai terminal theme](https://github.com/0xcomposure/monokai-gnome-terminal):
 
