@@ -111,6 +111,9 @@ See the [LICENSE.md](LICENSE.md) file for the full license text.
       - [4.3.1. Prerequisites](#431-prerequisites)
       - [4.3.2. Extensions List](#432-extensions-list)
   - [5. Terminal Theme](#5-terminal-theme)
+  - [6. Applications](#6-applications)
+  - [7. Gaming](#7-gaming)
+  - [8. Cleanup](#8-cleanup)
 
 **[:arrow_up: Back to Top](#0-details)**
 
@@ -168,7 +171,7 @@ Perform a full system upgrade:
 sudo dnf upgrade --assumeyes --refresh
 ```
 
-Install Preload for improve overall system responsiveness:
+Install [Preload](https://copr.fedorainfracloud.org/coprs/elxreno/preload/):
 
 > Preload is an adaptive readahead daemon. It monitors which programs you use the most, and caches (part of) them to speed up their load time.
 
@@ -606,13 +609,13 @@ gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
 
 #### 4.3.1. Prerequisites
 
-Install GNOME tweaks:
+Install [GNOME tweaks](https://gitlab.gnome.org/GNOME/gnome-tweaks):
 
 ```bash
 sudo dnf install --assumeyes gnome-tweaks
 ```
 
-Install the GNOME extension manager:
+Install the [GNOME extension manager](https://flathub.org/apps/details/org.gnome.Extensions):
 
 ```bash
 sudo flatpak install --assumeyes flathub org.gnome.Extensions
@@ -620,7 +623,7 @@ sudo flatpak override --user --filesystem=home org.gnome.Extensions
 sudo flatpak override --user --device=dri org.gnome.Extensions
 ```
 
-Install the GNOME extension installer:
+Install the [GNOME extension installer](https://github.com/brunelli/gnome-shell-extension-installer):
 
 ```bash
 sudo dnf install --assumeyes \
@@ -640,7 +643,7 @@ sudo mv --verbose gnome-shell-extension-installer /usr/bin/
 
 #### 4.3.2. Extensions List
 
-- Alphabetical App Grid
+- [Alphabetical App Grid](https://extensions.gnome.org/extension/4269/alphabetical-app-grid/)
 
 ```bash
 cd /usr/share/glib-2.0/schemas
@@ -650,7 +653,7 @@ sudo glib-compile-schemas .
 gnome-shell-extension-installer --yes 4269
 ```
 
-- Blur my Shell
+- [Blur my Shell](https://extensions.gnome.org/extension/3193/blur-my-shell/)
 
 ```bash
 cd /usr/share/glib-2.0/schemas
@@ -660,7 +663,7 @@ sudo glib-compile-schemas .
 gnome-shell-extension-installer --yes 3193
 ```
 
-- Dash-to-Dock
+- [Dash-to-Dock](https://extensions.gnome.org/extension/307/dash-to-dock/)
 
 ```bash
 cd /usr/share/glib-2.0/schemas
@@ -670,17 +673,7 @@ sudo glib-compile-schemas .
 gnome-shell-extension-installer --yes 307
 ```
 
-- GNOME User Themes
-
-```bash
-cd /usr/share/glib-2.0/schemas
-sudo wget "https://gitlab.gnome.org/GNOME/gnome-shell-extensions/-/raw/main/extensions/user-theme/org.gnome.shell.extensions.user-theme.gschema.xml"
-sudo glib-compile-schemas .
-
-gnome-shell-extension-installer --yes 19
-```
-
-- Hide Top Bar
+- [Hide Top Bar](https://extensions.gnome.org/extension/545/hide-top-bar/)
 
 ```bash
 cd /usr/share/glib-2.0/schemas
@@ -690,7 +683,7 @@ sudo glib-compile-schemas .
 gnome-shell-extension-installer --yes 545
 ```
 
-- Tray Icons: Reloaded
+- [Tray Icons: Reloaded](https://extensions.gnome.org/extension/2890/tray-icons-reloaded/)
 
 ```bash
 cd /usr/share/glib-2.0/schemas
@@ -698,6 +691,16 @@ sudo wget "https://raw.githubusercontent.com/MartinPL/Tray-Icons-Reloaded/master
 sudo glib-compile-schemas .
 
 gnome-shell-extension-installer --yes 2890
+```
+
+- [User Themes](https://extensions.gnome.org/extension/19/user-themes/)
+
+```bash
+cd /usr/share/glib-2.0/schemas
+sudo wget "https://gitlab.gnome.org/GNOME/gnome-shell-extensions/-/raw/main/extensions/user-theme/org.gnome.shell.extensions.user-theme.gschema.xml"
+sudo glib-compile-schemas .
+
+gnome-shell-extension-installer --yes 19
 ```
 
 <div align="center">
@@ -780,7 +783,7 @@ gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
 
 ## 5. Terminal Theme
 
-Install `zsh` and `oh-my-zsh`:
+Install [zsh](https://www.zsh.org/) and [Oh My Zsh](https://ohmyz.sh/):
 
 ```bash
 sudo dnf install --assumeyes \
@@ -811,6 +814,145 @@ git clone "https://github.com/0xComposure/monokai-gnome-terminal" terminal
 cd terminal
 
 echo "1\nYES\n" | ./install.sh
+```
+
+**[:arrow_up: Back to Top](#0-details)**
+
+## 6. Applications
+
+Install the following applications:
+
+> Giving Flatpak applications access to the $HOME folder applies the custom GTK theme on them, even with sandboxing enabled.
+> Giving access to the GPU `device=dri` enables hardware-acceleration when possible (which might be more hazardous, depending on the application itself).
+> These applications are from trusted sources, as possible.
+
+- [Bleachbit](https://www.bleachbit.org/)
+
+```bash
+sudo dnf install --assumeyes bleachbit
+```
+
+- [Discord](https://discord.com/)
+
+```bash
+sudo flatpak install --assumeyes flathub com.discordapp.Discord
+sudo flatpak override --user --filesystem=home com.discordapp.Discord
+sudo flatpak override --user --device=dri com.discordapp.Discord
+```
+
+- [Flatseal](https://github.com/tchx84/Flatseal)
+
+```bash
+sudo flatpak install --assumeyes flathub com.github.tchx84.Flatseal
+sudo flatpak override --user --filesystem=home com.github.tchx84.Flatseal
+sudo flatpak override --user --device=dri com.github.tchx84.Flatseal
+```
+
+- [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/)
+
+> Replacing the pre-installed RPM with its Flatpak variant for better system consistency:
+
+```bash
+sudo killall firefox
+rm --force --recursive --verbose ~/.mozilla
+
+sudo flatpak install --assumeyes flathub org.mozilla.firefox
+sudo flatpak override --user --filesystem=home org.mozilla.firefox
+sudo flatpak override --user --device=dri org.mozilla.firefox
+```
+
+- [ONLYOFFICE](https://www.onlyoffice.com/s)
+
+```bash
+sudo flatpak install --assumeyes flathub org.onlyoffice.desktopeditors
+sudo flatpak override --user --filesystem=home org.onlyoffice.desktopeditors
+sudo flatpak override --user --device=dri org.onlyoffice.desktopeditors
+```
+
+- [Visual Studio Codium](https://vscodium.com/)
+
+> Codium (or VSCodium) is the full open-source variant of Microsoft's Visual Studio Code.
+> Using the RPM variant instead of the Flatpak one for better system & terminal integration.
+
+```bash
+sudo rpm --import https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/-/raw/master/pub.gpg
+printf "[gitlab.com_paulcarroty_vscodium_repo]\nname=download.vscodium.com\nbaseurl=https://download.vscodium.com/rpms/\nenabled=1\ngpgcheck=1\nrepo_gpgcheck=1\ngpgkey=https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/-/raw/master/pub.gpg\nmetadata_expire=1h" | sudo tee --append /etc/yum.repos.d/vscodium.repo
+sudo dnf install --assumeyes codium
+```
+
+- [VLC](https://www.videolan.org/)
+
+```bash
+sudo flatpak install --assumeyes flathub org.videolan.VLC
+sudo flatpak override --user --filesystem=home org.videolan.VLC
+sudo flatpak override --user --device=dri org.videolan.VLC
+```
+
+**[:arrow_up: Back to Top](#0-details)**
+
+## 7. Gaming
+
+Install the required 32-bit libraries, as prerequisites:
+
+```bash
+sudo dnf install --assumeyes \
+    freetype.i686 \
+    gnutls.i686 \
+    libgpg-error.i686 \
+    openldap.i686 \
+    pulseaudio-libs.i686 \
+    sqlite2.i686 \
+    vulkan-loader.i686
+```
+
+Then, install the following:
+
+- [Lutris](https://lutris.net/)
+
+```bash
+sudo flatpak install --assumeyes flathub net.lutris.Lutris
+sudo flatpak override --user --filesystem=home net.lutris.Lutris
+sudo flatpak override --user --device=dri net.lutris.Lutris
+```
+
+- [Steam](https://store.steampowered.com/)
+
+```bash
+sudo flatpak install --assumeyes flathub com.valvesoftware.Steam
+sudo flatpak override --user --filesystem=home com.valvesoftware.Steam
+sudo flatpak override --user --device=dri com.valvesoftware.Steam
+```
+
+> For other clients like the Epic Games Store and GOG, check out the [Heroic Game Launcher](https://heroicgameslauncher.com/).
+
+**[:arrow_up: Back to Top](#0-details)**
+
+## 8. Cleanup
+
+Finish the installation by removing these unneeded applications:
+
+> This section is truly optional, and more personal.
+
+```bash
+sudo dnf remove --assumeyes \
+    $(rpm --query --all | grep --ignore-case libreoffice) \
+    cheese \
+    evince \
+    gedit \
+    gnome-boxes \
+    gnome-camera \
+    gnome-characters \
+    gnome-clocks \
+    gnome-connections \
+    gnome-contacts \
+    gnome-maps \
+    gnome-text-editor \
+    gnome-tour \
+    gnome-weather \
+    liveusb-creator \
+    rhythmbox \
+    totem \
+    yelp
 ```
 
 **[:arrow_up: Back to Top](#0-details)**

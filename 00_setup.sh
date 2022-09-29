@@ -738,7 +738,6 @@ EOT
         gnome-tour \
         gnome-weather \
         liveusb-creator \
-        mozilla-firefox \
         rhythmbox \
         totem \
         yelp >$NO_OUTPUT
