@@ -717,7 +717,6 @@ EOT
         evince \
         gedit \
         gnome-boxes \
-        gnome-calendar \
         gnome-camera \
         gnome-characters \
         gnome-clocks \
