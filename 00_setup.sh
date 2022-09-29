@@ -103,9 +103,9 @@ _log_title() {
 00_update_system() {
     _log_title "==> Updating system"
 
-    #
+    # ################################################################
     # Updating DNF settings
-    #
+    # ################################################################
 
     _log_progress "Updating DNF settings"
     sudo tee --append /etc/dnf/dnf.conf >$NO_OUTPUT <<EOT
@@ -115,17 +115,19 @@ max_parallel_downloads=20
 EOT
     _log_success_and_replace "Updating DNF settings"
 
-    #
+    # ################################################################
     # Enabling the Flathub repository
-    #
+    # ################################################################
 
     _log_progress "Enabling the Flathub repository"
+
     sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo >$NO_OUTPUT
+
     _log_success_and_replace "Enabling the Flathub repository"
 
-    #
+    # ################################################################
     # Updating and cleaning currently installed applications
-    #
+    # ################################################################
 
     _log_progress "Updating and cleaning currently installed applications"
 
@@ -141,11 +143,11 @@ EOT
 
     _log_success_and_replace "Updating and cleaning currently installed applications"
 
-    #
-    # Enabling the RPM Fusion repositories
-    #
+    # ################################################################
+    # Enabling the Fedora RPM Fusion repositories
+    # ################################################################
 
-    _log_progress "Enabling the RPM Fusion repositories"
+    _log_progress "Enabling the Fedora RPM Fusion repositories"
 
     sudo dnf install --assumeyes --quiet https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm >$NO_OUTPUT
     sudo dnf install --assumeyes --quiet https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm >$NO_OUTPUT
@@ -156,19 +158,21 @@ EOT
         rpmfusion-nonfree-appstream-data >$NO_OUTPUT
     sudo dnf group update core --assumeyes --quiet >$NO_OUTPUT
 
-    _log_success_and_replace "Enabling the RPM Fusion repositories"
+    _log_success_and_replace "Enabling the Fedora RPM Fusion repositories"
 
-    #
+    # ################################################################
     # Performing a full system upgrade
-    #
+    # ################################################################
 
     _log_progress "Performing a full system upgrade"
+
     sudo dnf upgrade --assumeyes --quiet --refresh >$NO_OUTPUT
+
     _log_success_and_replace "Performing a full system upgrade"
 
-    #
+    # ################################################################
     # Updating system drivers
-    #
+    # ################################################################
 
     _log_progress "Updating system drivers"
 
@@ -180,9 +184,9 @@ EOT
 
     _log_success_and_replace "Updating system drivers"
 
-    #
+    # ################################################################
     # Installing Preload
-    #
+    # ################################################################
 
     _log_progress "Installing Preload"
 
@@ -262,9 +266,9 @@ EOT
 02_harden_system() {
     _log_title "\n==> Hardening system"
 
-    #
+    # ################################################################
     # Enabling kernel self-protection parameters
-    #
+    # ################################################################
 
     _log_progress "Enabling kernel self-protection parameters"
 
@@ -332,9 +336,9 @@ EOT
     sudo sysctl -p >$NO_OUTPUT
     _log_success_and_replace "Enabling kernel self-protection parameters"
 
-    #
+    # ################################################################
     # Enabling recommended boot parameters
-    #
+    # ################################################################
 
     _log_progress "Enabling recommended boot parameters"
 
@@ -346,11 +350,19 @@ EOT
 03_setup_tpm() {
     _log_title "\n==> Setting up TPM for '${_arg_luks_partition}' auto-decryption"
 
-    sudo dnf install --assumeyes --quiet tpm2-tools
+    # ################################################################
+    # Installing prerequisites
+    # ################################################################
 
-    #
+    _log_progress "Installing prerequisites"
+
+    sudo dnf install --assumeyes --quiet tpm2-tools >$NO_OUTPUT
+
+    _log_success_and_replace "Installing prerequisites"
+
+    # ################################################################
     # Enrolling decryption key in TPM
-    #
+    # ################################################################
 
     _log_progress "Enrolling decryption key in TPM"
 
@@ -372,9 +384,9 @@ EOT
 04_install_multimedia_codecs() {
     _log_title "\n==> Installing multimedia codecs"
 
-    #
+    # ################################################################
     # Installing required sound and audio codecs
-    #
+    # ################################################################
 
     _log_progress "Installing required sound and audio codecs"
 
@@ -399,9 +411,9 @@ EOT
 05_install_desktop_theme() {
     _log_title "\n==> Installing desktop theme"
 
-    #
+    # ################################################################
     # Configuring desktop settings
-    #
+    # ################################################################
 
     _log_progress "Configuring desktop settings"
 
@@ -410,19 +422,19 @@ EOT
     gsettings set org.gnome.desktop.interface clock-show-weekday true
     gsettings set org.gnome.desktop.interface color-scheme prefer-dark
     gsettings set org.gnome.desktop.interface enable-hot-corners true
+    gsettings set org.gnome.desktop.interface font-antialiasing "rgba"
     gsettings set org.gnome.desktop.wm.preferences button-layout "close,minimize,maximize:appmenu"
     gsettings set org.gnome.mutter center-new-windows true
     gsettings set org.gnome.nautilus.preferences default-folder-viewer "list-view"
     gsettings set org.gnome.nautilus.preferences show-hidden-files true
     gsettings set org.gnome.nautilus.window-state sidebar-width 220
-    gsettings set org.gnome.desktop.interface font-antialiasing "rgba"
     gsettings set org.gtk.Settings.FileChooser show-hidden true
 
     _log_success_and_replace "Configuring desktop settings"
 
-    #
+    # ################################################################
     # Configuring desktop fonts
-    #
+    # ################################################################
 
     _log_progress "Configuring desktop fonts"
 
@@ -437,9 +449,9 @@ EOT
 
     _log_success_and_replace "Configuring desktop fonts"
 
-    #
+    # ################################################################
     # Installing shell theme
-    #
+    # ################################################################
 
     _log_progress "Installing shell theme"
 
@@ -460,14 +472,15 @@ EOT
         --color dark \
         --theme default \
         --tweaks rimless >$NO_OUTPUT
+
     gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
     gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 
     _log_success_and_replace "Installing shell theme"
 
-    #
+    # ################################################################
     # Installing icon theme
-    #
+    # ################################################################
 
     _log_progress "Installing icon theme"
 
@@ -479,13 +492,14 @@ EOT
     ./install.sh \
         --scheme default \
         --theme default >$NO_OUTPUT 2>&1
+
     gsettings set org.gnome.desktop.interface icon-theme "Colloid"
 
     _log_success_and_replace "Installing icon theme"
 
-    #
+    # ################################################################
     # Installing cursor theme
-    #
+    # ################################################################
 
     _log_progress "Installing cursor theme"
 
@@ -503,9 +517,9 @@ EOT
 06_install_desktop_extensions() {
     _log_title "\n==> Installing desktop extensions"
 
-    #
+    # ################################################################
     # Enabling desktop extensions support
-    #
+    # ################################################################
 
     _log_progress "Enabling desktop extensions support"
 
@@ -526,9 +540,9 @@ EOT
 
     _log_success_and_replace "Enabling desktop extensions support"
 
-    #
+    # ################################################################
     # Installing desktop extensions
-    #
+    # ################################################################
 
     _log_progress "Installing desktop extensions"
 
@@ -549,9 +563,9 @@ EOT
 07_install_terminal_theme() {
     _log_title "\n==> Installing terminal theme"
 
-    #
+    # ################################################################
     # Installing shell
-    #
+    # ################################################################
 
     _log_progress "Installing shell"
 
@@ -564,9 +578,9 @@ EOT
 
     _log_success_and_replace "Installing shell"
 
-    #
+    # ################################################################
     # Installing shell theme
-    #
+    # ################################################################
 
     _log_progress "Installing shell theme"
 
@@ -585,33 +599,33 @@ EOT
 08_install_applications() {
     _log_title "\n==> Installing applications"
 
-    #
+    # ################################################################
     # Installing Bleachbit
-    #
+    # ################################################################
 
     _log_progress "Installing Bleachbit"
     sudo dnf install --assumeyes --quiet bleachbit >$NO_OUTPUT
     _log_success_and_replace "Installing Bleachbit"
 
-    #
+    # ################################################################
     # Installing Discord
-    #
+    # ################################################################
 
     _log_progress "Installing Discord"
     _install_flatpak "com.discordapp.Discord"
     _log_success_and_replace "Installing Discord"
 
-    #
+    # ################################################################
     # Installing Flatseal
-    #
+    # ################################################################
 
     _log_progress "Installing Flatseal"
     _install_flatpak "com.github.tchx84.Flatseal"
     _log_success_and_replace "Installing Flatseal"
 
-    #
+    # ################################################################
     # Installing Mozilla Firefox
-    #
+    # ################################################################
 
     _log_progress "Installing Mozilla Firefox"
 
@@ -624,19 +638,21 @@ EOT
 
     _log_success_and_replace "Installing Mozilla Firefox"
 
-    #
+    # ################################################################
     # Installing ONLYOFFICE
-    #
+    # ################################################################
 
     _log_progress "Installing ONLYOFFICE"
     _install_flatpak "org.onlyoffice.desktopeditors"
     _log_success_and_replace "Installing ONLYOFFICE"
 
-    #
+    # ################################################################
     # Installing Visual Studio Code
-    #
+    # ################################################################
 
     _log_progress "Installing Visual Studio Code"
+
+    # Using the non-Flatpak version for a better system/terminal integration
 
     sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc >$NO_OUTPUT
     sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo' >$NO_OUTPUT
@@ -644,9 +660,9 @@ EOT
 
     _log_success_and_replace "Installing Visual Studio Code"
 
-    #
+    # ################################################################
     # Installing VLC
-    #
+    # ################################################################
 
     _log_progress "Installing VLC"
     _install_flatpak "org.videolan.VLC"
@@ -656,9 +672,9 @@ EOT
 09_install_gaming_requirements() {
     _log_title "\n==> Installing gaming requirements"
 
-    #
+    # ################################################################
     # Installing required 32-bit libraries
-    #
+    # ################################################################
 
     _log_progress "Installing required 32-bit libraries"
 
@@ -669,22 +685,21 @@ EOT
         openldap.i686 \
         pulseaudio-libs.i686 \
         sqlite2.i686 \
-        vulkan-loader.i686 \
-        xorg-x11-drv-nvidia-libs.i686 >$NO_OUTPUT
+        vulkan-loader.i686 >$NO_OUTPUT
 
     _log_success_and_replace "Installing required 32-bit libraries"
 
-    #
+    # ################################################################
     # Installing Lutris
-    #
+    # ################################################################
 
     _log_progress "Installing Lutris"
     _install_flatpak "net.lutris.Lutris"
     _log_success_and_replace "Installing Lutris"
 
-    #
+    # ################################################################
     # Installing Steam
-    #
+    # ################################################################
 
     _log_progress "Installing Steam"
     _install_flatpak "com.valvesoftware.Steam"

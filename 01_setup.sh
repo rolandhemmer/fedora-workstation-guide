@@ -70,9 +70,9 @@ log_title() {
 00_configure_desktop_extensions() {
     log_title "\n==> Configuring desktop extensions"
 
-    #
+    # ################################################################
     # Enabling desktop extensions
-    #
+    # ################################################################
 
     log_progress "Enabling desktop extensions"
 
@@ -87,9 +87,9 @@ log_title() {
 
     log_success_and_replace "Enabling desktop extensions"
 
-    #
+    # ################################################################
     # Configuring desktop extensions
-    #
+    # ################################################################
 
     log_progress "Configuring desktop extensions"
 
