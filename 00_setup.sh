@@ -199,24 +199,13 @@ EOT
 }
 
 01_install_nvidia_drivers() {
-    _log_title "\n==> Installing Nvidia drivers"
+    _log_title "\n==> Installing latest Nvidia drivers"
 
-    #
-    # Enabling Nvidia kernel module auto-signing
-    #
+    # ################################################################
+    # Installing prerequisites
+    # ################################################################
 
-    _log_progress "Enabling Nvidia kernel module auto-signing"
-
-    sudo kmodgenca --auto >$NO_OUTPUT
-    sudo mokutil --import /etc/pki/akmods/certs/public_key.der >$NO_OUTPUT
-
-    _log_success "Enabling Nvidia kernel module auto-signing"
-
-    #
-    # Installing Nvidia drivers
-    #
-
-    _log_progress "Installing Nvidia drivers"
+    _log_progress "Installing prerequisites"
 
     sudo dnf install --assumeyes --quiet \
         akmods \
@@ -237,7 +226,27 @@ EOT
         vim \
         wget >$NO_OUTPUT
 
+    _log_success_and_replace "Installing prerequisites"
+
+    # ################################################################
+    # Enabling Nvidia kernel module auto-signing
+    # ################################################################
+
+    _log_progress "Enabling Nvidia kernel module auto-signing"
+
+    sudo kmodgenca --auto >$NO_OUTPUT
+    sudo mokutil --import /etc/pki/akmods/certs/public_key.der >$NO_OUTPUT
+
+    _log_success "Enabling Nvidia kernel module auto-signing"
+
+    # ################################################################
+    # Installing latest Nvidia drivers
+    # ################################################################
+
+    _log_progress "Installing latest Nvidia drivers"
+
     sudo dnf config-manager --set-enable rpmfusion-nonfree-nvidia-driver >$NO_OUTPUT
+
     sudo dnf install --assumeyes --quiet \
         akmod-nvidia \
         libva-utils \
@@ -247,7 +256,9 @@ EOT
         xorg-x11-drv-nvidia-cuda \
         xorg-x11-drv-nvidia-cuda-libs \
         xorg-x11-drv-nvidia-libs \
-        vulkan-loader >$NO_OUTPUT
+        xorg-x11-drv-nvidia-libs.i686 \
+        vulkan-loader \
+        vulkan-loader.i686 >$NO_OUTPUT
 
     echo "%global _with_kmod_nvidia_open 1" | sudo tee --append /etc/rpm/macros-nvidia-kmod >$NO_OUTPUT
     sudo akmods --force >$NO_OUTPUT
@@ -260,7 +271,7 @@ install_items+=" /etc/modprobe.d/nvidia.conf "
 EOT
     sudo dracut --force
 
-    _log_success_and_replace "Installing Nvidia drivers"
+    _log_success_and_replace "Installing latest Nvidia drivers"
 }
 
 02_harden_system() {
