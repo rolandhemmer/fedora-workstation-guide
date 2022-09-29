@@ -10,7 +10,7 @@
 # Fedora Workstation Installation Guide
 
 Installation guide and **personal** post-installation steps.  
-This purpose of this document is to provide a quick, clean, minimalistic, gaming-ready, production-ready, Fedora setup.
+This purpose of this document is to provide a quick, clean, minimalist, gaming-ready, production-ready, Fedora setup.
 
 This installation represents a **personal point-of-view**, with a **private** workstation in mind.  
 Details provided here are mostly for educational and information purposes, and to complete a **personal** vision of what a personal operating system should be.
@@ -94,46 +94,49 @@ See the [LICENSE.md](LICENSE.md) file for the full license text.
       - [1.3.1. Prerequisites](#131-prerequisites)
       - [1.3.2. Kernel Module Auto-Signing](#132-kernel-module-auto-signing)
       - [1.3.3. Installation](#133-installation)
-    - [1.4. Multimedia Codecs](#14-multimedia-codecs)
   - [2. System Hardening](#2-system-hardening)
     - [2.1. Kernel Hardening](#21-kernel-hardening)
     - [2.2. Boot Hardening](#22-boot-hardening)
     - [2.3. LUKS Decryption With TPM](#23-luks-decryption-with-tpm)
-  - [3. Desktop Setup](#3-desktop-setup)
-    - [3.1. Desktop Settings](#31-desktop-settings)
-      - [3.1.1. Global](#311-global)
-      - [3.1.2. Fonts](#312-fonts)
-    - [3.2. Desktop Extensions](#32-desktop-extensions)
-      - [3.2.1. Prerequisites](#321-prerequisites)
-      - [3.2.2. Extensions List](#322-extensions-list)
-    - [3.3. Desktop Theme](#33-desktop-theme)
-      - [3.3.1. Shell Theme](#331-shell-theme)
-      - [3.3.2. Icon Theme](#332-icon-theme)
-      - [3.3.3. Cursor Theme](#333-cursor-theme)
-      - [3.3.4. Terminal Theme](#334-terminal-theme)
+  - [3. Multimedia Codecs](#3-multimedia-codecs)
+  - [4. Desktop Setup](#4-desktop-setup)
+    - [4.1. Desktop Settings](#41-desktop-settings)
+      - [4.1.1. Global](#411-global)
+      - [4.1.2. Fonts](#412-fonts)
+    - [4.2. Desktop Theme](#42-desktop-theme)
+      - [4.2.1. Shell Theme](#421-shell-theme)
+      - [4.2.2. Icon Theme](#422-icon-theme)
+      - [4.3.3. Cursor Theme](#433-cursor-theme)
+    - [4.3. Desktop Extensions](#43-desktop-extensions)
+      - [4.3.1. Prerequisites](#431-prerequisites)
+      - [4.3.2. Extensions List](#432-extensions-list)
+  - [5. Terminal Theme](#5-terminal-theme)
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+**[:arrow_up: Back to Top](#0-details)**
 
 ## 1. System Setup
 
 ### 1.1. System Upgrade
 
-Perform a full system upgrade:
+Update DNF settings:
 
 ```bash
-gsettings reset org.gnome.desktop.input-sources xkb-options
-
-sudo tee --append /etc/dnf/dnf.conf > /dev/null << EOT
+sudo tee --append /etc/dnf/dnf.conf <<EOT
 deltarpm=true
 fastestmirror=1
 max_parallel_downloads=20
 EOT
+```
 
-sudo dnf upgrade --assumeyes --refresh
+Enable the Flathub repository:
 
-sudo flatpak remote-add --if-not-exists fedora oci+https://registry.fedoraproject.org
+``` bash
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+```
 
+Update and clean existing installed Flatpaks:
+
+```bash
 flatpak repair --user
 flatpak update --assumeyes --user
 flatpak uninstall --assumeyes --unused --user
@@ -145,12 +148,11 @@ sudo flatpak uninstall --assumeyes --unused --system
 sudo flatpak override --reset
 ```
 
-Enable RPM Fusion repositories:
+Enabling the Fedora RPM Fusion repositories:
 
 ```bash
 sudo dnf install --assumeyes https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
 sudo dnf install --assumeyes https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-sudo dnf upgrade --assumeyes --refresh
 
 sudo dnf install --assumeyes \
     fedora-workstation-repositories \
@@ -160,7 +162,25 @@ sudo dnf install --assumeyes \
 sudo dnf group update core --assumeyes
 ```
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+Perform a full system upgrade:
+
+``` bash
+sudo dnf upgrade --assumeyes --refresh
+```
+
+Install Preload for improve overall system responsiveness:
+
+> Preload is an adaptive readahead daemon. It monitors which programs you use the most, and caches (part of) them to speed up their load time.
+
+```bash
+sudo dnf copr enable --assumeyes elxreno/preload
+sudo dnf install --assumeyes preload
+
+sudo systemctl start preload
+sudo systemctl enable preload
+```
+
+**[:arrow_up: Back to Top](#0-details)**
 
 ### 1.2. System Drivers
 
@@ -168,11 +188,12 @@ Add the `fwupd` command, and run it to check for driver and firmware updates:
 
 ```bash
 sudo dnf install --assumeyes fwupd
-sudo fwupdmgr refresh --assume-yes --force
-sudo fwupdmgr get-updates --assume-yes
+
+sudo fwupdmgr --assume-yes --force refresh
+sudo fwupdmgr --assume-yes --force get-updates
 ```
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+**[:arrow_up: Back to Top](#0-details)**
 
 ### 1.3. Nvidia Drivers
 
@@ -201,11 +222,14 @@ sudo dnf install --assumeyes \
     wget
 ```
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+**[:arrow_up: Back to Top](#0-details)**
 
 #### 1.3.2. Kernel Module Auto-Signing
 
-Enable Nvidia kernel module auto-signing:
+Enable the Nvidia kernel module auto-signing:
+
+> This will allow the load of the Nvidia drivers and kernel modules even with Secure Boot enabled.
+> Repeating this operation might be required after each Nvidia driver update.
 
 ```bash
 sudo kmodgenca --auto
@@ -224,7 +248,7 @@ sudo mokutil --import /etc/pki/akmods/certs/public_key.der
 
 </div>
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+**[:arrow_up: Back to Top](#0-details)**
 
 #### 1.3.3. Installation
 
@@ -243,13 +267,21 @@ sudo dnf install --assumeyes \
     xorg-x11-drv-nvidia-cuda-libs \
     xorg-x11-drv-nvidia-libs \
     xorg-x11-drv-nvidia-libs.i686 \
-    vulkan-loader
+    vulkan-loader \
+    vulkan-loader.i686
 
 echo "%global _with_kmod_nvidia_open 1" | sudo tee --append /etc/rpm/macros-nvidia-kmod
 sudo akmods --force
+sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1'
 
-sudo grubby --update-kernel=ALL --args="nvidia-drm.modeset=1"
-sudo dracut --regenerate-all --force
+echo "options nvidia_drm modeset=1" | sudo tee --append /etc/modprobe.d/nvidia.conf
+
+sudo tee --append /etc/dracut.conf.d/nvidia.conf <<EOT
+add_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "
+install_items+=" /etc/modprobe.d/nvidia.conf "
+EOT
+
+sudo dracut --force
 ```
 
 <div align="center">
@@ -260,38 +292,13 @@ sudo dracut --regenerate-all --force
 
 </div>
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
-
-### 1.4. Multimedia Codecs
-
-Install the multimedia codecs for hardware-acceleration and content playback:
-
-```bash
-sudo dnf config-manager --set-enable fedora-cisco-openh264
-
-sudo dnf install --assumeyes \
-    ffmpeg \
-    ffmpeg-libs \
-    gstreamer1-libav \
-    gstreamer1-plugins-{bad-\*,good-\*,base} \
-    gstreamer1-plugin-openh264 \
-    mozilla-openh264 \
-    lame\* \
-    --exclude=gstreamer1-plugins-bad-free-devel \
-    --exclude=lame-devel
-
-sudo dnf group update --assumeyes --with-optional multimedia
-
-sudo flatpak install --assumeyes org.freedesktop.Platform.ffmpeg-full//22.08
-```
-
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+**[:arrow_up: Back to Top](#0-details)**
 
 ## 2. System Hardening
 
 ### 2.1. Kernel Hardening
 
-Update the following kernel settings:
+Enable the following kernel self-protection parameters:
 
 ```bash
 sudo tee --append /etc/sysctl.conf > /dev/null << EOT
@@ -366,11 +373,11 @@ sudo sysctl -p
 
 </div>
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+**[:arrow_up: Back to Top](#0-details)**
 
 ### 2.2. Boot Hardening
 
-Update the following boot settings:
+Enable the following boot parameters:
 
 ```bash
 sudo grubby --update-kernel=ALL --args="debugfs=off init_on_alloc=1 init_on_free=1 lockdown=confidentiality loglevel=0 module.sig_enforce=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on slab_nomerge spectre_v2=on spec_store_bypass_disable=on tsx=off tsx_async_abort=full,nosmt mds=full,nosmt l1tf=full,force nosmt=force kvm.nx_huge_pages=force vsyscall=none"
@@ -398,7 +405,7 @@ Details:
 
 </div>
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+**[:arrow_up: Back to Top](#0-details)**
 
 ### 2.3. LUKS Decryption With TPM
 
@@ -443,8 +450,7 @@ sudo sed --in-place --expression \
   /etc/crypttab
 
 echo 'install_optional_items+=" /usr/lib64/libtss2* /usr/lib64/libfido2.so.* /usr/lib64/cryptsetup/libcryptsetup-token-systemd-tpm2.so "' | sudo tee --append /etc/dracut.conf.d/tss2.conf
-
-sudo dracut --regenerate-all --force
+sudo dracut --force
 ```
 
 If the operation is a success, at next reboot, the LUKS container should be decrypted automatically.  
@@ -458,13 +464,36 @@ Be aware, this operation might be repeated after every kernel update.
 
 </div>
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+**[:arrow_up: Back to Top](#0-details)**
 
-## 3. Desktop Setup
+## 3. Multimedia Codecs
 
-### 3.1. Desktop Settings
+Install the multimedia codecs for hardware-acceleration and content playback:
 
-#### 3.1.1. Global
+```bash
+sudo dnf config-manager --assumeyes --set-enable fedora-cisco-openh264
+
+sudo dnf install --assumeyes \
+    ffmpeg \
+    ffmpeg-libs \
+    gstreamer1-libav \
+    gstreamer1-plugins-{bad-\*,good-\*,base} \
+    gstreamer1-plugin-openh264 \
+    mozilla-openh264 \
+    lame\* \
+    --exclude=gstreamer1-plugins-bad-free-devel \
+    --exclude=lame-devel
+
+sudo dnf group update --assumeyes --with-optional multimedia
+```
+
+**[:arrow_up: Back to Top](#0-details)**
+
+## 4. Desktop Setup
+
+### 4.1. Desktop Settings
+
+#### 4.1.1. Global
 
 Use the following to configure GNOME settings:
 
@@ -474,6 +503,7 @@ gsettings set org.gnome.desktop.interface clock-show-date true
 gsettings set org.gnome.desktop.interface clock-show-weekday true
 gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 gsettings set org.gnome.desktop.interface enable-hot-corners true
+gsettings set org.gnome.desktop.interface font-antialiasing "rgba"
 gsettings set org.gnome.desktop.wm.preferences button-layout "close,minimize,maximize:appmenu"
 
 gsettings set org.gnome.mutter center-new-windows true
@@ -482,20 +512,19 @@ gsettings set org.gnome.nautilus.preferences default-folder-viewer "list-view"
 gsettings set org.gnome.nautilus.preferences show-hidden-files true
 gsettings set org.gnome.nautilus.window-state sidebar-width 220
 
-gsettings set org.gnome.desktop.interface font-antialiasing "rgba"
 gsettings set org.gtk.Settings.FileChooser show-hidden true
 ```
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+**[:arrow_up: Back to Top](#0-details)**
 
-#### 3.1.2. Fonts
+#### 4.1.2. Fonts
 
 Set up the following fonts:
 
 ```bash
 sudo dnf install --assumeyes \
-  google-roboto-fonts \
-  google-roboto-mono-fonts
+    google-roboto-fonts \
+    google-roboto-mono-fonts
 
 gsettings set org.gnome.desktop.interface document-font-name "Roboto 11"
 gsettings set org.gnome.desktop.interface font-name "Roboto 11"
@@ -503,11 +532,79 @@ gsettings set org.gnome.desktop.interface monospace-font-name "Roboto Mono 11"
 gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 11"
 ```
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+**[:arrow_up: Back to Top](#0-details)**
 
-### 3.2. Desktop Extensions
+### 4.2. Desktop Theme
 
-#### 3.2.1. Prerequisites
+#### 4.2.1. Shell Theme
+
+Use the following commands to install the [Colloid GTK theme](https://github.com/vinceliuice/Colloid-gtk-theme):
+
+```bash
+sudo dnf install --assumeyes \
+    gtk-murrine-engine \
+    gnome-themes-extra \
+    gnome-themes-standard \
+    sassc
+
+mkdir --parents ~/.themes/_sources/Colloid
+cd ~/.themes/_sources/Colloid
+
+git clone "https://github.com/vinceliuice/Colloid-gtk-theme.git" shell
+cd shell
+
+./install.sh \
+    --color dark \
+    --theme default \
+    --tweaks rimless
+
+gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
+gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
+```
+
+**[:arrow_up: Back to Top](#0-details)**
+
+#### 4.2.2. Icon Theme
+
+Use the following commands to install the [Colloid icon theme](https://github.com/vinceliuice/Colloid-icon-theme):
+
+```bash
+mkdir --parents ~/.themes/_sources/Colloid
+cd ~/.themes/_sources/Colloid
+
+git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" icons
+cd icons
+
+./install.sh \
+    --scheme default \
+    --theme default
+
+gsettings set org.gnome.desktop.interface icon-theme "Colloid"
+```
+
+**[:arrow_up: Back to Top](#0-details)**
+
+#### 4.3.3. Cursor Theme
+
+Use the following commands to install the [Colloid cursor theme](https://github.com/vinceliuice/Colloid-icon-theme):
+
+```bash
+mkdir --parents ~/.themes/_sources/Colloid
+cd ~/.themes/_sources/Colloid
+
+git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" cursors
+cd cursors/cursors
+
+./install.sh
+
+gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
+```
+
+**[:arrow_up: Back to Top](#0-details)**
+
+### 4.3. Desktop Extensions
+
+#### 4.3.1. Prerequisites
 
 Install GNOME tweaks:
 
@@ -519,6 +616,8 @@ Install the GNOME extension manager:
 
 ```bash
 sudo flatpak install --assumeyes flathub org.gnome.Extensions
+sudo flatpak override --user --filesystem=home org.gnome.Extensions
+sudo flatpak override --user --device=dri org.gnome.Extensions
 ```
 
 Install the GNOME extension installer:
@@ -537,9 +636,9 @@ chmod +x gnome-shell-extension-installer
 sudo mv --verbose gnome-shell-extension-installer /usr/bin/
 ```
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+**[:arrow_up: Back to Top](#0-details)**
 
-#### 3.2.2. Extensions List
+#### 4.3.2. Extensions List
 
 - Alphabetical App Grid
 
@@ -603,9 +702,9 @@ gnome-shell-extension-installer --yes 2890
 
 <div align="center">
 
-  | :warning: A logout is required for this section |
+  | :warning: A reboot is required for this section |
   | ----------------------------------------------- |
-  | `gnome-session-quit --no-prompt`                |
+  | `sudo reboot`                                   |
 
 </div>
 
@@ -677,71 +776,9 @@ gsettings set org.gnome.shell.extensions.hidetopbar show-in-overview true
 gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
 ```
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+**[:arrow_up: Back to Top](#0-details)**
 
-### 3.3. Desktop Theme
-
-#### 3.3.1. Shell Theme
-
-Use the following commands to install the [Colloid GTK theme](https://github.com/vinceliuice/Colloid-gtk-theme):
-
-```bash
-mkdir --parents ~/.themes/_sources/Colloid
-cd ~/.themes/_sources/Colloid
-
-git clone "https://github.com/vinceliuice/Colloid-gtk-theme.git" shell
-cd shell
-
-./install.sh \
-  --color dark \
-  --theme default \
-  --tweaks rimless
-
-gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
-gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
-```
-
-**[:arrow_up: Back to Top](#1-table-of-contents)**
-
-#### 3.3.2. Icon Theme
-
-Use the following commands to install the [Colloid icon theme](https://github.com/vinceliuice/Colloid-icon-theme):
-
-```bash
-mkdir --parents ~/.themes/_sources/Colloid
-cd ~/.themes/_sources/Colloid
-
-git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" icons
-cd icons
-
-./install.sh \
-  --scheme default \
-  --theme default
-
-gsettings set org.gnome.desktop.interface icon-theme "Colloid"
-```
-
-**[:arrow_up: Back to Top](#1-table-of-contents)**
-
-#### 3.3.3. Cursor Theme
-
-Use the following commands to install the [Colloid cursor theme](https://github.com/vinceliuice/Colloid-icon-theme):
-
-```bash
-mkdir --parents ~/.themes/_sources/Colloid
-cd ~/.themes/_sources/Colloid
-
-git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" cursors
-cd cursors/cursors
-
-./install.sh
-
-gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
-```
-
-**[:arrow_up: Back to Top](#1-table-of-contents)**
-
-#### 3.3.4. Terminal Theme
+## 5. Terminal Theme
 
 Install `zsh` and `oh-my-zsh`:
 
@@ -776,4 +813,4 @@ cd terminal
 echo "1\nYES\n" | ./install.sh
 ```
 
-**[:arrow_up: Back to Top](#1-table-of-contents)**
+**[:arrow_up: Back to Top](#0-details)**
