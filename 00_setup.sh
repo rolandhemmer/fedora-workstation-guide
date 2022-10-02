@@ -367,6 +367,24 @@ EOT
     sudo systemctl enable rngd >$NO_OUTPUT
 
     _log_success_and_replace "Enabling the Random Number Generator service"
+
+    # ################################################################
+    # Enabling DNSSEC support
+    # ################################################################
+
+    _log_progress "Enabling DNSSEC support"
+
+    # 'mkdir' can fail if the destination folder already exists
+    sudo mkdir --parents /etc/systemd/resolved.conf.d/ || true
+    sudo tee --append /etc/systemd/resolved.conf.d/dnssec.conf >$NO_OUTPUT <<EOT
+[Resolve]
+DNSSEC=true
+EOT
+
+    sudo systemctl restart systemd-resolved
+
+    _log_success_and_replace "Enabling DNSSEC support"
+
 }
 
 03_setup_tpm() {
@@ -486,7 +504,7 @@ EOT
     mkdir --parents ~/.themes/_sources/Colloid || true
 
     cd ~/.themes/_sources/Colloid
-    # 'git clone' fails is the folder already exists (which is not an error in our case here; allows for the script to be re-run multiple times)
+    # 'git clone' can fail if the destination folder already exists
     git clone --quiet "https://github.com/vinceliuice/Colloid-gtk-theme.git" shell >$NO_OUTPUT 2>&1 || true
     cd shell
 
@@ -508,7 +526,7 @@ EOT
     _log_progress "Installing icon theme"
 
     cd ~/.themes/_sources/Colloid
-    # 'git clone' fails is the folder already exists (which is not an error in our case here; allows for the script to be re-run multiple times)
+    # 'git clone' can fail if the destination folder already exists
     git clone --quiet "https://github.com/vinceliuice/Colloid-icon-theme.git" icons >$NO_OUTPUT 2>&1 || true
     cd icons
 
@@ -528,7 +546,7 @@ EOT
     _log_progress "Installing cursor theme"
 
     cd ~/.themes/_sources/Colloid
-    # 'git clone' fails is the folder already exists (which is not an error in our case here; allows for the script to be re-run multiple times)
+    # 'git clone' can fail if the destination folder already exists
     git clone --quiet "https://github.com/vinceliuice/Colloid-icon-theme.git" cursors >$NO_OUTPUT 2>&1 || true
     cd cursors/cursors
 
@@ -612,9 +630,11 @@ EOT
 
     sudo dnf install --assumeyes --quiet dconf >$NO_OUTPUT
 
-    mkdir --parents ~/.themes/_sources/Monokai
+    # 'mkdir' can fail if the destination folder already exists
+    mkdir --parents ~/.themes/_sources/Monokai || true
     cd ~/.themes/_sources/Monokai
-    # 'git clone' fails is the folder already exists (which is not an error in our case here; allows for the script to be re-run multiple times)
+
+    # 'git clone' can fail if the destination folder already exists
     git clone --quiet "https://github.com/0xComposure/monokai-gnome-terminal" terminal >$NO_OUTPUT 2>&1 || true
     cd terminal
     echo "1\nYES\n" | ./install.sh >$NO_OUTPUT 2>&1 || true

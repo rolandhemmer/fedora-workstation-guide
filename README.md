@@ -99,6 +99,7 @@ See the [LICENSE.md](LICENSE.md) file for the full license text.
     - [2.2. Boot Hardening](#22-boot-hardening)
     - [2.3. LUKS Decryption With TPM](#23-luks-decryption-with-tpm)
     - [2.4. Random Number Generator](#24-random-number-generator)
+    - [2.5. DNSSEC Support](#25-dnssec-support)
   - [3. Multimedia Codecs](#3-multimedia-codecs)
   - [4. Desktop Setup](#4-desktop-setup)
     - [4.1. Desktop Settings](#41-desktop-settings)
@@ -479,6 +480,23 @@ sudo dnf install --assumeyes rng-tools
 
 sudo systemctl start rngd
 sudo systemctl enable rngd
+```
+
+**[:arrow_up: Back to Top](#0-details)**
+
+### 2.5. DNSSEC Support
+
+Use the following commands to enable [DNSSEC](https://wiki.archlinux.org/title/DNSSEC) support:
+
+```bash
+sudo mkdir --parents /etc/systemd/resolved.conf.d/
+
+sudo tee --append /etc/systemd/resolved.conf.d/dnssec.conf <<EOT
+[Resolve]
+DNSSEC=true
+EOT
+
+sudo systemctl restart systemd-resolved
 ```
 
 **[:arrow_up: Back to Top](#0-details)**
