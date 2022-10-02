@@ -618,8 +618,7 @@ sudo dnf install --assumeyes gnome-tweaks
 Install the [GNOME extension manager](https://flathub.org/apps/details/org.gnome.Extensions):
 
 ```bash
-sudo flatpak install --assumeyes flathub org.gnome.Extensions
-sudo flatpak override --user --filesystem=home org.gnome.Extensions
+flatpak install --assumeyes --user flathub org.gnome.Extensions
 sudo flatpak override --user --device=dri org.gnome.Extensions
 ```
 
@@ -835,16 +834,14 @@ sudo dnf install --assumeyes bleachbit
 - [Discord](https://discord.com/)
 
 ```bash
-sudo flatpak install --assumeyes flathub com.discordapp.Discord
-sudo flatpak override --user --filesystem=home com.discordapp.Discord
+flatpak install --assumeyes --user flathub com.discordapp.Discord
 sudo flatpak override --user --device=dri com.discordapp.Discord
 ```
 
 - [Flatseal](https://github.com/tchx84/Flatseal)
 
 ```bash
-sudo flatpak install --assumeyes flathub com.github.tchx84.Flatseal
-sudo flatpak override --user --filesystem=home com.github.tchx84.Flatseal
+flatpak install --assumeyes --user flathub com.github.tchx84.Flatseal
 sudo flatpak override --user --device=dri com.github.tchx84.Flatseal
 ```
 
@@ -856,16 +853,14 @@ sudo flatpak override --user --device=dri com.github.tchx84.Flatseal
 sudo killall firefox
 rm --force --recursive --verbose ~/.mozilla
 
-sudo flatpak install --assumeyes flathub org.mozilla.firefox
-sudo flatpak override --user --filesystem=home org.mozilla.firefox
+flatpak install --assumeyes --user flathub org.mozilla.firefox
 sudo flatpak override --user --device=dri org.mozilla.firefox
 ```
 
 - [ONLYOFFICE](https://www.onlyoffice.com/s)
 
 ```bash
-sudo flatpak install --assumeyes flathub org.onlyoffice.desktopeditors
-sudo flatpak override --user --filesystem=home org.onlyoffice.desktopeditors
+flatpak install --assumeyes --user flathub org.onlyoffice.desktopeditors
 sudo flatpak override --user --device=dri org.onlyoffice.desktopeditors
 ```
 
@@ -883,8 +878,7 @@ sudo dnf install --assumeyes codium
 - [VLC](https://www.videolan.org/)
 
 ```bash
-sudo flatpak install --assumeyes flathub org.videolan.VLC
-sudo flatpak override --user --filesystem=home org.videolan.VLC
+flatpak install --assumeyes --user flathub org.videolan.VLC
 sudo flatpak override --user --device=dri org.videolan.VLC
 ```
 
@@ -910,16 +904,14 @@ Then, install the following:
 - [Lutris](https://lutris.net/)
 
 ```bash
-sudo flatpak install --assumeyes flathub net.lutris.Lutris
-sudo flatpak override --user --filesystem=home net.lutris.Lutris
+flatpak install --assumeyes --user flathub net.lutris.Lutris
 sudo flatpak override --user --device=dri net.lutris.Lutris
 ```
 
 - [Steam](https://store.steampowered.com/)
 
 ```bash
-sudo flatpak install --assumeyes flathub com.valvesoftware.Steam
-sudo flatpak override --user --filesystem=home com.valvesoftware.Steam
+flatpak install --assumeyes --user flathub com.valvesoftware.Steam
 sudo flatpak override --user --device=dri com.valvesoftware.Steam
 ```
 

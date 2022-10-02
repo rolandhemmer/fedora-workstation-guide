@@ -79,8 +79,7 @@ print_help() {
 # --------------------------------
 
 _install_flatpak() {
-    sudo flatpak install --assumeyes flathub $1 >$NO_OUTPUT 2>&1
-    sudo flatpak override --user --filesystem=home $1
+    flatpak install --assumeyes --user flathub $1 >$NO_OUTPUT 2>&1
     sudo flatpak override --user --device=dri $1
 }
 
@@ -481,6 +480,7 @@ EOT
 
     ./install.sh \
         --color dark \
+        --dest "~/.local/share/themes" \
         --theme default \
         --tweaks rimless >$NO_OUTPUT
 
@@ -501,6 +501,7 @@ EOT
     cd icons
 
     ./install.sh \
+        --dest "~/.local/share/icons" \
         --scheme default \
         --theme default >$NO_OUTPUT 2>&1
 
@@ -519,7 +520,9 @@ EOT
     git clone --quiet "https://github.com/vinceliuice/Colloid-icon-theme.git" cursors >$NO_OUTPUT 2>&1 || true
     cd cursors/cursors
 
-    ./install.sh >$NO_OUTPUT
+    ./install.sh \
+        --dest "~/.local/share/icons" \  >$NO_OUTPUT
+
     gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
 
     _log_success_and_replace "Installing cursor theme"
