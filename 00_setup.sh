@@ -355,6 +355,18 @@ EOT
     sudo grubby --update-kernel=ALL --args="debugfs=off init_on_alloc=1 init_on_free=1 lockdown=confidentiality loglevel=0 module.sig_enforce=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on slab_nomerge spectre_v2=on spec_store_bypass_disable=on tsx=off tsx_async_abort=full,nosmt mds=full,nosmt l1tf=full,force nosmt=force kvm.nx_huge_pages=force vsyscall=none"
 
     _log_success_and_replace "Enabling recommended boot parameters"
+
+    # ################################################################
+    # Enabling the Random Number Generator service
+    # ################################################################
+
+    _log_progress "Enabling the Random Number Generator service"
+
+    sudo dnf install --assumeyes --quiet rng-tools >$NO_OUTPUT
+    sudo systemctl start rngd >$NO_OUTPUT
+    sudo systemctl enable rngd >$NO_OUTPUT
+
+    _log_success_and_replace "Enabling the Random Number Generator service"
 }
 
 03_setup_tpm() {

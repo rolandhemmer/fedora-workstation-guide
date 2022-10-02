@@ -98,6 +98,7 @@ See the [LICENSE.md](LICENSE.md) file for the full license text.
     - [2.1. Kernel Hardening](#21-kernel-hardening)
     - [2.2. Boot Hardening](#22-boot-hardening)
     - [2.3. LUKS Decryption With TPM](#23-luks-decryption-with-tpm)
+    - [2.4. Random Number Generator](#24-random-number-generator)
   - [3. Multimedia Codecs](#3-multimedia-codecs)
   - [4. Desktop Setup](#4-desktop-setup)
     - [4.1. Desktop Settings](#41-desktop-settings)
@@ -466,6 +467,19 @@ Be aware, this operation might be repeated after every kernel update.
   | `sudo reboot`                                   |
 
 </div>
+
+**[:arrow_up: Back to Top](#0-details)**
+
+### 2.4. Random Number Generator
+
+Enable the [Random Number Generator](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/security_guide/sect-security_guide-encryption-using_the_random_number_generator) for stronger cryptographic keys:
+
+```bash
+sudo dnf install --assumeyes rng-tools
+
+sudo systemctl start rngd
+sudo systemctl enable rngd
+```
 
 **[:arrow_up: Back to Top](#0-details)**
 
