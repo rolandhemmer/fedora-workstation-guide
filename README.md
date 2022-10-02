@@ -306,11 +306,11 @@ sudo dracut --force
 Enable the following kernel self-protection parameters:
 
 ```bash
-sudo tee --append /etc/sysctl.conf > /dev/null << EOT
+sudo tee /etc/sysctl.conf >$NO_OUTPUT <<EOT
 ## Kernel Self-Protection
 
 # Reduces buffer overflows attacks
-kernel.randomize_va_space=1
+kernel.randomize_va_space=2
 
 # Mitigates kernel pointer leaks
 kernel.kptr_restrict=2
@@ -352,6 +352,15 @@ net.ipv4.tcp_rfc1337=1
 net.ipv4.conf.all.rp_filter=1
 net.ipv4.conf.default.rp_filter=1
 
+# Prevent man-in-the-middle attacks and minimize information disclosure
+net.ipv4.conf.all.accept_redirects=0
+net.ipv4.conf.all.log_martians=1
+net.ipv4.conf.all.send_redirects=0
+net.ipv4.conf.default.accept_redirects=0
+net.ipv4.conf.default.log_martians=1
+net.ipv6.conf.all.accept_redirects=0
+net.ipv6.conf.default.accept_redirects=0
+
 # Avoids Smurf attacks and prevent clock fingerprinting through ICMP timestamps
 net.ipv4.icmp_echo_ignore_all=1
 
@@ -364,6 +373,9 @@ fs.protected_hardlinks=1
 # Prevents creating files in potentially attacker-controlled environments
 fs.protected_fifos=2
 fs.protected_regular=2
+
+# Prevents processes with elevated privileges to dump their memory
+fs.suid_dumpable=0
 
 EOT
 
