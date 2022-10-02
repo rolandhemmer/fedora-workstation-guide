@@ -582,6 +582,7 @@ EOT
         sassc >$NO_OUTPUT
 
     mkdir --parents ~/.themes/_sources/Colloid || true
+    mkdir --parents ~/.local/share/themes || true
 
     cd ~/.themes/_sources/Colloid
     # 'git clone' can fail if the destination folder already exists
@@ -604,6 +605,8 @@ EOT
     # ################################################################
 
     _log_progress "Installing icon theme"
+
+    mkdir --parents ~/.local/share/icons || true
 
     cd ~/.themes/_sources/Colloid
     # 'git clone' can fail if the destination folder already exists

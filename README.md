@@ -641,6 +641,8 @@ sudo dnf install --assumeyes \
     sassc
 
 mkdir --parents ~/.themes/_sources/Colloid
+mkdir --parents ~/.local/share/themes
+
 cd ~/.themes/_sources/Colloid
 
 git clone "https://github.com/vinceliuice/Colloid-gtk-theme.git" shell
@@ -648,6 +650,7 @@ cd shell
 
 ./install.sh \
     --color dark \
+    --dest "~/.local/share/themes" \
     --theme default \
     --tweaks rimless
 
@@ -665,12 +668,15 @@ Use the following commands to install the [Colloid icon theme](https://github.co
 
 ```bash
 mkdir --parents ~/.themes/_sources/Colloid
+mkdir --parents ~/.local/share/icons
+
 cd ~/.themes/_sources/Colloid
 
 git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" icons
 cd icons
 
 ./install.sh \
+    --dest "~/.local/share/icons" \
     --scheme default \
     --theme default
 
@@ -687,12 +693,15 @@ Use the following commands to install the [Colloid cursor theme](https://github.
 
 ```bash
 mkdir --parents ~/.themes/_sources/Colloid
+mkdir --parents ~/.local/share/icons
+
 cd ~/.themes/_sources/Colloid
 
 git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" cursors
 cd cursors/cursors
 
-./install.sh
+./install.sh \
+    --dest "~/.local/share/icons"
 
 flatpak override --user --filesystem=~/.local/share/icons
 
