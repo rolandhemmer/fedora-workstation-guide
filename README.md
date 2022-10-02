@@ -275,13 +275,13 @@ sudo dnf install --assumeyes \
     vulkan-loader \
     vulkan-loader.i686
 
-echo "%global _with_kmod_nvidia_open 1" | sudo tee --append /etc/rpm/macros-nvidia-kmod
+echo "%global _with_kmod_nvidia_open 1" | sudo tee /etc/rpm/macros-nvidia-kmod
 sudo akmods --force
 sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1'
 
-echo "options nvidia_drm modeset=1" | sudo tee --append /etc/modprobe.d/nvidia.conf
+echo "options nvidia_drm modeset=1" | sudo tee /etc/modprobe.d/nvidia.conf
 
-sudo tee --append /etc/dracut.conf.d/nvidia.conf <<EOT
+sudo tee /etc/dracut.conf.d/nvidia.conf <<EOT
 add_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "
 install_items+=" /etc/modprobe.d/nvidia.conf "
 EOT
@@ -466,7 +466,7 @@ sudo sed --in-place --expression \
   "/^luks-/s/$/,tpm2-device=auto/" \
   /etc/crypttab
 
-echo 'install_optional_items+=" /usr/lib64/libtss2* /usr/lib64/libfido2.so.* /usr/lib64/cryptsetup/libcryptsetup-token-systemd-tpm2.so "' | sudo tee --append /etc/dracut.conf.d/tss2.conf
+echo 'install_optional_items+=" /usr/lib64/libtss2* /usr/lib64/libfido2.so.* /usr/lib64/cryptsetup/libcryptsetup-token-systemd-tpm2.so "' | sudo tee /etc/dracut.conf.d/tss2.conf
 sudo dracut --force
 ```
 
@@ -503,7 +503,7 @@ Use the following commands to enable [DNSSEC](https://wiki.archlinux.org/title/D
 ```bash
 sudo mkdir --parents /etc/systemd/resolved.conf.d/
 
-sudo tee --append /etc/systemd/resolved.conf.d/dnssec.conf <<EOT
+sudo tee /etc/systemd/resolved.conf.d/dnssec.conf <<EOT
 [Resolve]
 DNSSEC=true
 EOT
@@ -915,7 +915,7 @@ sudo flatpak override --user --device=dri org.onlyoffice.desktopeditors
 
 ```bash
 sudo rpm --import https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/-/raw/master/pub.gpg
-printf "[gitlab.com_paulcarroty_vscodium_repo]\nname=download.vscodium.com\nbaseurl=https://download.vscodium.com/rpms/\nenabled=1\ngpgcheck=1\nrepo_gpgcheck=1\ngpgkey=https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/-/raw/master/pub.gpg\nmetadata_expire=1h" | sudo tee --append /etc/yum.repos.d/vscodium.repo
+printf "[gitlab.com_paulcarroty_vscodium_repo]\nname=download.vscodium.com\nbaseurl=https://download.vscodium.com/rpms/\nenabled=1\ngpgcheck=1\nrepo_gpgcheck=1\ngpgkey=https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/-/raw/master/pub.gpg\nmetadata_expire=1h" | sudo tee /etc/yum.repos.d/vscodium.repo
 sudo dnf install --assumeyes codium
 ```
 

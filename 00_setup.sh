@@ -259,12 +259,12 @@ EOT
         vulkan-loader \
         vulkan-loader.i686 >$NO_OUTPUT
 
-    echo "%global _with_kmod_nvidia_open 1" | sudo tee --append /etc/rpm/macros-nvidia-kmod >$NO_OUTPUT
+    echo "%global _with_kmod_nvidia_open 1" | sudo tee /etc/rpm/macros-nvidia-kmod >$NO_OUTPUT
     sudo akmods --force >$NO_OUTPUT
     sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1' >$NO_OUTPUT
 
-    echo "options nvidia_drm modeset=1" | sudo tee --append /etc/modprobe.d/nvidia.conf >$NO_OUTPUT
-    sudo tee --append /etc/dracut.conf.d/nvidia.conf >$NO_OUTPUT <<EOT
+    echo "options nvidia_drm modeset=1" | sudo tee /etc/modprobe.d/nvidia.conf >$NO_OUTPUT
+    sudo tee /etc/dracut.conf.d/nvidia.conf >$NO_OUTPUT <<EOT
 add_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "
 install_items+=" /etc/modprobe.d/nvidia.conf "
 EOT
@@ -388,7 +388,7 @@ EOT
 
     # 'mkdir' can fail if the destination folder already exists
     sudo mkdir --parents /etc/systemd/resolved.conf.d/ || true
-    sudo tee --append /etc/systemd/resolved.conf.d/dnssec.conf >$NO_OUTPUT <<EOT
+    sudo tee /etc/systemd/resolved.conf.d/dnssec.conf >$NO_OUTPUT <<EOT
 [Resolve]
 DNSSEC=true
 EOT
@@ -427,7 +427,7 @@ EOT
         "/^luks-/s/$/,tpm2-device=auto/" \
         /etc/crypttab
 
-    echo 'install_optional_items+=" /usr/lib64/libtss2* /usr/lib64/libfido2.so.* /usr/lib64/cryptsetup/libcryptsetup-token-systemd-tpm2.so "' | sudo tee --append /etc/dracut.conf.d/tss2.conf >$NO_OUTPUT
+    echo 'install_optional_items+=" /usr/lib64/libtss2* /usr/lib64/libfido2.so.* /usr/lib64/cryptsetup/libcryptsetup-token-systemd-tpm2.so "' | sudo tee /etc/dracut.conf.d/tss2.conf >$NO_OUTPUT
     sudo dracut --force
 
     _log_success "Enrolling decryption key in TPM"
