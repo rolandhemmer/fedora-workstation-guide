@@ -80,7 +80,6 @@ print_help() {
 
 _install_flatpak() {
     flatpak install --assumeyes --user flathub $1 >$NO_OUTPUT 2>&1
-    sudo flatpak override --user --device=dri $1
 }
 
 _log_progress() {
@@ -125,22 +124,34 @@ EOT
     _log_success_and_replace "Enabling the Flathub repository"
 
     # ################################################################
-    # Updating and cleaning currently installed applications
+    # Updating and cleaning system applications
     # ################################################################
 
-    _log_progress "Updating and cleaning currently installed applications"
-
-    flatpak repair --user >$NO_OUTPUT
-    flatpak update --assumeyes --user >$NO_OUTPUT
-    flatpak uninstall --assumeyes --unused --user >$NO_OUTPUT
+    _log_progress "Updating and cleaning system applications"
 
     sudo flatpak repair --system >$NO_OUTPUT
-    sudo flatpak update --assumeyes --system >$NO_OUTPUT
-    sudo flatpak uninstall --assumeyes --unused --system >$NO_OUTPUT
+    sudo flatpak update --system --assumeyes >$NO_OUTPUT
+    sudo flatpak uninstall --system --assumeyes --unused >$NO_OUTPUT
 
-    sudo flatpak override --reset
+    _log_success_and_replace "Updating and cleaning system applications"
 
-    _log_success_and_replace "Updating and cleaning currently installed applications"
+    # ################################################################
+    # Updating and cleaning user applications
+    # ################################################################
+
+    _log_progress "Updating and cleaning user applications"
+
+    flatpak repair --user >$NO_OUTPUT
+    flatpak update --user --assumeyes >$NO_OUTPUT
+    flatpak uninstall --user --assumeyes --unused >$NO_OUTPUT
+
+    flatpak override --user --reset
+
+    flatpak override --user --device=dri
+    flatpak override --user --filesystem=~/.local/share/themes
+    flatpak override --user --filesystem=~/.local/share/icons
+
+    _log_success_and_replace "Updating and cleaning user applications"
 
     # ################################################################
     # Enabling the Fedora RPM Fusion repositories
@@ -155,6 +166,7 @@ EOT
         fedora-workstation-repositories \
         rpmfusion-free-appstream-data \
         rpmfusion-nonfree-appstream-data >$NO_OUTPUT
+
     sudo dnf group update core --assumeyes --quiet >$NO_OUTPUT
 
     _log_success_and_replace "Enabling the Fedora RPM Fusion repositories"

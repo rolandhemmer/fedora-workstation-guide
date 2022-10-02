@@ -139,18 +139,23 @@ Enable the Flathub repository:
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 ```
 
-Update and clean existing installed Flatpaks:
+Update and clean existing system Flatpaks:
+
+```bash
+sudo flatpak repair --system
+sudo flatpak update --system --assumeyes
+sudo flatpak uninstall --system --assumeyes --unused
+```
+
+Update and clean existing user Flatpaks:
 
 ```bash
 flatpak repair --user
-flatpak update --assumeyes --user
-flatpak uninstall --assumeyes --unused --user
+flatpak update --user --assumeyes
+flatpak uninstall --user --assumeyes --unused
 
-sudo flatpak repair --system
-sudo flatpak update --assumeyes --system
-sudo flatpak uninstall --assumeyes --unused --system
-
-sudo flatpak override --reset
+flatpak override --user --reset
+flatpak override --user --device=dri
 ```
 
 Enabling the Fedora RPM Fusion repositories:
@@ -605,6 +610,8 @@ cd shell
     --theme default \
     --tweaks rimless
 
+flatpak override --user --filesystem=~/.local/share/themes
+
 gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
 gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 ```
@@ -626,6 +633,8 @@ cd icons
     --scheme default \
     --theme default
 
+flatpak override --user --filesystem=~/.local/share/icons
+
 gsettings set org.gnome.desktop.interface icon-theme "Colloid"
 ```
 
@@ -643,6 +652,8 @@ git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" cursors
 cd cursors/cursors
 
 ./install.sh
+
+flatpak override --user --filesystem=~/.local/share/icons
 
 gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
 ```
