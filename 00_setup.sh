@@ -8,11 +8,25 @@
 # Arguments Parsing and Management
 # --------------------------------
 
-_arg_nvidia_drivers="off"
+_positionals=()
+
 _arg_luks_partition=
+_arg_nvidia_drivers="off"
+
+assign_positional_args() {
+    local _positional_name _shift_for=$1
+    _positional_names="_arg_static_hostname _arg_pretty_hostname "
+
+    shift "$_shift_for"
+    for _positional_name in ${_positional_names}; do
+        test $# -gt 0 || break
+        eval "$_positional_name=\${1}" || die "Error during argument parsing, possibly an Argbash bug." 1
+        shift
+    done
+}
 
 begins_with_short_option() {
-    local first_option all_short_options='nlh'
+    local first_option all_short_options='lnh'
     first_option="${1:0:1}"
     test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0
 }
@@ -24,21 +38,17 @@ die() {
     exit "${_ret}"
 }
 
+handle_passed_args_count() {
+    local _required_args_string="'static-hostname' and 'pretty-hostname'"
+    test "${_positionals_count}" -ge 2 || _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require exactly 2 (namely: $_required_args_string), but got only ${_positionals_count}." 1
+    test "${_positionals_count}" -le 2 || _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect exactly 2 (namely: $_required_args_string), but got ${_positionals_count} (the last one was: '${_last_positional}')." 1
+}
+
 parse_commandline() {
+    _positionals_count=0
     while test $# -gt 0; do
         _key="$1"
         case "$_key" in
-        -n | --no-nvidia-drivers | --nvidia-drivers)
-            _arg_nvidia_drivers="on"
-            test "${1:0:5}" = "--no-" && _arg_nvidia_drivers="off"
-            ;;
-        -n*)
-            _arg_nvidia_drivers="on"
-            _next="${_key##-n}"
-            if test -n "$_next" -a "$_next" != "$_key"; then
-                { begins_with_short_option "$_next" && shift && set -- "-n" "-${_next}" "$@"; } || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
-            fi
-            ;;
         -l | --luks-partition)
             test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
             _arg_luks_partition="$2"
@@ -50,6 +60,17 @@ parse_commandline() {
         -l*)
             _arg_luks_partition="${_key##-l}"
             ;;
+        -n | --no-nvidia-drivers | --nvidia-drivers)
+            _arg_nvidia_drivers="on"
+            test "${1:0:5}" = "--no-" && _arg_nvidia_drivers="off"
+            ;;
+        -n*)
+            _arg_nvidia_drivers="on"
+            _next="${_key##-n}"
+            if test -n "$_next" -a "$_next" != "$_key"; then
+                { begins_with_short_option "$_next" && shift && set -- "-n" "-${_next}" "$@"; } || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
+            fi
+            ;;
         -h | --help)
             print_help
             exit 0
@@ -59,7 +80,9 @@ parse_commandline() {
             exit 0
             ;;
         *)
-            _PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$1'" 1
+            _last_positional="$1"
+            _positionals+=("$_last_positional")
+            _positionals_count=$((_positionals_count + 1))
             ;;
         esac
         shift
@@ -68,9 +91,11 @@ parse_commandline() {
 
 print_help() {
     printf '%s\n' "Fedora Workstation Personal Installation Script"
-    printf 'Usage: %s [-n|--(no-)nvidia-drivers] [-l|--luks-partition <arg>] [-h|--help]\n' "$0"
-    printf '\t%s\n' "-n, --nvidia-drivers, --no-nvidia-drivers: include latest Nvidia drivers with installation (off by default)"
+    printf 'Usage: %s [-l|--luks-partition <arg>] [-n|--(no-)nvidia-drivers] [-h|--help] <static-hostname> <pretty-hostname>\n' "$0"
+    printf '\t%s\n' "<static-hostname>: Static name of the system, containing only lowercase letters, numbers and/or dashes (e.g: \"system-name-01\")"
+    printf '\t%s\n' "<pretty-hostname>: \"Pretty\" name of the system, without restrictions (e.g: \"System Name 01\")"
     printf '\t%s\n' "-l, --luks-partition: Partition name of the LUKS container to be automatically decrypted using the TPM chip (e.g: /dev/sda1) (no default)"
+    printf '\t%s\n' "-n, --nvidia-drivers, --no-nvidia-drivers: include latest Nvidia drivers with installation (off by default)"
     printf '\t%s\n' "-h, --help: Prints help"
 }
 
@@ -98,8 +123,17 @@ _log_title() {
     echo -e "${ECHO_BOLD}$1${ECHO_RESET}"
 }
 
-00_update_system() {
-    _log_title "==> Updating system"
+00_setup_hostname() {
+    _log_progress "Configuring hostname"
+
+    sudo hostnamectl set-hostname --pretty $_arg_pretty_hostname
+    sudo hostnamectl set-hostname --static $_arg_static_hostname
+
+    _log_success_and_replace "Configuring hostname"
+}
+
+01_update_system() {
+    _log_title "\n==> Updating system"
 
     # ################################################################
     # Updating DNF settings
@@ -209,7 +243,7 @@ EOT
     _log_success_and_replace "Installing Preload"
 }
 
-01_install_nvidia_drivers() {
+02_install_nvidia_drivers() {
     _log_title "\n==> Installing latest Nvidia drivers"
 
     # ################################################################
@@ -285,7 +319,7 @@ EOT
     _log_success_and_replace "Installing latest Nvidia drivers"
 }
 
-02_harden_system() {
+03_harden_system() {
     _log_title "\n==> Hardening system"
 
     # ################################################################
@@ -411,7 +445,7 @@ EOT
 
 }
 
-03_setup_tpm() {
+04_setup_tpm() {
     _log_title "\n==> Setting up TPM for '${_arg_luks_partition}' auto-decryption"
 
     # ################################################################
@@ -445,7 +479,7 @@ EOT
     _log_success "Enrolling decryption key in TPM"
 }
 
-04_install_multimedia_codecs() {
+05_install_multimedia_codecs() {
     _log_title "\n==> Installing multimedia codecs"
 
     # ################################################################
@@ -472,7 +506,7 @@ EOT
     _log_success_and_replace "Installing required sound and audio codecs"
 }
 
-05_install_desktop_theme() {
+06_install_desktop_theme() {
     _log_title "\n==> Installing desktop theme"
 
     # ################################################################
@@ -582,7 +616,7 @@ EOT
     _log_success_and_replace "Installing cursor theme"
 }
 
-06_install_desktop_extensions() {
+07_install_desktop_extensions() {
     _log_title "\n==> Installing desktop extensions"
 
     # ################################################################
@@ -628,7 +662,7 @@ EOT
     _log_success_and_replace "Installing desktop extensions"
 }
 
-07_install_terminal_theme() {
+08_install_terminal_theme() {
     _log_title "\n==> Installing terminal theme"
 
     # ################################################################
@@ -666,7 +700,7 @@ EOT
     _log_success_and_replace "Installing shell theme"
 }
 
-08_install_applications() {
+09_install_applications() {
     _log_title "\n==> Installing applications"
 
     # ################################################################
@@ -739,7 +773,7 @@ EOT
     _log_success_and_replace "Installing VLC"
 }
 
-09_install_gaming_requirements() {
+10_install_gaming_requirements() {
     _log_title "\n==> Installing gaming requirements"
 
     # ################################################################
@@ -776,7 +810,7 @@ EOT
     _log_success_and_replace "Installing Steam"
 }
 
-10_cleanup() {
+11_cleanup() {
     _log_title "\n==> Cleaning up"
 
     _log_progress "Removing unneeded applications"
@@ -809,6 +843,8 @@ EOT
 # --------------------------------
 
 parse_commandline "$@"
+handle_passed_args_count
+assign_positional_args 1 "${_positionals[@]}"
 
 set -e
 
@@ -829,24 +865,25 @@ cat <<"EOT"
 
 EOT
 
-00_update_system
+00_setup_hostname
+01_update_system
 
 if [ ${_arg_nvidia_drivers} = "on" ]; then
-    01_install_nvidia_drivers
+    02_install_nvidia_drivers
 fi
 
-02_harden_system
+03_harden_system
 
 if [ ${_arg_luks_partition} ]; then
-    03_setup_tpm
+    04_setup_tpm
 fi
 
-04_install_multimedia_codecs
-05_install_desktop_theme
-06_install_desktop_extensions
-07_install_terminal_theme
-08_install_applications
-09_install_gaming_requirements
-10_cleanup
+05_install_multimedia_codecs
+06_install_desktop_theme
+07_install_desktop_extensions
+08_install_terminal_theme
+09_install_applications
+10_install_gaming_requirements
+11_cleanup
 
 echo -e "\n[ ${ECHO_BOLD}DONE${ECHO_RESET} ]"

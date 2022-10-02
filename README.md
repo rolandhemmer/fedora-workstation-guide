@@ -36,19 +36,19 @@ Then, run (**not** as `sudo`):
 > All script arguments can be combined.
 
 ```bash
-./00_setup.sh
+./00_setup.sh $static_hostname $pretty_hostname
 ```
 
-- If you have a Nvidia GPU, run:
+- If you have a Nvidia GPU, add:
 
 ```bash
-./00_setup.sh --nvidia-drivers
+--nvidia-drivers
 ```
 
-- If you have an encrypted LUKS installation **and** a TPM 2.0 chip, run:
+- If you have an encrypted LUKS installation **and** a TPM 2.0 chip, add:
 
 ```bash
-./00_setup.sh --luks-partition="<partition-name>"
+--luks-partition="<partition-name>"
 ```
 
 > See [4.3. LUKS Decryption With TPM](#43-luks-decryption-with-tpm) on how to identify the correct partition name.  
@@ -88,12 +88,13 @@ See the [LICENSE.md](LICENSE.md) file for the full license text.
   - [License](#license)
   - [0. Details](#0-details)
   - [1. System Setup](#1-system-setup)
-    - [1.1. System Upgrade](#11-system-upgrade)
-    - [1.2. System Drivers](#12-system-drivers)
-    - [1.3. Nvidia Drivers](#13-nvidia-drivers)
-      - [1.3.1. Prerequisites](#131-prerequisites)
-      - [1.3.2. Kernel Module Auto-Signing](#132-kernel-module-auto-signing)
-      - [1.3.3. Installation](#133-installation)
+    - [1.1. Hostname](#11-hostname)
+    - [1.2. System Upgrade](#12-system-upgrade)
+    - [1.3. System Drivers](#13-system-drivers)
+    - [1.4. Nvidia Drivers](#14-nvidia-drivers)
+      - [1.4.1. Prerequisites](#141-prerequisites)
+      - [1.4.2. Kernel Module Auto-Signing](#142-kernel-module-auto-signing)
+      - [1.4.3. Installation](#143-installation)
   - [2. System Hardening](#2-system-hardening)
     - [2.1. Kernel Hardening](#21-kernel-hardening)
     - [2.2. Boot Hardening](#22-boot-hardening)
@@ -121,7 +122,23 @@ See the [LICENSE.md](LICENSE.md) file for the full license text.
 
 ## 1. System Setup
 
-### 1.1. System Upgrade
+### 1.1. Hostname
+
+Name the system with both the pretty and static hostname:
+
+```bash
+# "Pretty" name of the system, without restrictions
+# (e.g: "System Name 01")
+sudo hostnamectl set-hostname --pretty $pretty_hostname
+
+# Static name of the system, containing only lowercase letters, numbers and/or dashes
+# (e.g: "system-name-01")
+sudo hostnamectl set-hostname --static $static_hostname
+```
+
+**[:arrow_up: Back to Top](#0-details)**
+
+### 1.2. System Upgrade
 
 Update DNF settings:
 
@@ -192,7 +209,7 @@ sudo systemctl enable preload
 
 **[:arrow_up: Back to Top](#0-details)**
 
-### 1.2. System Drivers
+### 1.3. System Drivers
 
 Add the `fwupd` command, and run it to check for driver and firmware updates:
 
@@ -205,9 +222,9 @@ sudo fwupdmgr --assume-yes --force get-updates
 
 **[:arrow_up: Back to Top](#0-details)**
 
-### 1.3. Nvidia Drivers
+### 1.4. Nvidia Drivers
 
-#### 1.3.1. Prerequisites
+#### 1.4.1. Prerequisites
 
 Install the following prerequisites:
 
@@ -234,7 +251,7 @@ sudo dnf install --assumeyes \
 
 **[:arrow_up: Back to Top](#0-details)**
 
-#### 1.3.2. Kernel Module Auto-Signing
+#### 1.4.2. Kernel Module Auto-Signing
 
 Enable the Nvidia kernel module auto-signing:
 
@@ -260,7 +277,7 @@ sudo mokutil --import /etc/pki/akmods/certs/public_key.der
 
 **[:arrow_up: Back to Top](#0-details)**
 
-#### 1.3.3. Installation
+#### 1.4.3. Installation
 
 Install the latest Nvidia drivers:
 
@@ -465,7 +482,7 @@ sudo dnf install --assumeyes tpm2-tools
 sudo systemd-cryptenroll \
   --tpm2-device=auto \
   --tpm2-pcrs=7+8 \
-  <$partition_name>
+  $partition_name
 
 sudo sed --in-place --expression \
   "/^luks-/s/$/,tpm2-device=auto/" \
