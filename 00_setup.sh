@@ -124,12 +124,34 @@ _log_title() {
 }
 
 00_setup_hostname() {
+    # ################################################################
+    # Configuring hostname
+    # ################################################################
+
     _log_progress "Configuring hostname"
 
     sudo hostnamectl set-hostname --pretty $_arg_pretty_hostname
     sudo hostnamectl set-hostname --static $_arg_static_hostname
 
     _log_success_and_replace "Configuring hostname"
+
+    # ################################################################
+    # Configuring Git settings
+    # ################################################################
+
+    _log_progress "Configuring Git settings"
+
+    git config --global core.autocrlf input
+    git config --global core.editor vim
+    git config --global core.eol lf
+    git config --global diff.colormoved zebra
+    git config --global fetch.prune true
+    git config --global http.maxrequestbuffer 128M
+    git config --global http.postbuffer 512M
+    git config --global pull.rebase true
+    git config --global submodule.recurse true
+
+    _log_success_and_replace "Configuring Git settings"
 }
 
 01_update_system() {

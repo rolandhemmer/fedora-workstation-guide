@@ -88,7 +88,9 @@ See the [LICENSE.md](LICENSE.md) file for the full license text.
   - [License](#license)
   - [0. Details](#0-details)
   - [1. System Setup](#1-system-setup)
-    - [1.1. Hostname](#11-hostname)
+    - [1.1. Prerequisites](#11-prerequisites)
+      - [1.1.1. Hostname Settings](#111-hostname-settings)
+      - [1.1.2. Git Settings](#112-git-settings)
     - [1.2. System Upgrade](#12-system-upgrade)
     - [1.3. System Drivers](#13-system-drivers)
     - [1.4. Nvidia Drivers](#14-nvidia-drivers)
@@ -122,7 +124,9 @@ See the [LICENSE.md](LICENSE.md) file for the full license text.
 
 ## 1. System Setup
 
-### 1.1. Hostname
+### 1.1. Prerequisites
+
+#### 1.1.1. Hostname Settings
 
 Name the system with both the pretty and static hostname:
 
@@ -135,6 +139,26 @@ sudo hostnamectl set-hostname --pretty $pretty_hostname
 # (e.g: "system-name-01")
 sudo hostnamectl set-hostname --static $static_hostname
 ```
+
+**[:arrow_up: Back to Top](#0-details)**
+
+#### 1.1.2. Git Settings
+
+Apply the following Git settings:
+
+```bash
+git config --global core.autocrlf input
+git config --global core.editor vim
+git config --global core.eol lf
+git config --global diff.colormoved zebra
+git config --global fetch.prune true
+git config --global http.maxrequestbuffer 128M
+git config --global http.postbuffer 512M
+git config --global pull.rebase true
+git config --global submodule.recurse true
+```
+
+> Consider setting up `user.name` and `user.email` as well, if needed.
 
 **[:arrow_up: Back to Top](#0-details)**
 
