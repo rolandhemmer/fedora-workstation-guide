@@ -51,30 +51,38 @@ print_help() {
 # Functions
 # --------------------------------
 
-log_progress() {
-    echo -e "[ .. ]\t${ECHO_GREY}$1${ECHO_RESET}"
+__install_dnf__() {
+    sudo dnf install --assumeyes --quiet $1 >$NO_OUTPUT
 }
 
-log_success() {
-    echo -e "[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t${ECHO_GREY}$1${ECHO_RESET}"
+__install_flatpak__() {
+    flatpak install --assumeyes --user flathub $1 >$NO_OUTPUT 2>&1
 }
 
-log_success_and_replace() {
-    echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t${ECHO_GREY}$1${ECHO_RESET}"
+__log_progress__() {
+    echo -e "[ .. ]\t$1"
 }
 
-log_title() {
+__log_success__() {
+    echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
+}
+
+__log_success_alt__() {
+    echo -e "[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
+}
+
+__log_title__() {
     echo -e "${ECHO_BOLD}$1${ECHO_RESET}"
 }
 
 00_configure_desktop_extensions() {
-    log_title "\n==> Configuring desktop extensions"
+    __log_title__ "\n==> Configuring desktop extensions"
 
     # ################################################################
     # Enabling desktop extensions
     # ################################################################
 
-    log_progress "Enabling desktop extensions"
+    __log_progress__ "Enabling desktop extensions"
 
     gnome-extensions disable background-logo@fedorahosted.org
 
@@ -85,13 +93,13 @@ log_title() {
     gnome-extensions enable trayIconsReloaded@selfmade.pl
     gnome-extensions enable user-theme@gnome-shell-extensions.gcampax.github.com
 
-    log_success_and_replace "Enabling desktop extensions"
+    __log_success__ "Enabling desktop extensions"
 
     # ################################################################
     # Configuring desktop extensions
     # ################################################################
 
-    log_progress "Configuring desktop extensions"
+    __log_progress__ "Configuring desktop extensions"
 
     gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-position "alphabetical"
     gsettings set org.gnome.shell.extensions.alphabetical-app-grid logging-enabled false
@@ -110,6 +118,7 @@ log_title() {
     gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur false
     gsettings set org.gnome.shell.extensions.blur-my-shell.hidetopbar compatibility false
     gsettings set org.gnome.shell.extensions.blur-my-shell.overview style-components 0
+    gsettings set org.gnome.shell.extensions.blur-my-shell.panel customize true
     gsettings set org.gnome.shell.extensions.blur-my-shell.panel brightness 1.0
     gsettings set org.gnome.shell.extensions.blur-my-shell.panel override-background-dynamically true
     gsettings set org.gnome.shell.extensions.blur-my-shell.panel sigma 0
@@ -142,7 +151,39 @@ log_title() {
 
     gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
 
-    log_success_and_replace "Configuring desktop extensions"
+    __log_success__ "Configuring desktop extensions"
+}
+
+01_configure_desktop_theme() {
+    __log_title__ "\n==> Configuring desktop theme"
+
+    # ################################################################
+    # Applying theme to legacy applications
+    # ################################################################
+
+    __log_progress__ "Applying theme to legacy applications"
+
+    gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
+
+    __log_success__ "Applying theme to legacy applications"
+
+    # ################################################################
+    # Applying theme to sandboxed applications
+    # ################################################################
+
+    __log_progress__ "Applying theme to sandboxed applications"
+
+    __install_dnf__ \
+        libappstream-glib \
+        ostree
+
+    wget --quiet "https://raw.githubusercontent.com/refi64/stylepak/master/stylepak"
+    chmod +x stylepak
+    sudo mv stylepak /usr/bin/
+
+    stylepak install-user >$NO_OUTPUT
+
+    __log_success__ "Applying theme to sandboxed applications"
 }
 
 # --------------------------------
@@ -171,5 +212,6 @@ cat <<"EOT"
 EOT
 
 00_configure_desktop_extensions
+01_configure_desktop_theme
 
 echo -e "\n[ ${ECHO_BOLD}DONE${ECHO_RESET} ]"

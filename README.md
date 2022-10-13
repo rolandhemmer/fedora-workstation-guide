@@ -147,6 +147,7 @@ sudo hostnamectl set-hostname --static $static_hostname
 Apply the following Git settings:
 
 ```bash
+git config --global commit.gpgsign true
 git config --global core.autocrlf input
 git config --global core.editor vim
 git config --global core.eol lf
@@ -174,16 +175,16 @@ max_parallel_downloads=20
 EOT
 ```
 
-Enable the Flathub repository:
+Enable the recommended Flatpak repositories:
 
 ``` bash
-sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak remote-add --if-not-exists --user fedora oci+https://registry.fedoraproject.org
+flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
 ```
 
 Update and clean existing system Flatpaks:
 
 ```bash
-sudo flatpak repair --system
 sudo flatpak update --system --assumeyes
 sudo flatpak uninstall --system --assumeyes --unused
 ```
@@ -191,7 +192,6 @@ sudo flatpak uninstall --system --assumeyes --unused
 Update and clean existing user Flatpaks:
 
 ```bash
-flatpak repair --user
 flatpak update --user --assumeyes
 flatpak uninstall --user --assumeyes --unused
 
@@ -202,8 +202,8 @@ flatpak override --user --device=dri
 Enabling the Fedora RPM Fusion repositories:
 
 ```bash
-sudo dnf install --assumeyes https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-sudo dnf install --assumeyes https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+sudo dnf install --assumeyes https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm --eval %fedora).noarch.rpm
+sudo dnf install --assumeyes https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm --eval %fedora).noarch.rpm
 
 sudo dnf install --assumeyes \
     fedora-workstation-repositories \
@@ -326,6 +326,7 @@ sudo akmods --force
 sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1'
 
 echo "options nvidia_drm modeset=1" | sudo tee /etc/modprobe.d/nvidia.conf
+echo "blacklist nouveau" | sudo tee /etc/modprobe.d/blacklist.conf
 
 sudo tee /etc/dracut.conf.d/nvidia.conf <<EOT
 add_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "
@@ -352,7 +353,7 @@ sudo dracut --force
 Enable the following kernel self-protection parameters:
 
 ```bash
-sudo tee /etc/sysctl.conf >$NO_OUTPUT <<EOT
+    sudo tee /etc/sysctl.conf <<EOT
 ## Kernel Self-Protection
 
 # Reduces buffer overflows attacks
@@ -625,6 +626,12 @@ gsettings set org.gnome.desktop.interface monospace-font-name "Roboto Mono 11"
 gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 11"
 ```
 
+Once installed, rebuild the system font caches:
+
+```bash
+sudo fc-cache --really-force
+```
+
 **[:arrow_up: Back to Top](#0-details)**
 
 ### 4.2. Desktop Theme
@@ -634,30 +641,38 @@ gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 11"
 Use the following commands to install the [Colloid GTK theme](https://github.com/vinceliuice/Colloid-gtk-theme):
 
 ```bash
+mkdir --parents ~/.gnome/sources/themes
+
 sudo dnf install --assumeyes \
     gtk-murrine-engine \
     gnome-themes-extra \
     gnome-themes-standard \
     sassc
 
-mkdir --parents ~/.themes/_sources/Colloid
-mkdir --parents ~/.local/share/themes
+cd ~/.gnome/sources/themes
+git clone "https://github.com/vinceliuice/Colloid-gtk-theme.git" Colloid
+cd Colloid
 
-cd ~/.themes/_sources/Colloid
-
-git clone "https://github.com/vinceliuice/Colloid-gtk-theme.git" shell
-cd shell
-
-./install.sh \
+sudo ./install.sh \
     --color dark \
-    --dest "~/.local/share/themes" \
     --theme default \
     --tweaks rimless
 
-flatpak override --user --filesystem=~/.local/share/themes
-
 gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
-gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
+```
+
+Then, apply this theme to sandboxed applications using [Stylepak](https://github.com/refi64/stylepak):
+
+```bash
+sudo dnf install --assumeyes \
+    appstream-glib \
+    ostree
+
+wget "https://raw.githubusercontent.com/refi64/stylepak/master/stylepak"
+chmod +x stylepak
+sudo mv stylepak /usr/bin/
+
+stylepak install-user
 ```
 
 **[:arrow_up: Back to Top](#0-details)**
@@ -667,22 +682,17 @@ gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 Use the following commands to install the [Colloid icon theme](https://github.com/vinceliuice/Colloid-icon-theme):
 
 ```bash
-mkdir --parents ~/.themes/_sources/Colloid
-mkdir --parents ~/.local/share/icons
+mkdir --parents ~/.gnome/sources/icons
 
-cd ~/.themes/_sources/Colloid
+cd ~/.gnome/sources/icons
+git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" Colloid
+cd Colloid
 
-git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" icons
-cd icons
-
-./install.sh \
-    --dest "~/.local/share/icons" \
+sudo ./install.sh \
     --scheme default \
     --theme default
 
-flatpak override --user --filesystem=~/.local/share/icons
-
-gsettings set org.gnome.desktop.interface icon-theme "Colloid"
+gsettings set org.gnome.desktop.interface icon-theme "Colloid-dark"
 ```
 
 **[:arrow_up: Back to Top](#0-details)**
@@ -692,18 +702,13 @@ gsettings set org.gnome.desktop.interface icon-theme "Colloid"
 Use the following commands to install the [Colloid cursor theme](https://github.com/vinceliuice/Colloid-icon-theme):
 
 ```bash
-mkdir --parents ~/.themes/_sources/Colloid
-mkdir --parents ~/.local/share/icons
+mkdir --parents ~/.gnome/sources/cursors
 
-cd ~/.themes/_sources/Colloid
+cd ~/.gnome/sources/cursors
+git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" Colloid
+cd Colloid/cursors
 
-git clone "https://github.com/vinceliuice/Colloid-icon-theme.git" cursors
-cd cursors/cursors
-
-./install.sh \
-    --dest "~/.local/share/icons"
-
-flatpak override --user --filesystem=~/.local/share/icons
+sudo ./install.sh
 
 gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
 ```
@@ -724,7 +729,6 @@ Install the [GNOME extension manager](https://flathub.org/apps/details/org.gnome
 
 ```bash
 flatpak install --assumeyes --user flathub org.gnome.Extensions
-sudo flatpak override --user --device=dri org.gnome.Extensions
 ```
 
 Install the [GNOME extension installer](https://github.com/brunelli/gnome-shell-extension-installer):
@@ -738,7 +742,7 @@ sudo dnf install --assumeyes \
   less \
   perl
 
-wget "https://github.com/brunelli/gnome-shell-extension-installer/raw/master/gnome-shell-extension-installer"
+wget "https://raw.githubusercontent.com/brunelli/gnome-shell-extension-installer/master/gnome-shell-extension-installer"
 chmod +x gnome-shell-extension-installer
 sudo mv --verbose gnome-shell-extension-installer /usr/bin/
 ```
@@ -850,6 +854,7 @@ gsettings set org.gnome.shell.extensions.blur-my-shell.applications opacity 255
 gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur false
 gsettings set org.gnome.shell.extensions.blur-my-shell.hidetopbar compatibility false
 gsettings set org.gnome.shell.extensions.blur-my-shell.overview style-components 0
+gsettings set org.gnome.shell.extensions.blur-my-shell.panel customize true
 gsettings set org.gnome.shell.extensions.blur-my-shell.panel brightness 1.0
 gsettings set org.gnome.shell.extensions.blur-my-shell.panel override-background-dynamically true
 gsettings set org.gnome.shell.extensions.blur-my-shell.panel sigma 0
@@ -881,6 +886,8 @@ gsettings set org.gnome.shell.extensions.hidetopbar mouse-triggers-overview true
 gsettings set org.gnome.shell.extensions.hidetopbar show-in-overview true
 
 gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
+
+gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 ```
 
 **[:arrow_up: Back to Top](#0-details)**
@@ -906,29 +913,11 @@ sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.
 
 </div>
 
-Install the [Monokai terminal theme](https://github.com/0xcomposure/monokai-gnome-terminal):
-
-```bash
-sudo dnf install --assumeyes dconf
-
-mkdir --parents ~/.themes/_sources/Monokai
-cd ~/.themes/_sources/Monokai
-
-git clone "https://github.com/0xComposure/monokai-gnome-terminal" terminal
-cd terminal
-
-echo "1\nYES\n" | ./install.sh
-```
-
 **[:arrow_up: Back to Top](#0-details)**
 
 ## 6. Applications
 
 Install the following applications:
-
-> Giving Flatpak applications access to the $HOME folder applies the custom GTK theme on them, even with sandboxing enabled.
-> Giving access to the GPU `device=dri` enables hardware-acceleration when possible (which might be more hazardous, depending on the application itself).
-> These applications are from trusted sources, as possible.
 
 - [Bleachbit](https://www.bleachbit.org/)
 
@@ -940,14 +929,12 @@ sudo dnf install --assumeyes bleachbit
 
 ```bash
 flatpak install --assumeyes --user flathub com.discordapp.Discord
-sudo flatpak override --user --device=dri com.discordapp.Discord
 ```
 
 - [Flatseal](https://github.com/tchx84/Flatseal)
 
 ```bash
 flatpak install --assumeyes --user flathub com.github.tchx84.Flatseal
-sudo flatpak override --user --device=dri com.github.tchx84.Flatseal
 ```
 
 - [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/)
@@ -959,14 +946,12 @@ sudo killall firefox
 rm --force --recursive --verbose ~/.mozilla
 
 flatpak install --assumeyes --user flathub org.mozilla.firefox
-sudo flatpak override --user --device=dri org.mozilla.firefox
 ```
 
 - [ONLYOFFICE](https://www.onlyoffice.com/s)
 
 ```bash
 flatpak install --assumeyes --user flathub org.onlyoffice.desktopeditors
-sudo flatpak override --user --device=dri org.onlyoffice.desktopeditors
 ```
 
 - [Visual Studio Codium](https://vscodium.com/)
@@ -984,7 +969,6 @@ sudo dnf install --assumeyes codium
 
 ```bash
 flatpak install --assumeyes --user flathub org.videolan.VLC
-sudo flatpak override --user --device=dri org.videolan.VLC
 ```
 
 **[:arrow_up: Back to Top](#0-details)**
@@ -1010,14 +994,12 @@ Then, install the following:
 
 ```bash
 flatpak install --assumeyes --user flathub net.lutris.Lutris
-sudo flatpak override --user --device=dri net.lutris.Lutris
 ```
 
 - [Steam](https://store.steampowered.com/)
 
 ```bash
 flatpak install --assumeyes --user flathub com.valvesoftware.Steam
-sudo flatpak override --user --device=dri com.valvesoftware.Steam
 ```
 
 > For other clients like the Epic Games Store and GOG, check out the [Heroic Game Launcher](https://heroicgameslauncher.com/).
@@ -1043,6 +1025,7 @@ sudo dnf remove --assumeyes \
     gnome-connections \
     gnome-contacts \
     gnome-maps \
+    gnome-photos \
     gnome-text-editor \
     gnome-tour \
     gnome-weather \
