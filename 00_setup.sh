@@ -34,14 +34,14 @@ begins_with_short_option() {
 die() {
     local _ret="${2:-1}"
     test "${_PRINT_HELP:-no}" = yes && print_help >&2
-    echo "$1" >&2
+    echo -e "[ ${ECHO_RED}KO${ECHO_RESET} ]\t$1" >&2
     exit "${_ret}"
 }
 
 handle_passed_args_count() {
     local _required_args_string="'static-hostname' and 'pretty-hostname'"
-    test "${_positionals_count}" -ge 2 || _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require exactly 2 (namely: $_required_args_string), but got only ${_positionals_count}." 1
-    test "${_positionals_count}" -le 2 || _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect exactly 2 (namely: $_required_args_string), but got ${_positionals_count} (the last one was: '${_last_positional}')." 1
+    test "${_positionals_count}" -ge 2 || _PRINT_HELP=yes die "Not enough arguments - exactly 2 required (namely: $_required_args_string), only got ${_positionals_count}" 1
+    test "${_positionals_count}" -le 2 || _PRINT_HELP=yes die "Too many arguments - exactly 2 required (namely: $_required_args_string), got ${_positionals_count} (last one was: '${_last_positional}')" 1
 }
 
 parse_commandline() {
@@ -90,13 +90,14 @@ parse_commandline() {
 }
 
 print_help() {
-    printf '%s\n' "Fedora Workstation Personal Installation Script"
-    printf 'Usage: %s [-l|--luks-partition <arg>] [-n|--(no-)nvidia-drivers] [-h|--help] <static-hostname> <pretty-hostname>\n' "$0"
-    printf '\t%s\n' "<static-hostname>: Static name of the system, containing only lowercase letters, numbers and/or dashes (e.g: \"system-name-01\")"
-    printf '\t%s\n' "<pretty-hostname>: \"Pretty\" name of the system, without restrictions (e.g: \"System Name 01\")"
-    printf '\t%s\n' "-l, --luks-partition: Partition name of the LUKS container to be automatically decrypted using the TPM chip (e.g: /dev/sda1) (no default)"
-    printf '\t%s\n' "-n, --nvidia-drivers, --no-nvidia-drivers: include latest Nvidia drivers with installation (off by default)"
-    printf '\t%s\n' "-h, --help: Prints help"
+    printf '%s\n\n' "Fedora Workstation Personal Installation Script (1/2)"
+    printf 'Usage: %s <static-hostname> <pretty-hostname> [-l|--luks-partition <arg>] [-n|--nvidia-drivers] [-h|--help]\n' "$0"
+    printf '\t%s\t%s\t%s\n' "<static-hostname>" "Static name of the system, containing only lowercase letters, numbers and/or dashes" "(e.g: \"system-name-01\")"
+    printf '\t%s\t%s\t\t\t\t\t\t%s\n' "<pretty-hostname>" "Pretty name of the system, without restrictions" "(e.g: \"System Name 01\")"
+    printf '\t%s\t%s\t%s\n' "-l, --luks-partition" "Partition name of the LUKS container to be automatically decrypted using the TPM chip" "(e.g: /dev/sda1)"
+    printf '\t%s\t%s\n' "-n, --nvidia-drivers" "Include latest Nvidia drivers with installation"
+    printf '\t%s\t\t%s\n' "-h, --help" "Prints help"
+    printf '\n'
 }
 
 # --------------------------------
@@ -127,7 +128,7 @@ __log_title__() {
     echo -e "${ECHO_BOLD}$1${ECHO_RESET}"
 }
 
-00_setup_hostname() {
+00_setup_prerequisites() {
     # ################################################################
     # Configuring hostname
     # ################################################################
@@ -851,21 +852,22 @@ EOT
 # Main
 # --------------------------------
 
+export ECHO_BOLD="\033[1m"
+export ECHO_GREEN="\033[1;32m"
+export ECHO_GREY="\033[0;37m"
+export ECHO_RED="\033[1;31m"
+export ECHO_RESET="\033[0m"
+export ECHO_REPLACE="\033[1A\033[K"
+
+export NO_OUTPUT="/dev/null"
+
 parse_commandline "$@"
 handle_passed_args_count
 assign_positional_args 1 "${_positionals[@]}"
 
 set -e
 
-export ECHO_BOLD="\033[1m"
-export ECHO_GREEN="\033[1;32m"
-export ECHO_GREY="\033[0;37m"
-export ECHO_RESET="\033[0m"
-export ECHO_REPLACE="\033[1A\033[K"
-
-export NO_OUTPUT="/dev/null"
-
-cat <<"EOT"
+cat <<EOT
     ________________  ____  ____  ___       _____ ______________  ______
    / ____/ ____/ __ \/ __ \/ __ \/   |     / ___// ____/_  __/ / / / __ \
   / /_  / __/ / / / / / / / /_/ / /| |     \__ \/ __/   / / / / / / /_/ /
@@ -874,7 +876,7 @@ cat <<"EOT"
 
 EOT
 
-00_setup_hostname
+00_setup_prerequisites
 01_update_system
 
 if [ ${_arg_nvidia_drivers} = "on" ]; then
@@ -895,4 +897,4 @@ fi
 10_install_gaming_requirements
 11_cleanup
 
-echo -e "\n[ ${ECHO_BOLD}DONE${ECHO_RESET} ]"
+echo -e "\n[ ${ECHO_BOLD}OK${ECHO_RESET} ]"

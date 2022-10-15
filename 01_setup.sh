@@ -17,7 +17,7 @@ begins_with_short_option() {
 die() {
     local _ret="${2:-1}"
     test "${_PRINT_HELP:-no}" = yes && print_help >&2
-    echo "$1" >&2
+    echo -e "[ ${ECHO_RED}KO${ECHO_RESET} ]\t$1" >&2
     exit "${_ret}"
 }
 
@@ -34,7 +34,7 @@ parse_commandline() {
             exit 0
             ;;
         *)
-            _PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$1'" 1
+            _PRINT_HELP=yes die "Unexpected argument '$1'" 1
             ;;
         esac
         shift
@@ -42,9 +42,10 @@ parse_commandline() {
 }
 
 print_help() {
-    printf '%s\n' "The general script's help msg"
+    printf '%s\n\n' "Fedora Workstation Personal Installation Script (2/2)"
     printf 'Usage: %s [-h|--help]\n' "$0"
-    printf '\t%s\n' "-h, --help: Prints help"
+    printf '\t%s\t\t%s\n' "-h, --help" "Prints help"
+    printf '\n'
 }
 
 # --------------------------------
@@ -190,19 +191,20 @@ __log_title__() {
 # Main
 # --------------------------------
 
-parse_commandline "$@"
-
-set -e
-
 export ECHO_BOLD="\033[1m"
 export ECHO_GREEN="\033[1;32m"
 export ECHO_GREY="\033[0;37m"
+export ECHO_RED="\033[1;31m"
 export ECHO_RESET="\033[0m"
 export ECHO_REPLACE="\033[1A\033[K"
 
 export NO_OUTPUT="/dev/null"
 
-cat <<"EOT"
+parse_commandline "$@"
+
+set -e
+
+cat <<EOT
     ________________  ____  ____  ___       _____ ______________  ______
    / ____/ ____/ __ \/ __ \/ __ \/   |     / ___// ____/_  __/ / / / __ \
   / /_  / __/ / / / / / / / /_/ / /| |     \__ \/ __/   / / / / / / /_/ /
@@ -214,4 +216,4 @@ EOT
 00_configure_desktop_extensions
 01_configure_desktop_theme
 
-echo -e "\n[ ${ECHO_BOLD}DONE${ECHO_RESET} ]"
+echo -e "\n[ ${ECHO_BOLD}OK${ECHO_RESET} ]"
