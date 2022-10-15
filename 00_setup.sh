@@ -235,6 +235,7 @@ EOT
 
     __log_progress__ "Performing a full system upgrade"
 
+    sudo dnf clean --assumeyes --quiet all >$NO_OUTPUT
     sudo dnf upgrade --assumeyes --quiet --refresh >$NO_OUTPUT
 
     __log_success__ "Performing a full system upgrade"

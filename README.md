@@ -216,6 +216,7 @@ sudo dnf group update core --assumeyes
 Perform a full system upgrade:
 
 ``` bash
+sudo dnf clean --assumeyes all
 sudo dnf upgrade --assumeyes --refresh
 ```
 
