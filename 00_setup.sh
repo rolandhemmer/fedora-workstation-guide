@@ -728,12 +728,34 @@ EOT
     __log_success__ "Installing Discord"
 
     # ################################################################
+    # Installing Fedora Media Writer
+    # ################################################################
+
+    __log_progress__ "Installing Fedora Media Writer"
+
+    # 'killall' fails is there is no process of that name
+    sudo killall liveusb-creator >$NO_OUTPUT 2>&1 || true
+    sudo dnf remove --assumeyes --quiet liveusb-creator >$NO_OUTPUT
+
+    __install_flatpak__ "org.fedoraproject.MediaWriter"
+
+    __log_success__ "Installing Fedora Media Writer"
+
+    # ################################################################
     # Installing Flatseal
     # ################################################################
 
     __log_progress__ "Installing Flatseal"
     __install_flatpak__ "com.github.tchx84.Flatseal"
     __log_success__ "Installing Flatseal"
+
+    # ################################################################
+    # Installing Fragments
+    # ################################################################
+
+    __log_progress__ "Installing Fragments"
+    __install_flatpak__ "de.haeckerfelix.Fragments"
+    __log_success__ "Installing Fragments"
 
     # ################################################################
     # Installing Mozilla Firefox
@@ -743,9 +765,9 @@ EOT
 
     # 'killall' fails is there is no process of that name
     sudo killall firefox >$NO_OUTPUT 2>&1 || true
+    sudo dnf remove --assumeyes --quiet firefox >$NO_OUTPUT
     rm --force --recursive ~/.mozilla
 
-    sudo dnf remove --assumeyes --quiet firefox >$NO_OUTPUT
     __install_flatpak__ "org.mozilla.firefox"
 
     __log_success__ "Installing Mozilla Firefox"
@@ -840,7 +862,6 @@ EOT
         gnome-text-editor \
         gnome-tour \
         gnome-weather \
-        liveusb-creator \
         rhythmbox \
         totem \
         yelp >$NO_OUTPUT

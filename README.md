@@ -931,10 +931,27 @@ sudo dnf install --assumeyes bleachbit
 flatpak install --assumeyes --user flathub com.discordapp.Discord
 ```
 
+- [Fedora Media Writer](https://flathub.org/apps/details/org.fedoraproject.MediaWriter)
+
+> Replacing the pre-installed RPM with its Flatpak variant for better system consistency:
+
+```bash
+sudo killall liveusb-creator
+sudo dnf remove --assumeyes liveusb-creator
+
+flatpak install --assumeyes --user flathub org.fedoraproject.MediaWriter
+```
+
 - [Flatseal](https://github.com/tchx84/Flatseal)
 
 ```bash
 flatpak install --assumeyes --user flathub com.github.tchx84.Flatseal
+```
+
+- [Fragments](https://flathub.org/apps/details/de.haeckerfelix.Fragments)
+
+```bash
+flatpak install --assumeyes --user flathub de.haeckerfelix.Fragments
 ```
 
 - [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/)
@@ -943,6 +960,7 @@ flatpak install --assumeyes --user flathub com.github.tchx84.Flatseal
 
 ```bash
 sudo killall firefox
+sudo dnf remove --assumeyes firefox
 rm --force --recursive --verbose ~/.mozilla
 
 flatpak install --assumeyes --user flathub org.mozilla.firefox
@@ -1029,7 +1047,6 @@ sudo dnf remove --assumeyes \
     gnome-text-editor \
     gnome-tour \
     gnome-weather \
-    liveusb-creator \
     rhythmbox \
     totem \
     yelp
