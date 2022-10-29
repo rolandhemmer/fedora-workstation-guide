@@ -203,6 +203,7 @@ export NO_OUTPUT="/dev/null"
 parse_commandline "$@"
 
 set -e
+sudo echo ""
 
 cat <<"EOT"
     ________________  ____  ____  ___       _____ ______________  ______

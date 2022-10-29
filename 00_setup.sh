@@ -237,6 +237,7 @@ EOT
 
     sudo dnf clean --assumeyes --quiet all >$NO_OUTPUT
     sudo dnf upgrade --assumeyes --quiet --refresh >$NO_OUTPUT
+    __install_dnf__ neofetch
 
     __log_success__ "Performing a full system upgrade"
 
@@ -805,33 +806,16 @@ EOT
     __log_success__ "Installing VLC"
 }
 
-10_install_gaming_requirements() {
-    __log_title__ "\n==> Installing gaming requirements"
+10_install_gaming_features() {
+    __log_title__ "\n==> Installing gaming features"
 
     # ################################################################
-    # Installing required 32-bit libraries
+    # Installing Bottles
     # ################################################################
 
-    __log_progress__ "Installing required 32-bit libraries"
-
-    __install_dnf__ \
-        freetype.i686 \
-        gnutls.i686 \
-        libgpg-error.i686 \
-        openldap.i686 \
-        pulseaudio-libs.i686 \
-        sqlite2.i686 \
-        vulkan-loader.i686
-
-    __log_success__ "Installing required 32-bit libraries"
-
-    # ################################################################
-    # Installing Lutris
-    # ################################################################
-
-    __log_progress__ "Installing Lutris"
-    __install_flatpak__ "net.lutris.Lutris"
-    __log_success__ "Installing Lutris"
+    __log_progress__ "Installing Bottles"
+    __install_flatpak__ "com.usebottles.bottles"
+    __log_success__ "Installing Bottles"
 
     # ################################################################
     # Installing Steam
@@ -842,7 +826,20 @@ EOT
     __log_success__ "Installing Steam"
 }
 
-11_cleanup() {
+11_install_automation_scripts() {
+    __log_title__ "\n==> Installing automation scripts"
+
+    # ################################################################
+    # Installing update script
+    # ################################################################
+
+    __log_progress__ "Installing update script"
+    sudo mv scripts/update.sh /usr/bin/update
+    __log_success__ "Installing update script"
+
+}
+
+12_cleanup() {
     __log_title__ "\n==> Cleaning up"
 
     __log_progress__ "Removing unneeded applications"
@@ -888,6 +885,7 @@ handle_passed_args_count
 assign_positional_args 1 "${_positionals[@]}"
 
 set -e
+sudo echo ""
 
 cat <<"EOT"
     ________________  ____  ____  ___       _____ ______________  ______
@@ -916,7 +914,8 @@ fi
 07_install_desktop_extensions
 08_install_terminal_options
 09_install_applications
-10_install_gaming_requirements
-11_cleanup
+10_install_gaming_features
+11_install_automation_scripts
+12_cleanup
 
 echo -e "\n[ ${ECHO_BOLD}OK${ECHO_RESET} ]"
