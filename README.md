@@ -1057,25 +1057,12 @@ flatpak install --assumeyes --user flathub org.videolan.VLC
 
 ## 7. Gaming
 
-Install the required 32-bit libraries, as prerequisites:
+Install the following:
+
+- [Bottles](https://usebottles.com/)
 
 ```bash
-sudo dnf install --assumeyes \
-    freetype.i686 \
-    gnutls.i686 \
-    libgpg-error.i686 \
-    openldap.i686 \
-    pulseaudio-libs.i686 \
-    sqlite2.i686 \
-    vulkan-loader.i686
-```
-
-Then, install the following:
-
-- [Lutris](https://lutris.net/)
-
-```bash
-flatpak install --assumeyes --user flathub net.lutris.Lutris
+flatpak install --assumeyes --user flathub com.usebottles.bottles
 ```
 
 - [Steam](https://store.steampowered.com/)

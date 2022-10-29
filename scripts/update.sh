@@ -95,7 +95,7 @@ parse_commandline() {
             exit 0
             ;;
         *)
-            _PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$1'" 1
+            _PRINT_HELP=yes die "Unexpected argument '$1'" 1
             ;;
         esac
         shift
