@@ -31,12 +31,50 @@ On the very first reboot, after creating your account:
 - disable `Automatic Problem Reporting`
 - enable `Third-Party Repositories`
 
-Then, run (**not** as `sudo`):
+### Available Scripts
 
-> All script arguments can be combined.
+- First installation script:
+
+```text
+Fedora Workstation Personal Installation Script (1/2)
+
+Usage: ./scripts/setup_00.sh <static-hostname> <pretty-hostname> [-l|--luks-partition <arg>] [-n|--nvidia-drivers] [-h|--help]
+        <static-hostname>       Static name of the system, containing only lowercase letters, numbers and/or dashes     (e.g: "system-name-01")
+        <pretty-hostname>       Pretty name of the system, without restrictions                                         (e.g: "System Name 01")
+        -l, --luks-partition    Partition name of the LUKS container to be automatically decrypted using the TPM chip   (e.g: /dev/sda1)
+        -n, --nvidia-drivers    Include latest Nvidia drivers with installation
+        -h, --help              Prints help
+```
+
+- Second installation script (after reboot):
+
+```text
+Fedora Workstation Personal Installation Script (2/2)
+
+Usage: ./scripts/setup_01.sh [-h|--help]
+        -h, --help              Prints help
+```
+
+- Update script (for maintenance):
+
+```text
+Fedora Workstation Personal Update Script
+
+Usage: ./scripts/update.sh [-a|--all] [-s|--system] [-e|--extensions] [-t|--theme] [-l|--luks-partition <arg>] [-h|--help]
+        -a, --all               Update everything (system, extensions, and theme)
+        -s, --system            Update only system packages and applications
+        -e, --extensions        Update only GNOME extensions
+        -t, --theme             Update only GNOME theme (shell, cursors, and icons)
+        -l, --luks-partition    Partition name of the LUKS container to be automatically decrypted using the TPM chip   (e.g: /dev/sda1)
+        -h, --help              Prints help
+```
+
+### Installation
+
+Run (**not** as `sudo`):
 
 ```bash
-./00_setup.sh $static_hostname $pretty_hostname
+./scripts/setup_00.sh $static_hostname $pretty_hostname
 ```
 
 - If you have a Nvidia GPU, add:
@@ -64,10 +102,32 @@ sudo reboot
 After reboot, finish the installation with:
 
 ```bash
-./01_setup.sh
+./scripts/setup_01.sh
 ```
 
-Done!
+### Update
+
+To update your system and automatically re-apply everything from this guide, run (**not** as `sudo`):
+
+```bash
+update --all
+```
+
+- If you have an encrypted LUKS installation **and** a TPM 2.0 chip, add:
+
+```bash
+--luks-partition="<partition-name>"
+```
+
+> See [4.3. LUKS Decryption With TPM](#43-luks-decryption-with-tpm) on how to identify the correct partition name.  
+> If the system has been installed on an NVMe disk alone, the partition name will likely be:  
+> `/dev/nvme0n1p3`
+
+For a more detailed usage, run:
+
+```bash
+update --help
+```
 
 ## License
 
@@ -85,6 +145,9 @@ See the [LICENSE.md](LICENSE.md) file for the full license text.
 
 - [Fedora Workstation Installation Guide](#fedora-workstation-installation-guide)
   - [Quick Start](#quick-start)
+    - [Available Scripts](#available-scripts)
+    - [Installation](#installation)
+    - [Update](#update)
   - [License](#license)
   - [0. Details](#0-details)
   - [1. System Setup](#1-system-setup)
