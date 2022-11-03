@@ -583,9 +583,9 @@ EOT
 
     __log_progress__ "Installing shell theme"
 
-    mkdir --parents ~/.gnome/sources/themes || true
-    mkdir --parents ~/.gnome/sources/icons || true
-    mkdir --parents ~/.gnome/sources/cursors || true
+    mkdir --parents ~/.setup/theme || true
+    mkdir --parents ~/.setup/icons || true
+    mkdir --parents ~/.setup/cursors || true
 
     __install_dnf__ \
         gtk-murrine-engine \
@@ -593,7 +593,7 @@ EOT
         gnome-themes-standard \
         sassc
 
-    cd ~/.gnome/sources/themes
+    cd ~/.setup/theme
     # 'git clone' can fail if the destination folder already exists
     git clone --quiet "https://github.com/vinceliuice/Colloid-gtk-theme.git" Colloid >$NO_OUTPUT 2>&1 || true
     cd Colloid
@@ -613,7 +613,7 @@ EOT
 
     __log_progress__ "Installing icon theme"
 
-    cd ~/.gnome/sources/icons
+    cd ~/.setup/icons
     # 'git clone' can fail if the destination folder already exists
     git clone --quiet "https://github.com/vinceliuice/Colloid-icon-theme.git" Colloid >$NO_OUTPUT 2>&1 || true
     cd Colloid
@@ -632,7 +632,7 @@ EOT
 
     __log_progress__ "Installing cursor theme"
 
-    cd ~/.gnome/sources/cursors
+    cd ~/.setup/cursors
     # 'git clone' can fail if the destination folder already exists
     git clone --quiet "https://github.com/vinceliuice/Colloid-icon-theme.git" Colloid >$NO_OUTPUT 2>&1 || true
     cd Colloid/cursors
@@ -664,9 +664,15 @@ EOT
         less \
         perl
 
-    wget --quiet "https://raw.githubusercontent.com/brunelli/gnome-shell-extension-installer/master/gnome-shell-extension-installer"
+    mkdir --parents ~/.setup/tools || true
+
+    cd ~/.setup/tools
+    # 'git clone' can fail if the destination folder already exists
+    git clone --quiet "https://github.com/brunelli/gnome-shell-extension-installer.git" extension-installer >$NO_OUTPUT 2>&1 || true
+
+    cd extension-installer
     chmod +x gnome-shell-extension-installer
-    sudo mv gnome-shell-extension-installer /usr/bin/
+    sudo cp gnome-shell-extension-installer /usr/bin/
 
     __log_success__ "Enabling desktop extensions support"
 
@@ -833,7 +839,7 @@ EOT
     # ################################################################
 
     __log_progress__ "Installing update script"
-    sudo mv scripts/update.sh /usr/bin/update
+    sudo cp scripts/update.sh /usr/bin/update
     __log_success__ "Installing update script"
 
 }

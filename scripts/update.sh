@@ -208,6 +208,10 @@ __log_title__() {
     sudo wget --quiet "https://raw.githubusercontent.com/MartinPL/Tray-Icons-Reloaded/master/schemas/org.gnome.shell.extensions.trayIconsReloaded.gschema.xml"
     sudo glib-compile-schemas . >$NO_OUTPUT 2>&1
 
+    cd ~/.setup/tools/extension-installer
+    __git_reset__
+    sudo cp gnome-shell-extension-installer /usr/bin/
+
     gnome-shell-extension-installer --update --yes >$NO_OUTPUT 2>&1
 
     __log_success__ "Updating desktop extensions"
