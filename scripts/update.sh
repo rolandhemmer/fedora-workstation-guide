@@ -208,7 +208,7 @@ __log_title__() {
     sudo wget --quiet "https://raw.githubusercontent.com/MartinPL/Tray-Icons-Reloaded/master/schemas/org.gnome.shell.extensions.trayIconsReloaded.gschema.xml"
     sudo glib-compile-schemas . >$NO_OUTPUT 2>&1
 
-    cd ~/.setup/tools/extension-installer
+    cd ~/.setup/tools/gnome-shell-extension-installer
     __git_reset__
     sudo cp gnome-shell-extension-installer /usr/bin/
 
@@ -332,7 +332,7 @@ __log_title__() {
 
     __log_progress__ "Updating shell theme"
 
-    cd ~/.gnome/sources/themes/Colloid
+    cd ~/.setup/shell/Colloid
     __git_reset__
 
     sudo ./install.sh \
@@ -344,6 +344,9 @@ __log_title__() {
     gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
     gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 
+    cd ~/.setup/tools/stylepak
+    __git_reset__
+
     stylepak install-user >$NO_OUTPUT
 
     __log_success__ "Updating shell theme"
@@ -354,7 +357,7 @@ __log_title__() {
 
     __log_progress__ "Updating icon theme"
 
-    cd ~/.gnome/sources/icons/Colloid
+    cd ~/.setup/icons/Colloid
     __git_reset__
 
     sudo ./install.sh \
@@ -371,7 +374,7 @@ __log_title__() {
 
     __log_progress__ "Updating cursor theme"
 
-    cd ~/.gnome/sources/cursors/Colloid/cursors
+    cd ~/.setup/cursors/Colloid/cursors
     __git_reset__
 
     sudo ./install.sh >$NO_OUTPUT 2>&1

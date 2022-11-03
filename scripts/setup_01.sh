@@ -177,9 +177,13 @@ __log_title__() {
         libappstream-glib \
         ostree
 
-    wget --quiet "https://raw.githubusercontent.com/refi64/stylepak/master/stylepak"
+    cd ~/.setup/tools
+    # 'git clone' can fail if the destination folder already exists
+    git clone --quiet "https://github.com/refi64/stylepak.git" stylepak >$NO_OUTPUT 2>&1 || true
+
+    cd stylepak
     chmod +x stylepak
-    sudo mv stylepak /usr/bin/
+    sudo cp stylepak /usr/bin/
 
     stylepak install-user >$NO_OUTPUT
 

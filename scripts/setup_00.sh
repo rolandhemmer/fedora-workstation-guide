@@ -583,7 +583,7 @@ EOT
 
     __log_progress__ "Installing shell theme"
 
-    mkdir --parents ~/.setup/theme || true
+    mkdir --parents ~/.setup/shell || true
     mkdir --parents ~/.setup/icons || true
     mkdir --parents ~/.setup/cursors || true
 
@@ -593,7 +593,7 @@ EOT
         gnome-themes-standard \
         sassc
 
-    cd ~/.setup/theme
+    cd ~/.setup/shell
     # 'git clone' can fail if the destination folder already exists
     git clone --quiet "https://github.com/vinceliuice/Colloid-gtk-theme.git" Colloid >$NO_OUTPUT 2>&1 || true
     cd Colloid
@@ -669,9 +669,9 @@ EOT
 
     cd ~/.setup/tools
     # 'git clone' can fail if the destination folder already exists
-    git clone --quiet "https://github.com/brunelli/gnome-shell-extension-installer.git" extension-installer >$NO_OUTPUT 2>&1 || true
+    git clone --quiet "https://github.com/brunelli/gnome-shell-extension-installer.git" gnome-shell-extension-installer >$NO_OUTPUT 2>&1 || true
 
-    cd extension-installer
+    cd gnome-shell-extension-installer
     chmod +x gnome-shell-extension-installer
     sudo cp gnome-shell-extension-installer /usr/bin/
 
