@@ -105,13 +105,12 @@ parse_commandline() {
 print_help() {
     printf '%s\n\n' "Fedora Workstation Personal Update Script"
     printf 'Usage: %s [-a|--all] [-s|--system] [-e|--extensions] [-t|--theme] [-l|--luks-partition <arg>] [-h|--help]\n' "$0"
-    printf '\t%s\t\t%s\n' "-a, --all" "Update everything (system, extensions, and theme)"
-    printf '\t%s\t\t%s\n' "-s, --system" "Update only system packages and applications"
-    printf '\t%s\t%s\n' "-e, --extensions" "Update only GNOME extensions"
-    printf '\t%s\t\t%s\n' "-t, --theme" "Update only GNOME theme (shell, cursors, and icons)"
+    printf '\t%s\t\t%s\n' "-a, --all" "Updates everything (system, extensions, and theme)"
+    printf '\t%s\t\t%s\n' "-s, --system" "Updates only system packages and applications"
+    printf '\t%s\t%s\n' "-e, --extensions" "Updates only GNOME extensions"
+    printf '\t%s\t\t%s\n' "-t, --theme" "Updates only GNOME theme (shell, cursors, and icons)"
     printf '\t%s\t%s\t%s\n' "-l, --luks-partition" "Partition name of the LUKS container to be automatically decrypted using the TPM chip" "(e.g: /dev/sda1)"
     printf '\t%s\t\t%s\n' "-h, --help" "Prints help"
-    printf '\n'
 }
 
 # --------------------------------
@@ -427,6 +426,10 @@ fi
 if [ ${_arg_luks_partition} ]; then
     echo ""
     03_update_tpm
+fi
+
+if [ ${_arg_system} = "off" ] && [ ${_arg_extensions} = "off" ] && [ ${_arg_theme} = "off" ] && [ -z ${_arg_luks_partition} ]; then
+    print_help
 fi
 
 echo -e "\n[ ${ECHO_BOLD}OK${ECHO_RESET} ]"

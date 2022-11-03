@@ -45,7 +45,6 @@ print_help() {
     printf '%s\n\n' "Fedora Workstation Personal Installation Script (2/2)"
     printf 'Usage: %s [-h|--help]\n' "$0"
     printf '\t%s\t\t%s\n' "-h, --help" "Prints help"
-    printf '\n'
 }
 
 # --------------------------------

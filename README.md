@@ -42,7 +42,7 @@ Usage: ./scripts/setup_00.sh <static-hostname> <pretty-hostname> [-l|--luks-part
         <static-hostname>       Static name of the system, containing only lowercase letters, numbers and/or dashes     (e.g: "system-name-01")
         <pretty-hostname>       Pretty name of the system, without restrictions                                         (e.g: "System Name 01")
         -l, --luks-partition    Partition name of the LUKS container to be automatically decrypted using the TPM chip   (e.g: /dev/sda1)
-        -n, --nvidia-drivers    Include latest Nvidia drivers with installation
+        -n, --nvidia-drivers    Includes latest Nvidia drivers with installation
         -h, --help              Prints help
 ```
 
@@ -61,10 +61,10 @@ Usage: ./scripts/setup_01.sh [-h|--help]
 Fedora Workstation Personal Update Script
 
 Usage: ./scripts/update.sh [-a|--all] [-s|--system] [-e|--extensions] [-t|--theme] [-l|--luks-partition <arg>] [-h|--help]
-        -a, --all               Update everything (system, extensions, and theme)
-        -s, --system            Update only system packages and applications
-        -e, --extensions        Update only GNOME extensions
-        -t, --theme             Update only GNOME theme (shell, cursors, and icons)
+        -a, --all               Updates everything (system, extensions, and theme)
+        -s, --system            Updates only system packages and applications
+        -e, --extensions        Updates only GNOME extensions
+        -t, --theme             Updates only GNOME theme (shell, cursors, and icons)
         -l, --luks-partition    Partition name of the LUKS container to be automatically decrypted using the TPM chip   (e.g: /dev/sda1)
         -h, --help              Prints help
 ```

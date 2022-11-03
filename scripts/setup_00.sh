@@ -95,9 +95,8 @@ print_help() {
     printf '\t%s\t%s\t%s\n' "<static-hostname>" "Static name of the system, containing only lowercase letters, numbers and/or dashes" "(e.g: \"system-name-01\")"
     printf '\t%s\t%s\t\t\t\t\t\t%s\n' "<pretty-hostname>" "Pretty name of the system, without restrictions" "(e.g: \"System Name 01\")"
     printf '\t%s\t%s\t%s\n' "-l, --luks-partition" "Partition name of the LUKS container to be automatically decrypted using the TPM chip" "(e.g: /dev/sda1)"
-    printf '\t%s\t%s\n' "-n, --nvidia-drivers" "Include latest Nvidia drivers with installation"
+    printf '\t%s\t%s\n' "-n, --nvidia-drivers" "Includes latest Nvidia drivers with installation"
     printf '\t%s\t\t%s\n' "-h, --help" "Prints help"
-    printf '\n'
 }
 
 # --------------------------------
