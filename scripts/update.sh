@@ -149,8 +149,8 @@ __log_title__() {
 
     __log_progress__ "Updating and cleaning system applications"
 
-    sudo flatpak update --system --assumeyes >$NO_OUTPUT
-    sudo flatpak uninstall --system --assumeyes --unused >$NO_OUTPUT
+    sudo flatpak update --system --assumeyes >$NO_OUTPUT 2>&1
+    sudo flatpak uninstall --system --assumeyes --unused >$NO_OUTPUT 2>&1
 
     __log_success__ "Updating and cleaning system applications"
 
@@ -160,8 +160,8 @@ __log_title__() {
 
     __log_progress__ "Updating and cleaning user applications"
 
-    flatpak update --user --assumeyes >$NO_OUTPUT
-    flatpak uninstall --user --assumeyes --unused >$NO_OUTPUT
+    flatpak update --user --assumeyes >$NO_OUTPUT 2>&1
+    flatpak uninstall --user --assumeyes --unused >$NO_OUTPUT 2>&1
 
     flatpak override --user --reset
     flatpak override --user --device=dri
@@ -174,7 +174,7 @@ __log_title__() {
 
     __log_progress__ "Performing a full system upgrade"
 
-    sudo dnf upgrade --assumeyes --quiet --refresh >$NO_OUTPUT
+    sudo dnf upgrade --assumeyes --quiet --refresh >$NO_OUTPUT 2>&1
 
     __log_success__ "Performing a full system upgrade"
 
@@ -346,7 +346,7 @@ __log_title__() {
     cd ~/.setup/tools/stylepak
     __git_reset__
 
-    stylepak install-user >$NO_OUTPUT
+    stylepak install-user >$NO_OUTPUT 2>&1
 
     __log_success__ "Updating shell theme"
 
@@ -399,7 +399,7 @@ __log_title__() {
         "/^luks-/s/$/,tpm2-device=auto/" \
         /etc/crypttab
 
-    echo 'install_optional_items+=" /usr/lib64/libtss2* /usr/lib64/libfido2.so.* /usr/lib64/cryptsetup/libcryptsetup-token-systemd-tpm2.so "' | sudo tee /etc/dracut.conf.d/tss2.conf >$NO_OUTPUT
+    echo 'install_optional_items+=" /usr/lib64/libtss2* /usr/lib64/libfido2.so.* /usr/lib64/cryptsetup/libcryptsetup-token-systemd-tpm2.so "' | sudo tee /etc/dracut.conf.d/tss2.conf >$NO_OUTPUT 2>&1
 
     sudo dracut --force
 
