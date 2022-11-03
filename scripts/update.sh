@@ -214,6 +214,20 @@ __log_title__() {
 
     gnome-shell-extension-installer --update --yes >$NO_OUTPUT 2>&1
 
+    gnome-extensions disable AlphabeticalAppGrid@stuarthayhurst
+    gnome-extensions disable blur-my-shell@aunetx
+    gnome-extensions disable dash-to-dock@micxgx.gmail.com
+    gnome-extensions disable hidetopbar@mathieu.bidon.ca
+    gnome-extensions disable trayIconsReloaded@selfmade.pl
+    gnome-extensions disable user-theme@gnome-shell-extensions.gcampax.github.com
+
+    gnome-extensions enable AlphabeticalAppGrid@stuarthayhurst
+    gnome-extensions enable blur-my-shell@aunetx
+    gnome-extensions enable dash-to-dock@micxgx.gmail.com
+    gnome-extensions enable hidetopbar@mathieu.bidon.ca
+    gnome-extensions enable trayIconsReloaded@selfmade.pl
+    gnome-extensions enable user-theme@gnome-shell-extensions.gcampax.github.com
+
     __log_success__ "Updating desktop extensions"
 
     # ################################################################
