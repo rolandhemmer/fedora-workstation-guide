@@ -337,6 +337,7 @@ __log_title__() {
 
     sudo ./install.sh \
         --color dark \
+        --libadwaita \
         --theme default \
         --tweaks rimless >$NO_OUTPUT 2>&1
 
