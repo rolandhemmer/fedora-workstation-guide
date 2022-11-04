@@ -4,8 +4,6 @@
 # See https://argbash.io for more
 #
 
-source __common__.sh
-
 # --------------------------------
 # Arguments Parsing and Management
 # --------------------------------
@@ -92,7 +90,7 @@ parse_commandline() {
 }
 
 print_help() {
-    printf '%s\n\n' "Fedora Workstation Personal Installation Script (1/2)"
+    printf '%s\n\n' "Fedora Workstation Personal Installation Script"
     printf 'Usage: %s <static-hostname> <pretty-hostname> [-l|--luks-partition <arg>] [-n|--nvidia-drivers] [-h|--help]\n' "$0"
     printf '\t%s\t%s\t%s\n' "<static-hostname>" "Static name of the system, containing only lowercase letters, numbers and/or dashes" "(e.g: \"system-name-01\")"
     printf '\t%s\t%s\t\t\t\t\t\t%s\n' "<pretty-hostname>" "Pretty name of the system, without restrictions" "(e.g: \"System Name 01\")"
@@ -139,14 +137,16 @@ __log_title__() {
 }
 
 __reboot__() {
-    echo "Do you wish to reboot now?"
-    select yn in "Yes" "No"; do
+    while true; do
+        echo -e "\nA reboot is required to continue. Do you wish to reboot now?"
+        read yn
         case $yn in
-        Yes)
+        [Yy]*)
             sudo reboot now
             break
             ;;
-        No) exit ;;
+        [Nn]*) exit ;;
+        *) echo "Please answer yes or no." ;;
         esac
     done
 }
@@ -650,14 +650,14 @@ EOT
         sassc
 
     cd ~/.setup/shell
-    git clone --quiet "https://github.com/vinceliuice/Colloid-gtk-theme.git" Colloid >$NO_OUTPUT 2>&1
+    git clone --quiet "https://github.com/vinceliuice/Colloid-gtk-theme.git" Colloid >$NO_OUTPUT 2>&1 || true
     cd Colloid
 
     sudo ./install.sh \
         --color dark \
         --libadwaita \
         --theme default \
-        --tweaks rimless
+        --tweaks rimless >$NO_OUTPUT 2>&1
 
     mkdir --parents ~/.setup/tools || true
 
@@ -666,7 +666,7 @@ EOT
         ostree
 
     cd ~/.setup/tools
-    git clone --quiet "https://github.com/refi64/stylepak.git" stylepak >$NO_OUTPUT 2>&1
+    git clone --quiet "https://github.com/refi64/stylepak.git" stylepak >$NO_OUTPUT 2>&1 || true
     cd stylepak
 
     chmod +x stylepak
@@ -683,7 +683,7 @@ EOT
     mkdir --parents ~/.setup/icons || true
 
     cd ~/.setup/icons
-    git clone --quiet "https://github.com/vinceliuice/Colloid-icon-theme.git" Colloid >$NO_OUTPUT 2>&1
+    git clone --quiet "https://github.com/vinceliuice/Colloid-icon-theme.git" Colloid >$NO_OUTPUT 2>&1 || true
     cd Colloid
 
     sudo ./install.sh \
@@ -701,7 +701,7 @@ EOT
     mkdir --parents ~/.setup/cursors || true
 
     cd ~/.setup/cursors
-    git clone --quiet "https://github.com/vinceliuice/Colloid-icon-theme.git" Colloid >$NO_OUTPUT 2>&1
+    git clone --quiet "https://github.com/vinceliuice/Colloid-icon-theme.git" Colloid >$NO_OUTPUT 2>&1 || true
     cd Colloid/cursors
 
     sudo ./install.sh >$NO_OUTPUT 2>&1
@@ -730,7 +730,7 @@ EOT
         perl
 
     cd ~/.setup/tools
-    git clone --quiet "https://github.com/brunelli/gnome-shell-extension-installer.git" gnome-shell-extension-installer >$NO_OUTPUT 2>&1
+    git clone --quiet "https://github.com/brunelli/gnome-shell-extension-installer.git" gnome-shell-extension-installer >$NO_OUTPUT 2>&1 || true
     cd gnome-shell-extension-installer
 
     chmod +x gnome-shell-extension-installer
@@ -1017,7 +1017,7 @@ EOT
 # --------------------------------
 
 setup_00() {
-    if [ ! -f setup_00.part ]; then
+    if [ ! -f /var/tmp/setup_00.part ]; then
         00_setup_prerequisites
         01_update_system
         02_harden_system
@@ -1030,38 +1030,38 @@ setup_00() {
         05_install_terminal_options
         06_cleanup
 
-        touch setup_00.part
+        sudo touch /var/tmp/setup_00.part
         __reboot__
     fi
 }
 
 setup_nvidia() {
-    if [ ${_arg_nvidia_drivers} = "on" ] && [ ! -f setup_nvidia.part ]; then
+    if [ ${_arg_nvidia_drivers} = "on" ] && [ ! -f /var/tmp/setup_nvidia.part ]; then
         00_install_nvidia_drivers
 
-        touch setup_nvidia.part
+        sudo touch /var/tmp/setup_nvidia.part
         __reboot__
     fi
 }
 
 setup_01() {
-    if [ ! -f setup_01.part ]; then
+    if [ ! -f /var/tmp/setup_01.part ]; then
         00_install_desktop_prerequisites
         01_install_desktop_extensions
 
-        touch setup_01.part
+        sudo touch /var/tmp/setup_01.part
         __reboot__
     fi
 }
 
 setup_02() {
-    if [ ! -f setup_02.part ]; then
+    if [ ! -f /var/tmp/setup_02.part ]; then
         00_configure_desktop
         01_configure_desktop_extensions
         02_install_applications
         03_install_automation_scripts
 
-        touch setup_02.part
+        sudo touch /var/tmp/setup_02.part
         __reboot__
     fi
 }
