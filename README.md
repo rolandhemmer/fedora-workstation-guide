@@ -33,25 +33,16 @@ On the very first reboot, after creating your account:
 
 ### Available Scripts
 
-- First installation script:
+- Installation script:
 
 ```text
-Fedora Workstation Personal Installation Script (1/2)
+Fedora Workstation Personal Installation Script
 
 Usage: ./scripts/setup_00.sh <static-hostname> <pretty-hostname> [-l|--luks-partition <arg>] [-n|--nvidia-drivers] [-h|--help]
         <static-hostname>       Static name of the system, containing only lowercase letters, numbers and/or dashes     (e.g: "system-name-01")
         <pretty-hostname>       Pretty name of the system, without restrictions                                         (e.g: "System Name 01")
         -l, --luks-partition    Partition name of the LUKS container to be automatically decrypted using the TPM chip   (e.g: /dev/sda1)
         -n, --nvidia-drivers    Includes latest Nvidia drivers with installation
-        -h, --help              Prints help
-```
-
-- Second installation script (after reboot):
-
-```text
-Fedora Workstation Personal Installation Script (2/2)
-
-Usage: ./scripts/setup_01.sh [-h|--help]
         -h, --help              Prints help
 ```
 
@@ -74,7 +65,7 @@ Usage: ./scripts/update.sh [-a|--all] [-s|--system] [-e|--extensions] [-t|--them
 Run (**not** as `sudo`):
 
 ```bash
-./scripts/setup_00.sh $static_hostname $pretty_hostname
+.setup.sh $static_hostname $pretty_hostname
 ```
 
 - If you have a Nvidia GPU, add:
@@ -93,17 +84,7 @@ Run (**not** as `sudo`):
 > If the system has been installed on an NVMe disk alone, the partition name will likely be:  
 > `/dev/nvme0n1p3`
 
-Once done, reboot to apply changes:
-
-```bash
-sudo reboot
-```
-
-After reboot, finish the installation with:
-
-```bash
-./scripts/setup_01.sh
-```
+:warning: A total of up to **4 reboots** is required to fully apply these changes with stability in mind.
 
 ### Update
 

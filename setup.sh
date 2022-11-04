@@ -105,6 +105,56 @@ print_help() {
 # Functions
 # --------------------------------
 
+export ECHO_BOLD="\033[1m"
+export ECHO_GREEN="\033[1;32m"
+export ECHO_GREY="\033[0;37m"
+export ECHO_RED="\033[1;31m"
+export ECHO_RESET="\033[0m"
+export ECHO_REPLACE="\033[1A\033[K"
+
+export NO_OUTPUT="/dev/null"
+
+__install_dnf__() {
+    sudo dnf install --assumeyes --quiet $1 >$NO_OUTPUT 2>&1
+}
+
+__install_flatpak__() {
+    flatpak install --assumeyes --user flathub $1 >$NO_OUTPUT 2>&1
+}
+
+__log_progress__() {
+    echo -e "[ .. ]\t$1"
+}
+
+__log_success__() {
+    echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
+}
+
+__log_success_alt__() {
+    echo -e "[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
+}
+
+__log_title__() {
+    echo -e "${ECHO_BOLD}$1${ECHO_RESET}"
+}
+
+__reboot__() {
+    echo "Do you wish to reboot now?"
+    select yn in "Yes" "No"; do
+        case $yn in
+        Yes)
+            sudo reboot now
+            break
+            ;;
+        No) exit ;;
+        esac
+    done
+}
+
+# --------------------------------
+# setup_00
+# --------------------------------
+
 00_setup_prerequisites() {
     # ################################################################
     # Configuring hostname
@@ -239,7 +289,7 @@ EOT
     __log_progress__ "Installing Preload"
 
     sudo dnf copr enable --assumeyes elxreno/preload >$NO_OUTPUT 2>&1
-    
+
     __install_dnf__ preload
 
     sudo systemctl start preload >$NO_OUTPUT 2>&1
@@ -248,7 +298,7 @@ EOT
     __log_success__ "Installing Preload"
 }
 
-03_harden_system() {
+02_harden_system() {
     __log_title__ "\n==> Hardening system"
 
     # ################################################################
@@ -376,7 +426,7 @@ EOT
 
 }
 
-04_setup_tpm() {
+03_setup_tpm() {
     __log_title__ "\n==> Setting up TPM for '${_arg_luks_partition}' auto-decryption"
 
     # ################################################################
@@ -409,7 +459,7 @@ EOT
     __log_success_alt__ "Enrolling decryption key in TPM"
 }
 
-05_install_multimedia_codecs() {
+04_install_multimedia_codecs() {
     __log_title__ "\n==> Installing multimedia codecs"
 
     # ################################################################
@@ -436,7 +486,7 @@ EOT
     __log_success__ "Installing required sound and audio codecs"
 }
 
-08_install_terminal_options() {
+05_install_terminal_options() {
     __log_title__ "\n==> Installing terminal options"
 
     # ################################################################
@@ -455,7 +505,390 @@ EOT
     __log_success__ "Installing terminal shell"
 }
 
-09_install_applications() {
+06_cleanup() {
+    __log_title__ "\n==> Cleaning up"
+
+    __log_progress__ "Removing unneeded applications"
+
+    sudo dnf remove --assumeyes --quiet \
+        $(rpm --query --all | grep --ignore-case libreoffice) \
+        cheese \
+        evince \
+        gedit \
+        gnome-boxes \
+        gnome-camera \
+        gnome-characters \
+        gnome-clocks \
+        gnome-connections \
+        gnome-contacts \
+        gnome-maps \
+        gnome-photos \
+        gnome-text-editor \
+        gnome-tour \
+        gnome-weather \
+        rhythmbox \
+        totem \
+        yelp >$NO_OUTPUT 2>&1
+
+    __log_success__ "Removing unneeded applications"
+}
+
+# --------------------------------
+# setup_nvidia
+# --------------------------------
+
+00_install_nvidia_drivers() {
+    __log_title__ "\n==> Installing latest Nvidia drivers"
+
+    # ################################################################
+    # Installing prerequisites
+    # ################################################################
+
+    __log_progress__ "Installing prerequisites"
+
+    __install_dnf__ \
+        akmods \
+        acpid \
+        curl \
+        dkms \
+        gcc \
+        git \
+        kernel-devel \
+        kernel-headers \
+        libglvnd-glx \
+        libglvnd-opengl \
+        libglvnd-devel \
+        make \
+        mokutil \
+        openssl \
+        pkgconfig \
+        vim \
+        wget
+
+    __log_success__ "Installing prerequisites"
+
+    # ################################################################
+    # Enabling Nvidia kernel module auto-signing
+    # ################################################################
+
+    __log_progress__ "Enabling Nvidia kernel module auto-signing"
+
+    sudo kmodgenca --auto
+    sudo mokutil --import /etc/pki/akmods/certs/public_key.der
+
+    __log_success_alt__ "Enabling Nvidia kernel module auto-signing"
+
+    # ################################################################
+    # Installing latest Nvidia drivers
+    # ################################################################
+
+    __log_progress__ "Installing latest Nvidia drivers"
+
+    sudo dnf config-manager --set-enable rpmfusion-nonfree-nvidia-driver >$NO_OUTPUT 2>&1
+
+    __install_dnf__ \
+        akmod-nvidia \
+        libva-utils \
+        libva-vdpau-driver \
+        vdpauinfo \
+        xorg-x11-drv-nvidia \
+        xorg-x11-drv-nvidia-cuda \
+        xorg-x11-drv-nvidia-cuda-libs \
+        xorg-x11-drv-nvidia-libs \
+        xorg-x11-drv-nvidia-libs.i686 \
+        vulkan-loader \
+        vulkan-loader.i686
+
+    echo "%global _with_kmod_nvidia_open 1" | sudo tee /etc/rpm/macros-nvidia-kmod >$NO_OUTPUT 2>&1
+    sudo akmods --force >$NO_OUTPUT 2>&1
+    sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1' >$NO_OUTPUT 2>&1
+
+    echo "options nvidia_drm modeset=1" | sudo tee /etc/modprobe.d/nvidia.conf >$NO_OUTPUT 2>&1
+    echo "blacklist nouveau" | sudo tee /etc/modprobe.d/blacklist.conf >$NO_OUTPUT 2>&1
+
+    sudo tee /etc/dracut.conf.d/nvidia.conf >$NO_OUTPUT 2>&1 <<EOT
+add_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "
+install_items+=" /etc/modprobe.d/nvidia.conf "
+EOT
+
+    sudo dracut --force
+
+    __log_success__ "Installing latest Nvidia drivers"
+}
+
+# --------------------------------
+# setup_01
+# --------------------------------
+
+00_install_desktop_prerequisites() {
+    __log_title__ "\n==> Installing desktop prerequisites"
+
+    # ################################################################
+    # Installing desktop fonts
+    # ################################################################
+
+    __log_progress__ "Installing desktop fonts"
+
+    __install_dnf__ \
+        google-roboto-fonts \
+        google-roboto-mono-fonts >$NO_OUTPUT 2>&1
+
+    __log_success__ "Installing desktop fonts"
+
+    # ################################################################
+    # Installing shell theme
+    # ################################################################
+
+    __log_progress__ "Installing shell theme"
+
+    mkdir --parents ~/.setup/shell || true
+
+    __install_dnf__ \
+        gtk-murrine-engine \
+        gnome-themes-extra \
+        gnome-themes-standard \
+        sassc
+
+    cd ~/.setup/shell
+    git clone --quiet "https://github.com/vinceliuice/Colloid-gtk-theme.git" Colloid >$NO_OUTPUT 2>&1
+    cd Colloid
+
+    sudo ./install.sh \
+        --color dark \
+        --libadwaita \
+        --theme default \
+        --tweaks rimless
+
+    mkdir --parents ~/.setup/tools || true
+
+    __install_dnf__ \
+        libappstream-glib \
+        ostree
+
+    cd ~/.setup/tools
+    git clone --quiet "https://github.com/refi64/stylepak.git" stylepak >$NO_OUTPUT 2>&1
+    cd stylepak
+
+    chmod +x stylepak
+    sudo cp stylepak /usr/bin/
+
+    __log_success__ "Installing shell theme"
+
+    # ################################################################
+    # Installing icon theme
+    # ################################################################
+
+    __log_progress__ "Installing icon theme"
+
+    mkdir --parents ~/.setup/icons || true
+
+    cd ~/.setup/icons
+    git clone --quiet "https://github.com/vinceliuice/Colloid-icon-theme.git" Colloid >$NO_OUTPUT 2>&1
+    cd Colloid
+
+    sudo ./install.sh \
+        --scheme default \
+        --theme default >$NO_OUTPUT 2>&1
+
+    __log_success__ "Installing icon theme"
+
+    # ################################################################
+    # Installing cursor theme
+    # ################################################################
+
+    __log_progress__ "Installing cursor theme"
+
+    mkdir --parents ~/.setup/cursors || true
+
+    cd ~/.setup/cursors
+    git clone --quiet "https://github.com/vinceliuice/Colloid-icon-theme.git" Colloid >$NO_OUTPUT 2>&1
+    cd Colloid/cursors
+
+    sudo ./install.sh >$NO_OUTPUT 2>&1
+
+    __log_success__ "Installing cursor theme"
+}
+
+01_install_desktop_extensions() {
+    __log_title__ "\n==> Installing desktop extensions"
+
+    # ################################################################
+    # Enabling desktop extensions support
+    # ################################################################
+
+    __log_progress__ "Enabling desktop extensions support"
+
+    __install_dnf__ gnome-tweaks
+    __install_flatpak__ "org.gnome.Extensions"
+
+    __install_dnf__ \
+        bash \
+        curl \
+        dbus \
+        git \
+        less \
+        perl
+
+    cd ~/.setup/tools
+    git clone --quiet "https://github.com/brunelli/gnome-shell-extension-installer.git" gnome-shell-extension-installer >$NO_OUTPUT 2>&1
+    cd gnome-shell-extension-installer
+
+    chmod +x gnome-shell-extension-installer
+    sudo cp gnome-shell-extension-installer /usr/bin/
+
+    __log_success__ "Enabling desktop extensions support"
+
+    # ################################################################
+    # Installing desktop extensions
+    # ################################################################
+
+    __log_progress__ "Installing desktop extensions"
+
+    cd /usr/share/glib-2.0/schemas
+    sudo wget --quiet "https://raw.githubusercontent.com/stuarthayhurst/alphabetical-grid-extension/master/extension/schemas/org.gnome.shell.extensions.AlphabeticalAppGrid.gschema.xml"
+    sudo wget --quiet "https://raw.githubusercontent.com/aunetx/blur-my-shell/master/schemas/org.gnome.shell.extensions.blur-my-shell.gschema.xml"
+    sudo wget --quiet "https://raw.githubusercontent.com/micheleg/dash-to-dock/master/schemas/org.gnome.shell.extensions.dash-to-dock.gschema.xml"
+    sudo wget --quiet "https://gitlab.gnome.org/GNOME/gnome-shell-extensions/-/raw/main/extensions/user-theme/org.gnome.shell.extensions.user-theme.gschema.xml"
+    sudo wget --quiet "https://raw.githubusercontent.com/tuxor1337/hidetopbar/master/schemas/org.gnome.shell.extensions.hidetopbar.gschema.xml"
+    sudo wget --quiet "https://raw.githubusercontent.com/MartinPL/Tray-Icons-Reloaded/master/schemas/org.gnome.shell.extensions.trayIconsReloaded.gschema.xml"
+    sudo glib-compile-schemas . >$NO_OUTPUT 2>&1
+
+    gnome-shell-extension-installer --yes 4269 3193 307 19 545 2890 >$NO_OUTPUT 2>&1
+
+    __log_success__ "Installing desktop extensions"
+}
+
+# --------------------------------
+# setup_02
+# --------------------------------
+
+00_configure_desktop() {
+    __log_title__ "\n==> Configuring desktop"
+
+    # ################################################################
+    # Configuring desktop settings
+    # ################################################################
+
+    __log_progress__ "Configuring desktop settings"
+
+    gsettings set org.gnome.desktop.calendar show-weekdate true
+    gsettings set org.gnome.desktop.interface clock-show-date true
+    gsettings set org.gnome.desktop.interface clock-show-weekday true
+    gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+    gsettings set org.gnome.desktop.interface enable-hot-corners true
+    gsettings set org.gnome.desktop.interface font-antialiasing "rgba"
+    gsettings set org.gnome.desktop.wm.preferences button-layout "close,minimize,maximize:appmenu"
+    gsettings set org.gnome.mutter center-new-windows true
+    gsettings set org.gnome.nautilus.preferences default-folder-viewer "list-view"
+    gsettings set org.gnome.nautilus.preferences show-hidden-files true
+    gsettings set org.gnome.nautilus.window-state sidebar-width 220
+    gsettings set org.gtk.Settings.FileChooser show-hidden true
+
+    __log_success__ "Configuring desktop settings"
+
+    # ################################################################
+    # Configuring desktop theme
+    # ################################################################
+
+    __log_progress__ "Configuring desktop theme"
+
+    gsettings set org.gnome.desktop.interface document-font-name "Roboto 11"
+    gsettings set org.gnome.desktop.interface font-name "Roboto 11"
+    gsettings set org.gnome.desktop.interface monospace-font-name "Roboto Mono 11"
+    gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 11"
+
+    sudo fc-cache --really-force
+
+    gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
+    gsettings set org.gnome.desktop.interface icon-theme "Colloid-dark"
+    gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
+    gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
+
+    stylepak install-user >$NO_OUTPUT 2>&1
+
+    __log_success__ "Configuring desktop theme"
+}
+
+01_configure_desktop_extensions() {
+    __log_title__ "\n==> Configuring desktop extensions"
+
+    # ################################################################
+    # Enabling desktop extensions
+    # ################################################################
+
+    __log_progress__ "Enabling desktop extensions"
+
+    gnome-extensions disable background-logo@fedorahosted.org
+
+    gnome-extensions enable AlphabeticalAppGrid@stuarthayhurst
+    gnome-extensions enable blur-my-shell@aunetx
+    gnome-extensions enable dash-to-dock@micxgx.gmail.com
+    gnome-extensions enable hidetopbar@mathieu.bidon.ca
+    gnome-extensions enable trayIconsReloaded@selfmade.pl
+    gnome-extensions enable user-theme@gnome-shell-extensions.gcampax.github.com
+
+    __log_success__ "Enabling desktop extensions"
+
+    # ################################################################
+    # Configuring desktop extensions
+    # ################################################################
+
+    __log_progress__ "Configuring desktop extensions"
+
+    gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-position "alphabetical"
+    gsettings set org.gnome.shell.extensions.alphabetical-app-grid logging-enabled false
+    gsettings set org.gnome.shell.extensions.alphabetical-app-grid sort-folder-contents true
+
+    gsettings set org.gnome.shell.extensions.blur-my-shell brightness 1.0
+    gsettings set org.gnome.shell.extensions.blur-my-shell color-and-noise false
+    gsettings set org.gnome.shell.extensions.blur-my-shell hacks-level 1
+    gsettings set org.gnome.shell.extensions.blur-my-shell sigma 200
+    gsettings set org.gnome.shell.extensions.blur-my-shell.appfolder customize false
+    gsettings set org.gnome.shell.extensions.blur-my-shell.applications blur false
+    gsettings set org.gnome.shell.extensions.blur-my-shell.applications blur-on-overview false
+    gsettings set org.gnome.shell.extensions.blur-my-shell.applications customize false
+    gsettings set org.gnome.shell.extensions.blur-my-shell.applications enable-all false
+    gsettings set org.gnome.shell.extensions.blur-my-shell.applications opacity 255
+    gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur false
+    gsettings set org.gnome.shell.extensions.blur-my-shell.hidetopbar compatibility false
+    gsettings set org.gnome.shell.extensions.blur-my-shell.overview style-components 0
+    gsettings set org.gnome.shell.extensions.blur-my-shell.panel customize true
+    gsettings set org.gnome.shell.extensions.blur-my-shell.panel brightness 1.0
+    gsettings set org.gnome.shell.extensions.blur-my-shell.panel override-background-dynamically true
+    gsettings set org.gnome.shell.extensions.blur-my-shell.panel sigma 0
+    gsettings set org.gnome.shell.extensions.blur-my-shell.panel unblur-in-overview true
+    gsettings set org.gnome.shell.extensions.blur-my-shell.screenshot blur false
+
+    gsettings set org.gnome.shell.extensions.dash-to-dock apply-custom-theme false
+    gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 0.0
+    gsettings set org.gnome.shell.extensions.dash-to-dock click-action "minimize"
+    gsettings set org.gnome.shell.extensions.dash-to-dock custom-background-color false
+    gsettings set org.gnome.shell.extensions.dash-to-dock custom-theme-customize-running-dots true
+    gsettings set org.gnome.shell.extensions.dash-to-dock custom-theme-running-dots-border-color 'rgb(36,36,36)'
+    gsettings set org.gnome.shell.extensions.dash-to-dock custom-theme-shrink true
+    gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 42
+    gsettings set org.gnome.shell.extensions.dash-to-dock disable-overview-on-startup true
+    gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
+    gsettings set org.gnome.shell.extensions.dash-to-dock height-fraction 1.0
+    gsettings set org.gnome.shell.extensions.dash-to-dock intellihide-mode "MAXIMIZED_WINDOWS"
+    gsettings set org.gnome.shell.extensions.dash-to-dock show-mounts-only-mounted false
+    gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "FIXED"
+
+    gsettings set org.gnome.shell.extensions.hidetopbar enable-active-window true
+    gsettings set org.gnome.shell.extensions.hidetopbar enable-intellihide true
+    gsettings set org.gnome.shell.extensions.hidetopbar hot-corner true
+    gsettings set org.gnome.shell.extensions.hidetopbar keep-round-corners true
+    gsettings set org.gnome.shell.extensions.hidetopbar mouse-sensitive false
+    gsettings set org.gnome.shell.extensions.hidetopbar mouse-sensitive-fullscreen-window false
+    gsettings set org.gnome.shell.extensions.hidetopbar mouse-triggers-overview true
+    gsettings set org.gnome.shell.extensions.hidetopbar show-in-overview true
+
+    gsettings set org.gnome.shell.extensions.trayIconsReloaded icons-limit 5
+
+    __log_success__ "Configuring desktop extensions"
+}
+
+02_install_applications() {
     __log_title__ "\n==> Installing applications"
 
     # ################################################################
@@ -465,6 +898,14 @@ EOT
     __log_progress__ "Installing Bleachbit"
     __install_dnf__ bleachbit
     __log_success__ "Installing Bleachbit"
+
+    # ################################################################
+    # Installing Bottles
+    # ################################################################
+
+    __log_progress__ "Installing Bottles"
+    __install_flatpak__ "com.usebottles.bottles"
+    __log_success__ "Installing Bottles"
 
     # ################################################################
     # Installing Discord
@@ -528,6 +969,14 @@ EOT
     __log_success__ "Installing ONLYOFFICE"
 
     # ################################################################
+    # Installing Steam
+    # ################################################################
+
+    __log_progress__ "Installing Steam"
+    __install_flatpak__ "com.valvesoftware.Steam"
+    __log_success__ "Installing Steam"
+
+    # ################################################################
     # Installing Visual Studio Codium
     # ################################################################
 
@@ -551,27 +1000,7 @@ EOT
     __log_success__ "Installing VLC"
 }
 
-10_install_gaming_features() {
-    __log_title__ "\n==> Installing gaming features"
-
-    # ################################################################
-    # Installing Bottles
-    # ################################################################
-
-    __log_progress__ "Installing Bottles"
-    __install_flatpak__ "com.usebottles.bottles"
-    __log_success__ "Installing Bottles"
-
-    # ################################################################
-    # Installing Steam
-    # ################################################################
-
-    __log_progress__ "Installing Steam"
-    __install_flatpak__ "com.valvesoftware.Steam"
-    __log_success__ "Installing Steam"
-}
-
-11_install_automation_scripts() {
+03_install_automation_scripts() {
     __log_title__ "\n==> Installing automation scripts"
 
     # ################################################################
@@ -583,37 +1012,59 @@ EOT
     __log_success__ "Installing update script"
 }
 
-12_cleanup() {
-    __log_title__ "\n==> Cleaning up"
-
-    __log_progress__ "Removing unneeded applications"
-
-    sudo dnf remove --assumeyes --quiet \
-        $(rpm --query --all | grep --ignore-case libreoffice) \
-        cheese \
-        evince \
-        gedit \
-        gnome-boxes \
-        gnome-camera \
-        gnome-characters \
-        gnome-clocks \
-        gnome-connections \
-        gnome-contacts \
-        gnome-maps \
-        gnome-photos \
-        gnome-text-editor \
-        gnome-tour \
-        gnome-weather \
-        rhythmbox \
-        totem \
-        yelp >$NO_OUTPUT 2>&1
-
-    __log_success__ "Removing unneeded applications"
-}
-
 # --------------------------------
 # Main
 # --------------------------------
+
+setup_00() {
+    if [ ! -f setup_00.part ]; then
+        00_setup_prerequisites
+        01_update_system
+        02_harden_system
+
+        if [ ${_arg_luks_partition} ]; then
+            03_setup_tpm
+        fi
+
+        04_install_multimedia_codecs
+        05_install_terminal_options
+        06_cleanup
+
+        touch setup_00.part
+        __reboot__
+    fi
+}
+
+setup_nvidia() {
+    if [ ${_arg_nvidia_drivers} = "on" ] && [ ! -f setup_nvidia.part ]; then
+        00_install_nvidia_drivers
+
+        touch setup_nvidia.part
+        __reboot__
+    fi
+}
+
+setup_01() {
+    if [ ! -f setup_01.part ]; then
+        00_install_desktop_prerequisites
+        01_install_desktop_extensions
+
+        touch setup_01.part
+        __reboot__
+    fi
+}
+
+setup_02() {
+    if [ ! -f setup_02.part ]; then
+        00_configure_desktop
+        01_configure_desktop_extensions
+        02_install_applications
+        03_install_automation_scripts
+
+        touch setup_02.part
+        __reboot__
+    fi
+}
 
 parse_commandline "$@"
 handle_passed_args_count
@@ -631,19 +1082,7 @@ cat <<"EOT"
 
 EOT
 
-00_setup_prerequisites
-01_update_system
-03_harden_system
-
-if [ ${_arg_luks_partition} ]; then
-    04_setup_tpm
-fi
-
-05_install_multimedia_codecs
-08_install_terminal_options
-09_install_applications
-10_install_gaming_features
-11_install_automation_scripts
-12_cleanup
-
-echo -e "\n[ ${ECHO_BOLD}OK${ECHO_RESET} ]"
+setup_00
+setup_nvidia
+setup_01
+setup_02
