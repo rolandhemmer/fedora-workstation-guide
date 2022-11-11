@@ -163,7 +163,6 @@ __log_title__() {
     flatpak update --user --assumeyes >$NO_OUTPUT 2>&1
     flatpak uninstall --user --assumeyes --unused >$NO_OUTPUT 2>&1
 
-    flatpak override --user --reset
     flatpak override --user --device=dri
 
     __log_success__ "Updating and cleaning user applications"
@@ -270,7 +269,7 @@ __log_title__() {
     gsettings set org.gnome.shell.extensions.dash-to-dock disable-overview-on-startup true
     gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
     gsettings set org.gnome.shell.extensions.dash-to-dock height-fraction 1.0
-    gsettings set org.gnome.shell.extensions.dash-to-dock intellihide-mode "MAXIMIZED_WINDOWS"
+    gsettings set org.gnome.shell.extensions.dash-to-dock intellihide-mode "ALL_WINDOWS"
     gsettings set org.gnome.shell.extensions.dash-to-dock show-mounts-only-mounted false
     gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "FIXED"
 
@@ -401,7 +400,7 @@ __log_title__() {
 
     echo 'install_optional_items+=" /usr/lib64/libtss2* /usr/lib64/libfido2.so.* /usr/lib64/cryptsetup/libcryptsetup-token-systemd-tpm2.so "' | sudo tee /etc/dracut.conf.d/tss2.conf >$NO_OUTPUT 2>&1
 
-    sudo dracut --force
+    sudo dracut --force --parallel --regenerate-all
 
     __log_success_alt__ "Updating TPM for '${_arg_luks_partition}' auto-decryption"
 }

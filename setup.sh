@@ -113,11 +113,11 @@ export ECHO_REPLACE="\033[1A\033[K"
 export NO_OUTPUT="/dev/null"
 
 __install_dnf__() {
-    sudo dnf install --assumeyes --quiet $1 >$NO_OUTPUT 2>&1
+    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
 
 __install_flatpak__() {
-    flatpak install --assumeyes --user flathub $1 >$NO_OUTPUT 2>&1
+    flatpak install --assumeyes --user flathub $@ >$NO_OUTPUT 2>&1
 }
 
 __log_progress__() {
@@ -244,15 +244,15 @@ EOT
 
     __log_progress__ "Enabling the Fedora RPM Fusion repositories"
 
-    __install_dnf__ https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm --eval %fedora).noarch.rpm
-    __install_dnf__ https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm --eval %fedora).noarch.rpm
-
     __install_dnf__ \
-        fedora-workstation-repositories \
+        rpmfusion-free-release \
         rpmfusion-free-appstream-data \
-        rpmfusion-nonfree-appstream-data >$NO_OUTPUT 2>&1
+        rpmfusion-nonfree-release \
+        rpmfusion-nonfree-appstream-data \
+        rpmfusion-free-release-tainted \
+        rpmfusion-nonfree-release-tainted
 
-    sudo dnf group update core --assumeyes --quiet >$NO_OUTPUT 2>&1
+    sudo dnf groupupdate --assumeyes --quiet core >$NO_OUTPUT 2>&1
 
     __log_success__ "Enabling the Fedora RPM Fusion repositories"
 
@@ -264,6 +264,7 @@ EOT
 
     sudo dnf clean --assumeyes --quiet all >$NO_OUTPUT 2>&1
     sudo dnf upgrade --assumeyes --quiet --refresh >$NO_OUTPUT 2>&1
+
     __install_dnf__ neofetch
 
     __log_success__ "Performing a full system upgrade"
@@ -274,7 +275,9 @@ EOT
 
     __log_progress__ "Updating system drivers"
 
-    __install_dnf__ fwupd
+    __install_dnf__ \
+        fwupd \
+        \*-firmware
 
     # The 'fwupdmgr' command exits with '1' (as failure) when no update is needed
     sudo fwupdmgr --assume-yes --force refresh >$NO_OUTPUT 2>&1 || true
@@ -298,7 +301,7 @@ EOT
     __log_success__ "Installing Preload"
 }
 
-02_harden_system() {
+00_harden_system() {
     __log_title__ "\n==> Hardening system"
 
     # ################################################################
@@ -418,6 +421,7 @@ EOT
     sudo tee /etc/systemd/resolved.conf.d/dnssec.conf >$NO_OUTPUT 2>&1 <<EOT
 [Resolve]
 DNSSEC=true
+
 EOT
 
     sudo systemctl restart systemd-resolved
@@ -426,7 +430,7 @@ EOT
 
 }
 
-03_setup_tpm() {
+01_setup_tpm() {
     __log_title__ "\n==> Setting up TPM for '${_arg_luks_partition}' auto-decryption"
 
     # ################################################################
@@ -454,12 +458,12 @@ EOT
 
     echo 'install_optional_items+=" /usr/lib64/libtss2* /usr/lib64/libfido2.so.* /usr/lib64/cryptsetup/libcryptsetup-token-systemd-tpm2.so "' | sudo tee /etc/dracut.conf.d/tss2.conf >$NO_OUTPUT 2>&1
 
-    sudo dracut --force
+    sudo dracut --force --parallel --regenerate-all
 
     __log_success_alt__ "Enrolling decryption key in TPM"
 }
 
-04_install_multimedia_codecs() {
+02_install_multimedia_codecs() {
     __log_title__ "\n==> Installing multimedia codecs"
 
     # ################################################################
@@ -481,7 +485,8 @@ EOT
         --exclude=gstreamer1-plugins-bad-free-devel \
         --exclude=lame-devel
 
-    sudo dnf group update --assumeyes --quiet --with-optional multimedia >$NO_OUTPUT 2>&1
+    sudo dnf groupupdate --assumeyes --quiet multimedia >$NO_OUTPUT 2>&1
+    sudo dnf groupupdate --assumeyes --quiet sound-and-video >$NO_OUTPUT 2>&1
 
     __log_success__ "Installing required sound and audio codecs"
 }
@@ -505,7 +510,7 @@ EOT
     __log_success__ "Installing terminal shell"
 }
 
-06_cleanup() {
+04_cleanup() {
     __log_title__ "\n==> Cleaning up"
 
     __log_progress__ "Removing unneeded applications"
@@ -588,19 +593,23 @@ EOT
 
     __install_dnf__ \
         akmod-nvidia \
+        libva \
         libva-utils \
         libva-vdpau-driver \
         vdpauinfo \
         xorg-x11-drv-nvidia \
         xorg-x11-drv-nvidia-cuda \
         xorg-x11-drv-nvidia-cuda-libs \
+        xorg-x11-drv-nvidia-cuda-libs.i686 \
         xorg-x11-drv-nvidia-libs \
         xorg-x11-drv-nvidia-libs.i686 \
+        xorg-x11-drv-nvidia-power \
+        vulkan \
         vulkan-loader \
         vulkan-loader.i686
 
-    echo "%global _with_kmod_nvidia_open 1" | sudo tee /etc/rpm/macros-nvidia-kmod >$NO_OUTPUT 2>&1
-    sudo akmods --force >$NO_OUTPUT 2>&1
+    sudo systemctl enable nvidia-{suspend,resume,hibernate} >$NO_OUTPUT 2>&1
+
     sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1' >$NO_OUTPUT 2>&1
 
     echo "options nvidia_drm modeset=1" | sudo tee /etc/modprobe.d/nvidia.conf >$NO_OUTPUT 2>&1
@@ -611,7 +620,8 @@ add_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "
 install_items+=" /etc/modprobe.d/nvidia.conf "
 EOT
 
-    sudo dracut --force
+    sudo dracut --force --parallel --regenerate-all >$NO_OUTPUT 2>&1
+    sudo grub2-mkconfig --output /boot/efi/EFI/fedora/grub.cfg >$NO_OUTPUT 2>&1
 
     __log_success__ "Installing latest Nvidia drivers"
 }
@@ -620,7 +630,7 @@ EOT
 # setup_01
 # --------------------------------
 
-00_install_desktop_prerequisites() {
+02_install_desktop_prerequisites() {
     __log_title__ "\n==> Installing desktop prerequisites"
 
     # ################################################################
@@ -647,6 +657,7 @@ EOT
         gtk-murrine-engine \
         gnome-themes-extra \
         gnome-themes-standard \
+        libappindicator-gtk3 \
         sassc
 
     cd ~/.setup/shell
@@ -709,7 +720,7 @@ EOT
     __log_success__ "Installing cursor theme"
 }
 
-01_install_desktop_extensions() {
+03_install_desktop_extensions() {
     __log_title__ "\n==> Installing desktop extensions"
 
     # ################################################################
@@ -745,12 +756,12 @@ EOT
     __log_progress__ "Installing desktop extensions"
 
     cd /usr/share/glib-2.0/schemas
-    sudo wget --quiet "https://raw.githubusercontent.com/stuarthayhurst/alphabetical-grid-extension/master/extension/schemas/org.gnome.shell.extensions.AlphabeticalAppGrid.gschema.xml"
-    sudo wget --quiet "https://raw.githubusercontent.com/aunetx/blur-my-shell/master/schemas/org.gnome.shell.extensions.blur-my-shell.gschema.xml"
-    sudo wget --quiet "https://raw.githubusercontent.com/micheleg/dash-to-dock/master/schemas/org.gnome.shell.extensions.dash-to-dock.gschema.xml"
     sudo wget --quiet "https://gitlab.gnome.org/GNOME/gnome-shell-extensions/-/raw/main/extensions/user-theme/org.gnome.shell.extensions.user-theme.gschema.xml"
-    sudo wget --quiet "https://raw.githubusercontent.com/tuxor1337/hidetopbar/master/schemas/org.gnome.shell.extensions.hidetopbar.gschema.xml"
+    sudo wget --quiet "https://raw.githubusercontent.com/aunetx/blur-my-shell/master/schemas/org.gnome.shell.extensions.blur-my-shell.gschema.xml"
     sudo wget --quiet "https://raw.githubusercontent.com/MartinPL/Tray-Icons-Reloaded/master/schemas/org.gnome.shell.extensions.trayIconsReloaded.gschema.xml"
+    sudo wget --quiet "https://raw.githubusercontent.com/micheleg/dash-to-dock/master/schemas/org.gnome.shell.extensions.dash-to-dock.gschema.xml"
+    sudo wget --quiet "https://raw.githubusercontent.com/stuarthayhurst/alphabetical-grid-extension/master/extension/schemas/org.gnome.shell.extensions.AlphabeticalAppGrid.gschema.xml"
+    sudo wget --quiet "https://raw.githubusercontent.com/tuxor1337/hidetopbar/master/schemas/org.gnome.shell.extensions.hidetopbar.gschema.xml"
     sudo glib-compile-schemas . >$NO_OUTPUT 2>&1
 
     gnome-shell-extension-installer --yes 4269 3193 307 19 545 2890 >$NO_OUTPUT 2>&1
@@ -870,7 +881,7 @@ EOT
     gsettings set org.gnome.shell.extensions.dash-to-dock disable-overview-on-startup true
     gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
     gsettings set org.gnome.shell.extensions.dash-to-dock height-fraction 1.0
-    gsettings set org.gnome.shell.extensions.dash-to-dock intellihide-mode "MAXIMIZED_WINDOWS"
+    gsettings set org.gnome.shell.extensions.dash-to-dock intellihide-mode "ALL_WINDOWS"
     gsettings set org.gnome.shell.extensions.dash-to-dock show-mounts-only-mounted false
     gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "FIXED"
 
@@ -900,12 +911,12 @@ EOT
     __log_success__ "Installing Bleachbit"
 
     # ################################################################
-    # Installing Bottles
+    # Installing Clapper
     # ################################################################
 
-    __log_progress__ "Installing Bottles"
-    __install_flatpak__ "com.usebottles.bottles"
-    __log_success__ "Installing Bottles"
+    __log_progress__ "Installing Clapper"
+    __install_flatpak__ "com.github.rafostar.Clapper"
+    __log_success__ "Installing Clapper"
 
     # ################################################################
     # Installing Discord
@@ -946,6 +957,22 @@ EOT
     __log_success__ "Installing Fragments"
 
     # ################################################################
+    # Installing Lutris
+    # ################################################################
+
+    __install_dnf__ \
+        freetype.i686 \
+        gnutls.i686 \
+        libgpg-error.i686 \
+        openldap.i686 \
+        pulseaudio-libs.i686 \
+        sqlite2.i686
+
+    __log_progress__ "Installing Lutris"
+    __install_flatpak__ "net.lutris.Lutris"
+    __log_success__ "Installing Lutris"
+
+    # ################################################################
     # Installing Mozilla Firefox
     # ################################################################
 
@@ -957,6 +984,7 @@ EOT
     rm --force --recursive ~/.mozilla
 
     __install_flatpak__ "org.mozilla.firefox"
+    flatpak override --user --env="MOZ_LOG=PlatformDecoderModule:5" org.mozilla.firefox
 
     __log_success__ "Installing Mozilla Firefox"
 
@@ -990,14 +1018,6 @@ EOT
     __install_dnf__ codium
 
     __log_success__ "Installing Visual Studio Codium"
-
-    # ################################################################
-    # Installing VLC
-    # ################################################################
-
-    __log_progress__ "Installing VLC"
-    __install_flatpak__ "org.videolan.VLC"
-    __log_success__ "Installing VLC"
 }
 
 03_install_automation_scripts() {
@@ -1020,15 +1040,7 @@ setup_00() {
     if [ ! -f /var/tmp/setup_00.part ]; then
         00_setup_prerequisites
         01_update_system
-        02_harden_system
-
-        if [ ${_arg_luks_partition} ]; then
-            03_setup_tpm
-        fi
-
-        04_install_multimedia_codecs
-        05_install_terminal_options
-        06_cleanup
+        02_install_multimedia_codecs
 
         sudo touch /var/tmp/setup_00.part
         __reboot__
@@ -1046,8 +1058,14 @@ setup_nvidia() {
 
 setup_01() {
     if [ ! -f /var/tmp/setup_01.part ]; then
-        00_install_desktop_prerequisites
-        01_install_desktop_extensions
+        00_harden_system
+
+        if [ ${_arg_luks_partition} ]; then
+            01_setup_tpm
+        fi
+
+        02_install_desktop_prerequisites
+        03_install_desktop_extensions
 
         sudo touch /var/tmp/setup_01.part
         __reboot__
@@ -1060,6 +1078,7 @@ setup_02() {
         01_configure_desktop_extensions
         02_install_applications
         03_install_automation_scripts
+        04_cleanup
 
         sudo touch /var/tmp/setup_02.part
         __reboot__
