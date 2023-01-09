@@ -6,8 +6,6 @@
 
 export ECHO_BOLD="\033[1m"
 export ECHO_GREEN="\033[1;32m"
-export ECHO_GREY="\033[0;37m"
-export ECHO_RED="\033[1;31m"
 export ECHO_RESET="\033[0m"
 export ECHO_REPLACE="\033[1A\033[K"
 
@@ -28,10 +26,6 @@ ask_reboot() {
     done
 }
 
-flatpak_install() {
-    flatpak install --assumeyes --user flathub $@ >$NO_OUTPUT 2>&1
-}
-
 dnf_group_install() {
     sudo dnf group install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT 2>&1
 }
@@ -44,8 +38,8 @@ dnf_package_install() {
     sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT 2>&1
 }
 
-dnf_package_remove() {
-    sudo dnf remove --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
+flatpak_install() {
+    flatpak install --assumeyes --user flathub $@ >$NO_OUTPUT 2>&1
 }
 
 log_progress() {
@@ -54,10 +48,6 @@ log_progress() {
 
 log_success() {
     echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
-}
-
-log_success_alt() {
-    echo -e "[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
 }
 
 log_title() {
@@ -185,6 +175,7 @@ flatpak update --user --assumeyes >$NO_OUTPUT 2>&1
 flatpak uninstall --user --assumeyes --unused >$NO_OUTPUT 2>&1
 
 flatpak override --user --reset
+
 flatpak override --user --device=dri
 flatpak override --user --filesystem=xdg-config/gtk-4.0
 
