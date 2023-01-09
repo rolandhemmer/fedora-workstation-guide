@@ -129,16 +129,15 @@ log_success "Installing Lutris"
 
 log_progress "Installing Mozilla Firefox"
 
-# Installing the RPM variant instead of the Flatpak one to avoid hardware-acceleration issues, and for better system integration (example: GNOME extensions, password manager integration, etc.)
-#
-# To use the Flatpak version instead, use:
-#
-# > sudo killall firefox
-# > sudo dnf remove --assumeyes firefox
-# > rm --force --recursive --verbose ~/.mozilla
-# > flatpak install --assumeyes --user flathub org.mozilla.firefox
+# If you experience hardware acceleration issues, or want better system integration (like password managers), consider keeping the RPM version, and comment this block.
 
-dnf_group_install firefox
+# 'killall' fails is there is no process of that name
+sudo killall firefox >$NO_OUTPUT 2>&1 || true
+
+dnf_package_remove firefox
+rm --force --recursive ~/.mozilla
+
+flatpak_install org.mozilla.firefox
 
 log_success "Installing Mozilla Firefox"
 
