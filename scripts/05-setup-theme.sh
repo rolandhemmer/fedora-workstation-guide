@@ -197,6 +197,10 @@ log_progress "Configuring desktop settings"
 
 dnf_package_install gnome-tweaks
 
+sudo tee --append /usr/share/gnome-shell/search-providers/org.gnome.Software-search-provider.ini >$NO_OUTPUT 2>&1 <<EOT
+DefaultDisabled=true
+EOT
+
 gsettings set org.gnome.desktop.calendar show-weekdate true
 gsettings set org.gnome.desktop.interface clock-show-date true
 gsettings set org.gnome.desktop.interface clock-show-weekday true

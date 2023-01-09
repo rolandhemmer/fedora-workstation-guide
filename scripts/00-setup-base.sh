@@ -116,18 +116,6 @@ EOT
 log_success "Updating DNF settings"
 
 # ----------------------------------------------------------------
-# Updating GNOME Software settings
-# ----------------------------------------------------------------
-
-log_progress "Updating GNOME Software settings"
-
-sudo tee --append /usr/share/gnome-shell/search-providers/org.gnome.Software-search-provider.ini >$NO_OUTPUT 2>&1 <<EOT
-DefaultDisabled=true
-EOT
-
-log_success "Updating GNOME Software settings"
-
-# ----------------------------------------------------------------
 # Enabling the Fedora RPM Fusion repositories
 # ----------------------------------------------------------------
 
