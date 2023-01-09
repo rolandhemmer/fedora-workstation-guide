@@ -26,14 +26,6 @@ ask_reboot() {
     done
 }
 
-dnf_group_install() {
-    sudo dnf group install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT 2>&1
-}
-
-dnf_package_install() {
-    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT 2>&1
-}
-
 dnf_package_remove() {
     sudo dnf remove --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
