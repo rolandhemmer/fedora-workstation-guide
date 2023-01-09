@@ -77,7 +77,7 @@ log_title "\n==> Installing applications"
 # ----------------------------------------------------------------
 
 log_progress "Installing Bleachbit"
-dnf_package_install bleachbit
+flatpak_install org.bleachbit.BleachBit
 log_success "Installing Bleachbit"
 
 # ----------------------------------------------------------------
