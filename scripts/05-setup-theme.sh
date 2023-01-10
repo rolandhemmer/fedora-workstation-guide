@@ -175,6 +175,7 @@ log_progress "Configuring desktop settings"
 
 dnf_package_install gnome-tweaks
 
+# Prevent GNOME Software results from showing up in the desktop GNOME search
 sudo tee --append /usr/share/gnome-shell/search-providers/org.gnome.Software-search-provider.ini >$NO_OUTPUT 2>&1 <<EOT
 DefaultDisabled=true
 EOT

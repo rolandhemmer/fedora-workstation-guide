@@ -12,17 +12,14 @@
 
 # Fedora Workstation Installation Guide
 
-*Installation guide and **personal** post-installation steps.  
-The purpose of this document is to provide a clean, minimalist, secure, gaming-ready, Fedora setup.*
-
-*Scripts are provided for your convenience, but all of them are open and -I hope- legible enough for you to update them at will.  
-I've also added comments for more complex parts, and to offer variants.*
-
-*Hope you enjoy this guide.*
-
-*- R.*
-
----
+> *Installation guide and **personal** post-installation steps.*  
+> *The purpose of this document is to provide a clean, minimalist, secure, gaming-ready, Fedora setup.*
+>
+> *Scripts are provided for your convenience, but all of them are open and -I hope- legible enough for you to update them at will.*  
+> *I've also added comments for the more complex parts, and to offer variants.*
+> *Hope you enjoy this guide.*  
+>
+> *- R.*
 
 ## 📖 Table of Contents
 

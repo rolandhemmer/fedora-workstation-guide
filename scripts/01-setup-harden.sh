@@ -168,17 +168,17 @@ log_progress "Enabling recommended boot parameters"
 sudo grubby --update-kernel=ALL --args="debugfs=off init_on_alloc=1 init_on_free=1 lockdown=confidentiality loglevel=0 module.sig_enforce=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on slab_nomerge spectre_v2=on spec_store_bypass_disable=on tsx=off tsx_async_abort=full,nosmt mds=full,nosmt l1tf=full,force nosmt=force kvm.nx_huge_pages=force vsyscall=none"
 
 # Details:
-#   - `debugfs=off`: removes sensitive kernel information during boot
-#   - `init_on_alloc=1 init_on_free=1`: mitigates use-after-free vulnerabilities and erases sensitive information in memory
-#   - `lockdown=confidentiality`: reduces kernel privileges escalation methods via user space (implies `module.sig_enforce=1`)
-#   - `loglevel=0`: prevents information leaks during boot (implies `quiet` on boot, and `kernel.kptr_restrict=2` on sysctl.conf)
-#   - `module.sig_enforce=1`: only allows kernel modules that have been signed with a valid key
-#   - `page_alloc.shuffle=1`: improves security by making page allocations less predictable, and improves performance
-#   - `pti=on`: mitigates Meltdown and prevents some KASLR bypasses
-#   - `randomize_kstack_offset=on`: reduces attacks that rely on deterministic kernel stack layout
-#   - `slab_nomerge`: prevents overwriting objects from merged caches
-#   - `spectre_v2=on spec_store_bypass_disable=on tsx=off tsx_async_abort=full,nosmt mds=full,nosmt l1tf=full,force nosmt=force kvm.nx_huge_pages=force`: enables all built-in mitigations for all known CPU vulnerabilities (microcode updates should be installed to reduce performance impact)
-#   - `vsyscall=none`: disables vsyscalls (obsolete, and replaced by vDSO)
+#   - `debugfs=off`: removes sensitive kernel information during boot.
+#   - `init_on_alloc=1 init_on_free=1`: mitigates use-after-free vulnerabilities and erases sensitive information in memory.
+#   - `lockdown=confidentiality`: reduces kernel privileges escalation methods via user space (implies `module.sig_enforce=1`).
+#   - `loglevel=0`: prevents information leaks during boot (implies `quiet` on boot, and `kernel.kptr_restrict=2` on sysctl.conf).
+#   - `module.sig_enforce=1`: only allows kernel modules that have been signed with a valid key.
+#   - `page_alloc.shuffle=1`: improves security by making page allocations less predictable, and improves performance.
+#   - `pti=on`: mitigates Meltdown and prevents some KASLR bypasses.
+#   - `randomize_kstack_offset=on`: reduces attacks that rely on deterministic kernel stack layout.
+#   - `slab_nomerge`: prevents overwriting objects from merged caches.
+#   - `spectre_v2=on spec_store_bypass_disable=on tsx=off tsx_async_abort=full,nosmt mds=full,nosmt l1tf=full,force nosmt=force kvm.nx_huge_pages=force`: enables all built-in mitigations for all known CPU vulnerabilities (microcode updates should be installed to reduce performance impact).
+#   - `vsyscall=none`: disables vsyscalls (obsolete, and replaced by vDSO).
 
 log_success "Enabling recommended boot parameters"
 
@@ -203,6 +203,7 @@ log_progress "Enabling DNSSEC support"
 
 # 'mkdir' fails if the destination folder already exists
 sudo mkdir --parents /etc/systemd/resolved.conf.d/ || true
+
 sudo tee /etc/systemd/resolved.conf.d/dnssec.conf >$NO_OUTPUT 2>&1 <<EOT
 [Resolve]
 DNSSEC=true
