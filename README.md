@@ -43,13 +43,12 @@ I've also added comments for more complex parts, and to offer variants.*
 
 ### 1.1. Requirements
 
-- a basic Fedora installation (Workstation Edition, with GNOME)
+- basic Fedora installation (Workstation Edition, with GNOME)
+- Secure Boot enabled
 
 Highly recommended (but still **not** mandatory):
 
-- an UEFI platform (the more up-to-date, the better)
-- a TPM 2.0 chip
-- Secure Boot enabled
+- TPM 2.0 enabled
 - LUKS encryption enabled on all drives
 
 These scripts are better run right after a fresh Fedora installation.  
