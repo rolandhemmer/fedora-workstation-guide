@@ -81,11 +81,11 @@ sudo hostnamectl set-hostname --static $static_hostname
 Then, run:
 
 ```bash
-curl --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/00-setup-base.sh | bash
-# ✅ Reboot when asked
+bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/00-setup-base.sh)"
+# ➡️ Reboot when asked
 
-curl --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/01-setup-harden.sh | bash
-# ✅ Reboot when asked
+bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/01-setup-harden.sh)"
+# ➡️ Reboot when asked
 ```
 
 #### 1.2.2. Nvidia Drivers
@@ -93,8 +93,8 @@ curl --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstatio
 If you have an Nvidia GPU, run:
 
 ```bash
-curl --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/02-setup-nvidia.sh | bash
-# ✅ Reboot when asked
+bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/02-setup-nvidia.sh)"
+# ➡️ Reboot when asked
 ```
 
 ⚠️ A password will be asked during this step. This will allow the load of the Nvidia drivers and kernel modules even with Secure Boot enabled.  
@@ -105,9 +105,11 @@ At reboot, choose `Enroll MOK`, `Continue`, `Yes`, and enter the selected passwo
 Finish the basic installation with:
 
 ```bash
-curl --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/03-setup-codecs.sh | bash
+bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/03-setup-codecs.sh)"
+# ✅ No reboot needed
 
-curl --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/04-setup-applications.sh | bash
+bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/04-setup-applications.sh)"
+# ✅ No reboot needed
 ```
 
 #### 1.2.4. Theme
@@ -129,7 +131,8 @@ Then, open the GNOME Extension Manager, and install the following extensions:
 Then, run:
 
 ```bash
-curl --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/05-setup-theme.sh | bash
+bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/05-setup-theme.sh)"
+# ✅ No reboot needed
 ```
 
 ## 🔃 Automation
@@ -138,7 +141,7 @@ A script is provided to simplify all update chores (RPM, Flatpaks, firmware, etc
 Use the following command to add it to your installation:
 
 ```bash
-sudo curl --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/update.sh --output /usr/bin/update
+sudo curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/update.sh --output /usr/bin/update
 ```
 
 Once set up, run:
