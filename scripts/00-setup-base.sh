@@ -31,7 +31,7 @@ dnf_group_install() {
 }
 
 dnf_group_update() {
-    sudo dnf group update allowerasing --assumeyes --best --quiet --with-optional $@ >$NO_OUTPUT 2>&1
+    sudo dnf group update --allowerasing --assumeyes --best --quiet --with-optional $@ >$NO_OUTPUT 2>&1
 }
 
 dnf_package_install() {
