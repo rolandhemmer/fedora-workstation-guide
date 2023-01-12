@@ -1,37 +1,20 @@
 #!/bin/bash
 
 # ################################################################
-# FUNCTIONS
+# FORMATTING
 # ################################################################
 
 export ECHO_BOLD="\033[1m"
 export ECHO_GREEN="\033[1;32m"
-export ECHO_RESET="\033[0m"
+export ECHO_RED="\033[1;31m"
 export ECHO_REPLACE="\033[1A\033[K"
+export ECHO_RESET="\033[0m"
 
 export NO_OUTPUT="/dev/null"
 
-ask_reboot() {
-    while true; do
-        echo -e "\nA reboot is required to continue. Do you wish to reboot now?"
-        read yn
-        case $yn in
-        [Yy]*)
-            sudo reboot now
-            break
-            ;;
-        [Nn]*) exit ;;
-        *) echo "Please answer yes or no." ;;
-        esac
-    done
-}
-
-dnf_package_install() {
-    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT 2>&1
-}
-
-dnf_package_remove() {
-    sudo dnf remove --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
+handle_errors() {
+    echo -e "\n[ ${ECHO_RED}KO${ECHO_RESET} ] Script failed on line $1"
+    exit 1
 }
 
 log_progress() {
@@ -46,15 +29,38 @@ log_success_alt() {
     echo -e "[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
 }
 
-log_title() {
-    echo -e "${ECHO_BOLD}$1${ECHO_RESET}"
+# ################################################################
+# BASE METHODS
+# ################################################################
+
+ask_reboot() {
+    while true; do
+        echo -e "\nA reboot is required to continue. Do you wish to reboot now? [Y/N]"
+        read yn
+        case $yn in
+        [Yy]*)
+            sudo reboot now
+            break
+            ;;
+        [Nn]*) exit ;;
+        *) echo "Please answer yes or no." ;;
+        esac
+    done
+}
+
+dnf_package_install() {
+    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT
+}
+
+dnf_package_remove() {
+    sudo dnf remove --assumeyes --quiet $@ >$NO_OUTPUT
 }
 
 # ################################################################
-# SETUP
+# MAIN
 # ################################################################
 
-set -e
+trap 'handle_errors $LINENO' ERR
 sudo echo ""
 
 cat <<"EOT"
@@ -65,8 +71,6 @@ cat <<"EOT"
 /_/   /_____/_____/\____/_/ |_/_/  |_|   /____/_____/ /_/  \____/_/
 
 EOT
-
-log_title "\n==> Installing latest Nvidia drivers"
 
 # ----------------------------------------------------------------
 # Installing prerequisites
@@ -112,7 +116,7 @@ log_success_alt "Enabling kernel module auto-signing"
 
 log_progress "Installing drivers"
 
-sudo dnf config-manager --set-enable rpmfusion-nonfree-nvidia-driver >$NO_OUTPUT 2>&1
+sudo dnf config-manager --set-enable rpmfusion-nonfree-nvidia-driver >$NO_OUTPUT
 
 dnf_package_install \
     akmod-nvidia \
@@ -128,14 +132,14 @@ dnf_package_install \
     xorg-x11-drv-nvidia-libs \
     xorg-x11-drv-nvidia-power
 
-sudo systemctl enable nvidia-{suspend,resume,hibernate} >$NO_OUTPUT 2>&1
+sudo systemctl enable nvidia-{suspend,resume,hibernate} >$NO_OUTPUT
 
-sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1' >$NO_OUTPUT 2>&1
+sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1' >$NO_OUTPUT
 
-echo "blacklist nouveau" | sudo tee /etc/modprobe.d/blacklist.conf >$NO_OUTPUT 2>&1
-echo "options nvidia_drm modeset=1" | sudo tee /etc/modprobe.d/nvidia.conf >$NO_OUTPUT 2>&1
+echo "blacklist nouveau" | sudo tee /etc/modprobe.d/blacklist.conf >$NO_OUTPUT
+echo "options nvidia_drm modeset=1" | sudo tee /etc/modprobe.d/nvidia.conf >$NO_OUTPUT
 
-sudo tee /etc/dracut.conf.d/nvidia.conf >$NO_OUTPUT 2>&1 <<EOT
+sudo tee /etc/dracut.conf.d/nvidia.conf >$NO_OUTPUT <<EOT
 add_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "
 install_items+=" /etc/modprobe.d/nvidia.conf "
 EOT

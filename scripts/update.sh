@@ -1,12 +1,34 @@
 #!/bin/bash
 #
-# Generated using Argbash v2.9.0
-# See https://argbash.io for more
-#
 
-# --------------------------------
-# Arguments Parsing and Management
-# --------------------------------
+# ################################################################
+# FORMATTING
+# ################################################################
+
+export ECHO_BOLD="\033[1m"
+export ECHO_GREEN="\033[1;32m"
+export ECHO_RED="\033[1;31m"
+export ECHO_REPLACE="\033[1A\033[K"
+export ECHO_RESET="\033[0m"
+
+export NO_OUTPUT="/dev/null"
+
+handle_errors() {
+    echo -e "\n[ ${ECHO_RED}KO${ECHO_RESET} ] Script failed on line $1"
+    exit 1
+}
+
+log_progress() {
+    echo -e "[ .. ]\t$1"
+}
+
+log_success() {
+    echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
+}
+
+# ################################################################
+# ARGUMENT PARSING
+# ################################################################
 
 _arg_all="off"
 _arg_system="off"
@@ -88,7 +110,7 @@ print_help() {
 }
 
 # ################################################################
-# FUNCTIONS
+# BASE METHODS
 # ################################################################
 
 git_reset() {
@@ -100,16 +122,8 @@ git_reset() {
     git gc --aggressive --prune=now >$NO_OUTPUT 2>&1
 }
 
-log_progress() {
-    echo -e "[ .. ]\t$1"
-}
-
-log_success() {
-    echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
-}
-
 # ################################################################
-# UPDATE
+# UPDATE METHODS
 # ################################################################
 
 00_update_system() {
@@ -136,15 +150,15 @@ log_success() {
     log_success "Updating and cleaning user applications"
 
     # ----------------------------------------------------------------
-    # Performing a full system upgrade
+    # Updating system packages
     # ----------------------------------------------------------------
 
-    log_progress "Performing a full system upgrade"
+    log_progress "Updating system packages"
 
     sudo dnf upgrade --allowerasing --assumeyes --best --quiet --refresh >$NO_OUTPUT 2>&1
     sudo dracut --force --parallel --regenerate-all >$NO_OUTPUT 2>&1
 
-    log_success "Performing a full system upgrade"
+    log_success "Updating system packages"
 
     # ----------------------------------------------------------------
     # Updating system drivers
@@ -207,8 +221,8 @@ log_success() {
     gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur false
     gsettings set org.gnome.shell.extensions.blur-my-shell.hidetopbar compatibility false
     gsettings set org.gnome.shell.extensions.blur-my-shell.overview style-components 0
-    gsettings set org.gnome.shell.extensions.blur-my-shell.panel customize true
     gsettings set org.gnome.shell.extensions.blur-my-shell.panel brightness 1.0
+    gsettings set org.gnome.shell.extensions.blur-my-shell.panel customize true
     gsettings set org.gnome.shell.extensions.blur-my-shell.panel override-background-dynamically true
     gsettings set org.gnome.shell.extensions.blur-my-shell.panel sigma 0
     gsettings set org.gnome.shell.extensions.blur-my-shell.panel unblur-in-overview true
@@ -226,6 +240,7 @@ log_success() {
     gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
     gsettings set org.gnome.shell.extensions.dash-to-dock height-fraction 1.0
     gsettings set org.gnome.shell.extensions.dash-to-dock intellihide-mode "ALL_WINDOWS"
+    gsettings set org.gnome.shell.extensions.dash-to-dock running-indicator-style "DOTS"
     gsettings set org.gnome.shell.extensions.dash-to-dock show-mounts-only-mounted false
     gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "FIXED"
 
@@ -312,18 +327,9 @@ log_success() {
 # MAIN
 # ################################################################
 
-export ECHO_BOLD="\033[1m"
-export ECHO_GREEN="\033[1;32m"
-export ECHO_GREY="\033[0;37m"
-export ECHO_RED="\033[1;31m"
-export ECHO_RESET="\033[0m"
-export ECHO_REPLACE="\033[1A\033[K"
-
-export NO_OUTPUT="/dev/null"
-
 parse_commandline "$@"
 
-set -e
+trap 'handle_errors $LINENO' ERR
 sudo echo ""
 
 neofetch

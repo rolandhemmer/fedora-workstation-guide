@@ -1,19 +1,37 @@
 #!/bin/bash
 
 # ################################################################
-# FUNCTIONS
+# FORMATTING
 # ################################################################
 
 export ECHO_BOLD="\033[1m"
 export ECHO_GREEN="\033[1;32m"
-export ECHO_RESET="\033[0m"
+export ECHO_RED="\033[1;31m"
 export ECHO_REPLACE="\033[1A\033[K"
+export ECHO_RESET="\033[0m"
 
 export NO_OUTPUT="/dev/null"
 
+handle_errors() {
+    echo -e "\n[ ${ECHO_RED}KO${ECHO_RESET} ] Script failed on line $1"
+    exit 1
+}
+
+log_progress() {
+    echo -e "[ .. ]\t$1"
+}
+
+log_success() {
+    echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
+}
+
+# ################################################################
+# BASE METHODS
+# ################################################################
+
 ask_reboot() {
     while true; do
-        echo -e "\nA reboot is required to continue. Do you wish to reboot now?"
+        echo -e "\nA reboot is required to continue. Do you wish to reboot now? [Y/N]"
         read yn
         case $yn in
         [Yy]*)
@@ -27,38 +45,26 @@ ask_reboot() {
 }
 
 dnf_group_install() {
-    sudo dnf group install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT 2>&1
+    sudo dnf group install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT
 }
 
 dnf_group_update() {
-    sudo dnf group update --allowerasing --assumeyes --best --quiet --with-optional $@ >$NO_OUTPUT 2>&1
+    sudo dnf group update --allowerasing --assumeyes --best --quiet --with-optional $@ >$NO_OUTPUT
 }
 
 dnf_package_install() {
-    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT 2>&1
+    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT
 }
 
 flatpak_install() {
     flatpak install --assumeyes --user flathub $@ >$NO_OUTPUT 2>&1
 }
 
-log_progress() {
-    echo -e "[ .. ]\t$1"
-}
-
-log_success() {
-    echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
-}
-
-log_title() {
-    echo -e "${ECHO_BOLD}$1${ECHO_RESET}"
-}
-
 # ################################################################
-# SETUP
+# MAIN
 # ################################################################
 
-set -e
+trap 'handle_errors $LINENO' ERR
 sudo echo ""
 
 cat <<"EOT"
@@ -69,8 +75,6 @@ cat <<"EOT"
 /_/   /_____/_____/\____/_/ |_/_/  |_|   /____/_____/ /_/  \____/_/
 
 EOT
-
-log_title "\n==> Configuring system base"
 
 # ----------------------------------------------------------------
 # Configuring Git settings
@@ -92,12 +96,12 @@ git config --global submodule.recurse true
 log_success "Configuring Git settings"
 
 # ----------------------------------------------------------------
-# Updating DNF settings
+# Configuring DNF settings
 # ----------------------------------------------------------------
 
-log_progress "Updating DNF settings"
+log_progress "Configuring DNF settings"
 
-sudo tee /etc/dnf/dnf.conf >$NO_OUTPUT 2>&1 <<EOT
+sudo tee /etc/dnf/dnf.conf >$NO_OUTPUT <<EOT
 [main]
 best=True
 gpgcheck=1
@@ -114,7 +118,7 @@ EOT
 # All other values are at their respective default level.
 # See https://dnf.readthedocs.io/en/latest/conf_ref.html for more.
 
-log_success "Updating DNF settings"
+log_success "Configuring DNF settings"
 
 # ----------------------------------------------------------------
 # Enabling the Fedora RPM Fusion repositories
@@ -140,19 +144,19 @@ dnf_group_update core
 log_success "Enabling the Fedora RPM Fusion repositories"
 
 # ----------------------------------------------------------------
-# Performing a full system upgrade
+# Updating system packages
 # ----------------------------------------------------------------
 
-log_progress "Performing a full system upgrade"
+log_progress "Updating system packages"
 
-sudo dnf clean --assumeyes --quiet all >$NO_OUTPUT 2>&1
-sudo dnf upgrade --allowerasing --assumeyes --best --quiet --refresh >$NO_OUTPUT 2>&1
+sudo dnf clean --assumeyes --quiet all >$NO_OUTPUT
+sudo dnf upgrade --allowerasing --assumeyes --best --quiet --refresh >$NO_OUTPUT
 
 dnf_package_install \
     htop \
     neofetch
 
-log_success "Performing a full system upgrade"
+log_success "Updating system packages"
 
 # ----------------------------------------------------------------
 # Enabling Flatpak repositories
@@ -171,8 +175,8 @@ log_success "Enabling Flatpak repositories"
 
 log_progress "Updating and cleaning system applications"
 
-sudo flatpak update --system --assumeyes >$NO_OUTPUT 2>&1
-sudo flatpak uninstall --system --assumeyes --unused >$NO_OUTPUT 2>&1
+sudo flatpak update --system --assumeyes >$NO_OUTPUT
+sudo flatpak uninstall --system --assumeyes --unused >$NO_OUTPUT
 
 log_success "Updating and cleaning system applications"
 
@@ -182,12 +186,13 @@ log_success "Updating and cleaning system applications"
 
 log_progress "Updating and cleaning user applications"
 
-flatpak update --user --assumeyes >$NO_OUTPUT 2>&1
-flatpak uninstall --user --assumeyes --unused >$NO_OUTPUT 2>&1
+flatpak update --user --assumeyes >$NO_OUTPUT
+flatpak uninstall --user --assumeyes --unused >$NO_OUTPUT
 
 flatpak override --user --reset
 
 flatpak override --user --device=dri
+flatpak override --user --filesystem=xdg-config/gtk-3.0
 flatpak override --user --filesystem=xdg-config/gtk-4.0
 
 log_success "Updating and cleaning user applications"
@@ -211,7 +216,7 @@ dnf_package_install \
     numactl \
     sane-backends-libs
 
-# The 'fwupdmgr' command exits with '1' (as failure) when no update is needed
+# The 'fwupdmgr' command exits with '1' (as failure) when no update is needed.
 sudo fwupdmgr --assume-yes --force refresh >$NO_OUTPUT 2>&1 || true
 sudo fwupdmgr --assume-yes --force get-updates >$NO_OUTPUT 2>&1 || true
 

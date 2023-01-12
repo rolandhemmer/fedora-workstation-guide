@@ -1,37 +1,20 @@
 #!/bin/bash
 
 # ################################################################
-# FUNCTIONS
+# FORMATTING
 # ################################################################
 
 export ECHO_BOLD="\033[1m"
 export ECHO_GREEN="\033[1;32m"
-export ECHO_RESET="\033[0m"
+export ECHO_RED="\033[1;31m"
 export ECHO_REPLACE="\033[1A\033[K"
+export ECHO_RESET="\033[0m"
 
 export NO_OUTPUT="/dev/null"
 
-ask_reboot() {
-    while true; do
-        echo -e "\nA reboot is required to continue. Do you wish to reboot now?"
-        read yn
-        case $yn in
-        [Yy]*)
-            sudo reboot now
-            break
-            ;;
-        [Nn]*) exit ;;
-        *) echo "Please answer yes or no." ;;
-        esac
-    done
-}
-
-dnf_group_update() {
-    sudo dnf group update --allowerasing --assumeyes --best --quiet --with-optional $@ >$NO_OUTPUT 2>&1
-}
-
-dnf_package_install() {
-    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT 2>&1
+handle_errors() {
+    echo -e "\n[ ${ECHO_RED}KO${ECHO_RESET} ] Script failed on line $1"
+    exit 1
 }
 
 log_progress() {
@@ -43,10 +26,22 @@ log_success() {
 }
 
 # ################################################################
-# SETUP
+# BASE METHODS
 # ################################################################
 
-set -e
+dnf_group_update() {
+    sudo dnf group update --allowerasing --assumeyes --best --quiet --with-optional $@ >$NO_OUTPUT
+}
+
+dnf_package_install() {
+    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT
+}
+
+# ################################################################
+# MAIN
+# ################################################################
+
+trap 'handle_errors $LINENO' ERR
 sudo echo ""
 
 cat <<"EOT"
@@ -60,7 +55,7 @@ EOT
 
 log_progress "Installing multimedia codecs"
 
-sudo dnf config-manager --assumeyes --quiet --set-enable fedora-cisco-openh264 >$NO_OUTPUT 2>&1
+sudo dnf config-manager --assumeyes --quiet --set-enable fedora-cisco-openh264 >$NO_OUTPUT
 
 dnf_package_install \
     ffmpeg \

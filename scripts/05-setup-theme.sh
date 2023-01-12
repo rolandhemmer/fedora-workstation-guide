@@ -1,33 +1,20 @@
 #!/bin/bash
 
 # ################################################################
-# FUNCTIONS
+# FORMATTING
 # ################################################################
 
 export ECHO_BOLD="\033[1m"
 export ECHO_GREEN="\033[1;32m"
-export ECHO_RESET="\033[0m"
+export ECHO_RED="\033[1;31m"
 export ECHO_REPLACE="\033[1A\033[K"
+export ECHO_RESET="\033[0m"
 
 export NO_OUTPUT="/dev/null"
 
-ask_reboot() {
-    while true; do
-        echo -e "\nA reboot is required to continue. Do you wish to reboot now?"
-        read yn
-        case $yn in
-        [Yy]*)
-            sudo reboot now
-            break
-            ;;
-        [Nn]*) exit ;;
-        *) echo "Please answer yes or no." ;;
-        esac
-    done
-}
-
-dnf_package_install() {
-    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT 2>&1
+handle_errors() {
+    echo -e "\n[ ${ECHO_RED}KO${ECHO_RESET} ] Script failed on line $1"
+    exit 1
 }
 
 log_progress() {
@@ -38,15 +25,19 @@ log_success() {
     echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
 }
 
-log_title() {
-    echo -e "${ECHO_BOLD}$1${ECHO_RESET}"
+# ################################################################
+# BASE METHODS
+# ################################################################
+
+dnf_package_install() {
+    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT
 }
 
 # ################################################################
-# SETUP
+# MAIN
 # ################################################################
 
-set -e
+trap 'handle_errors $LINENO' ERR
 sudo echo ""
 
 cat <<"EOT"
@@ -57,8 +48,6 @@ cat <<"EOT"
 /_/   /_____/_____/\____/_/ |_/_/  |_|   /____/_____/ /_/  \____/_/
 
 EOT
-
-log_title "\n==> Installing desktop theme"
 
 # ----------------------------------------------------------------
 # Installing terminal theme
@@ -71,7 +60,7 @@ dnf_package_install \
     powerline-fonts \
     vim-powerline
 
-tee --append ~/.bashrc >$NO_OUTPUT 2>&1 <<EOT
+tee --append ~/.bashrc >$NO_OUTPUT <<EOT
 if [ -f $(which powerline-daemon) ]; then
     powerline-daemon --quiet
     POWERLINE_BASH_CONTINUATION=1
@@ -80,7 +69,7 @@ if [ -f $(which powerline-daemon) ]; then
 fi
 EOT
 
-tee --append ~/.vimrc >$NO_OUTPUT 2>&1 <<EOT
+tee --append ~/.vimrc >$NO_OUTPUT <<EOT
 python3 from powerline.vim import setup as powerline_setup
 python3 powerline_setup()
 python3 del powerline_setup
@@ -90,8 +79,8 @@ set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusl
 set t_Co=256
 EOT
 
-sudo cp ~/.bashrc /root/.bashrc >$NO_OUTPUT 2>&1
-sudo cp ~/.vimrc /root/.vimrc >$NO_OUTPUT 2>&1
+sudo cp ~/.bashrc /root/.bashrc >$NO_OUTPUT
+sudo cp ~/.vimrc /root/.vimrc >$NO_OUTPUT
 
 log_success "Installing terminal theme"
 
@@ -113,7 +102,7 @@ log_success "Installing desktop fonts"
 
 log_progress "Installing shell theme"
 
-mkdir --parents ~/.setup/shell || true
+mkdir --parents ~/.setup/shell 2>&1 || true
 
 dnf_package_install \
     gtk-murrine-engine \
@@ -140,7 +129,7 @@ log_success "Installing shell theme"
 
 log_progress "Installing icon theme"
 
-mkdir --parents ~/.setup/icons || true
+mkdir --parents ~/.setup/icons 2>&1 || true
 
 cd ~/.setup/icons
 git clone --quiet "https://github.com/vinceliuice/Colloid-icon-theme.git" Colloid >$NO_OUTPUT 2>&1 || true
@@ -158,7 +147,7 @@ log_success "Installing icon theme"
 
 log_progress "Installing cursor theme"
 
-mkdir --parents ~/.setup/cursors || true
+mkdir --parents ~/.setup/cursors 2>&1 || true
 
 cd ~/.setup/cursors
 git clone --quiet "https://github.com/vinceliuice/Colloid-icon-theme.git" Colloid >$NO_OUTPUT 2>&1 || true
@@ -177,7 +166,7 @@ log_progress "Configuring desktop settings"
 dnf_package_install gnome-tweaks
 
 # Prevent GNOME Software results from showing up in the desktop GNOME search
-sudo tee --append /usr/share/gnome-shell/search-providers/org.gnome.Software-search-provider.ini >$NO_OUTPUT 2>&1 <<EOT
+sudo tee --append /usr/share/gnome-shell/search-providers/org.gnome.Software-search-provider.ini >$NO_OUTPUT <<EOT
 DefaultDisabled=true
 EOT
 

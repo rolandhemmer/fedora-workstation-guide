@@ -1,19 +1,37 @@
 #!/bin/bash
 
 # ################################################################
-# FUNCTIONS
+# FORMATTING
 # ################################################################
 
 export ECHO_BOLD="\033[1m"
 export ECHO_GREEN="\033[1;32m"
-export ECHO_RESET="\033[0m"
+export ECHO_RED="\033[1;31m"
 export ECHO_REPLACE="\033[1A\033[K"
+export ECHO_RESET="\033[0m"
 
 export NO_OUTPUT="/dev/null"
 
+handle_errors() {
+    echo -e "\n[ ${ECHO_RED}KO${ECHO_RESET} ] Script failed on line $1"
+    exit 1
+}
+
+log_progress() {
+    echo -e "[ .. ]\t$1"
+}
+
+log_success() {
+    echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
+}
+
+# ################################################################
+# BASE METHODS
+# ################################################################
+
 ask_reboot() {
     while true; do
-        echo -e "\nA reboot is required to continue. Do you wish to reboot now?"
+        echo -e "\nA reboot is required to continue. Do you wish to reboot now? [Y/N]"
         read yn
         case $yn in
         [Yy]*)
@@ -27,30 +45,18 @@ ask_reboot() {
 }
 
 dnf_group_install() {
-    sudo dnf group install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT 2>&1
+    sudo dnf group install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT
 }
 
 dnf_package_install() {
-    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT 2>&1
-}
-
-log_progress() {
-    echo -e "[ .. ]\t$1"
-}
-
-log_success() {
-    echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
-}
-
-log_title() {
-    echo -e "${ECHO_BOLD}$1${ECHO_RESET}"
+    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT
 }
 
 # ################################################################
-# SETUP
+# MAIN
 # ################################################################
 
-set -e
+trap 'handle_errors $LINENO' ERR
 sudo echo ""
 
 cat <<"EOT"
@@ -61,8 +67,6 @@ cat <<"EOT"
 /_/   /_____/_____/\____/_/ |_/_/  |_|   /____/_____/ /_/  \____/_/
 
 EOT
-
-log_title "\n==> Hardening system"
 
 # ----------------------------------------------------------------
 # Enabling kernel self-protection parameters
@@ -81,7 +85,7 @@ dnf_package_install \
     openssl \
     openssl-libs
 
-sudo tee /etc/sysctl.conf >$NO_OUTPUT 2>&1 <<EOT
+sudo tee /etc/sysctl.conf >$NO_OUTPUT <<EOT
 ## Kernel Self-Protection
 
 # Reduces buffer overflows attacks
@@ -154,7 +158,7 @@ fs.suid_dumpable=0
 
 EOT
 
-sudo sysctl -p >$NO_OUTPUT 2>&1
+sudo sysctl -p >$NO_OUTPUT
 
 log_success "Enabling kernel self-protection parameters"
 
@@ -187,10 +191,10 @@ log_success "Enabling recommended boot parameters"
 
 log_progress "Enabling the Random Number Generator service"
 
-dnf_install rng-tools
+dnf_package_install rng-tools
 
-sudo systemctl start rngd >$NO_OUTPUT 2>&1
-sudo systemctl enable rngd >$NO_OUTPUT 2>&1
+sudo systemctl start rngd >$NO_OUTPUT
+sudo systemctl enable rngd >$NO_OUTPUT
 
 log_success "Enabling the Random Number Generator service"
 
@@ -203,7 +207,7 @@ log_progress "Enabling DNSSEC support"
 # 'mkdir' fails if the destination folder already exists
 sudo mkdir --parents /etc/systemd/resolved.conf.d/ || true
 
-sudo tee /etc/systemd/resolved.conf.d/dnssec.conf >$NO_OUTPUT 2>&1 <<EOT
+sudo tee /etc/systemd/resolved.conf.d/dnssec.conf >$NO_OUTPUT <<EOT
 [Resolve]
 DNSSEC=true
 EOT
