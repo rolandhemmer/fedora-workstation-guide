@@ -97,11 +97,22 @@ log_success "Configuring Git settings"
 
 log_progress "Updating DNF settings"
 
-sudo tee --append /etc/dnf/dnf.conf >$NO_OUTPUT 2>&1 <<EOT
-deltarpm=true
-fastestmirror=1
+sudo tee /etc/dnf/dnf.conf >$NO_OUTPUT 2>&1 <<EOT
+[main]
+best=True
+gpgcheck=1
 max_parallel_downloads=20
+skip_if_unavailable=True
 EOT
+
+# Details:
+#   - `best=True`: instructs the solver to either use a package with the highest available version or fail.
+#   - `gpgcheck=1`: performs GPG signature check on packages found in this repository.
+#   - `max_parallel_downloads=20`: sets the maximum number of simultaneous package downloads.
+#   - `skip_if_unavailable=True`: on error, disables the repository that couldn’t be synchronized for any reason, and continues running.
+#
+# All other values are at their respective default level.
+# See https://dnf.readthedocs.io/en/latest/conf_ref.html for more.
 
 log_success "Updating DNF settings"
 
