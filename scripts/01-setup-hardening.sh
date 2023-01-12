@@ -74,8 +74,6 @@ EOT
 
 log_progress "Enabling kernel self-protection parameters"
 
-dnf_group_install virtualization
-
 dnf_package_install \
     dracut-live \
     kernel \
