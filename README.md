@@ -170,16 +170,14 @@ All other trademarks and copyrights are property of their respective owners and 
 This humble guide is merely a compilation of what's existing out here already.  
 I did spent **A LOT** of time searching, experimenting and formatting my poor PC to test all of this.
 
-Alongside my own time, here's a list of the resources I used.
+I would like to take a minute and warmly thank the following authors for their work and ideas, which greatly helped bring this guide to life.
 
-I would like to take a minute and warmly thank their respective authors for their work and their ideas, which helped bring this guide to life.
-
-- [@Andrei Nevedomskii](https://github.com/monosoul) and his [Nvidia Kernel Module Installation Guide](https://blog.monosoul.dev/2021/12/29/automatically-sign-nvidia-kernel-module-in-fedora/)
-- [@GloriousEggroll](https://github.com/GloriousEggroll) and his [Nobara Project](https://nobaraproject.org/)
+- [@Andrei Nevedomskii](https://github.com/monosoul) and his [Nvidia Kernel Module Installation Guide](https://blog.monosoul.dev/2022/05/17/automatically-sign-nvidia-kernel-module-in-fedora-36/)
 - [@Madaidans-Insecurities](https://github.com/madaidans-insecurities) and his [Linux Hardening Guide](https://madaidans-insecurities.github.io/guides/linux-hardening.html)
+- [@Thomas Crider](https://github.com/GloriousEggroll) and his [Nobara Project](https://nobaraproject.org/)
+- [@Vinceliuice](https://github.com/vinceliuice) for the Colloid [GTK](https://github.com/vinceliuice/Colloid-gtk-theme) and [icon & cursor](https://github.com/vinceliuice/Colloid-icon-theme) themes
 - [The Linux Foundation IT](https://github.com/lfit) and its [Linux workstation security checklist](https://github.com/lfit/itpol/blob/master/linux-workstation-security.md)
 - The RPM Fusion team, and their [Nvidia Guide](https://rpmfusion.org/RPM%20Fusion)
-- [@Vinceliuice](https://github.com/vinceliuice) for the Colloid [GTK](https://github.com/vinceliuice/Colloid-gtk-theme) and [icon & cursor](https://github.com/vinceliuice/Colloid-icon-theme) themes
 - (probably more I forgot...)
 
 and of course the Fedora Team for such an amazing Linux distribution!
