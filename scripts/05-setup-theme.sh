@@ -102,6 +102,9 @@ log_success "Installing desktop fonts"
 
 log_progress "Installing shell theme"
 
+flatpak override --user --filesystem=xdg-config/gtk-3.0
+flatpak override --user --filesystem=xdg-config/gtk-4.0
+
 mkdir --parents ~/.setup/shell 2>&1 || true
 
 dnf_package_install \

@@ -190,10 +190,7 @@ flatpak update --user --assumeyes >$NO_OUTPUT
 flatpak uninstall --user --assumeyes --unused >$NO_OUTPUT
 
 flatpak override --user --reset
-
 flatpak override --user --device=dri
-flatpak override --user --filesystem=xdg-config/gtk-3.0
-flatpak override --user --filesystem=xdg-config/gtk-4.0
 
 log_success "Updating and cleaning user applications"
 
