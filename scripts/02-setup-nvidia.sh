@@ -120,11 +120,13 @@ sudo dnf config-manager --set-enable rpmfusion-nonfree-nvidia-driver >$NO_OUTPUT
 
 dnf_package_install \
     akmod-nvidia \
-    libva-vdpau-driver \
+    libva \
+    libva-utils \
+    libvdpau-va-gl \
+    nvidia-vaapi-driver \
     vdpauinfo \
     vulkan \
     vulkan-loader \
-    vulkan-loader.i686 \
     vulkan-tools \
     xorg-x11-drv-nvidia \
     xorg-x11-drv-nvidia-cuda \

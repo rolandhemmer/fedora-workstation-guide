@@ -76,8 +76,6 @@ dnf_package_install \
     libexif \
     libfreeaptx \
     libsndfile \
-    libva \
-    libva-utils \
     libvorbis \
     mozilla-openh264 \
     pipewire-codec-aptx \

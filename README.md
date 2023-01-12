@@ -28,10 +28,12 @@
   - [⏩ Quick Start](#-quick-start)
     - [1.1. Requirements](#11-requirements)
     - [1.2. Available Scripts](#12-available-scripts)
-      - [1.2.1. Base Setup](#121-base-setup)
-      - [1.2.2. Nvidia Drivers](#122-nvidia-drivers)
-      - [1.2.3. Environment](#123-environment)
-      - [1.2.4. Theme](#124-theme)
+      - [1.2.1. Base Installation](#121-base-installation)
+      - [1.2.2. Nvidia Drivers Installation](#122-nvidia-drivers-installation)
+      - [1.2.3. Desktop Environment Configuration](#123-desktop-environment-configuration)
+      - [1.2.4. Desktop Theme Configuration](#124-desktop-theme-configuration)
+    - [1.3. Tweaks](#13-tweaks)
+      - [1.3.1. Nvidia Hardware-Acceleration for Mozilla Firefox](#131-nvidia-hardware-acceleration-for-mozilla-firefox)
   - [🔃 Automation](#-automation)
   - [📖 License](#-license)
   - [🤝 Thanks](#-thanks)
@@ -60,7 +62,7 @@ On the very first reboot, after creating your account:
 Then, use the following scripts, in the following order.  
 ⚠️ Please **reboot** when asked.
 
-#### 1.2.1. Base Setup
+#### 1.2.1. Base Installation
 
 First, name your new system:
 
@@ -84,7 +86,7 @@ bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemm
 # ➡️ Reboot when asked
 ```
 
-#### 1.2.2. Nvidia Drivers
+#### 1.2.2. Nvidia Drivers Installation
 
 If you have an Nvidia GPU, run:
 
@@ -96,7 +98,7 @@ bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemm
 ⚠️ A password will be asked during this step. This will allow the load of the Nvidia drivers and kernel modules even with Secure Boot enabled.  
 At reboot, choose `Enroll MOK`, `Continue`, `Yes`, and enter the selected password. Reboot when done.
 
-#### 1.2.3. Environment
+#### 1.2.3. Desktop Environment Configuration
 
 Finish the basic installation with:
 
@@ -108,7 +110,7 @@ bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemm
 # ✅ No reboot needed
 ```
 
-#### 1.2.4. Theme
+#### 1.2.4. Desktop Theme Configuration
 
 If you want to include a minimalist, flat, macOS-like GNOME theme, run:
 
@@ -130,6 +132,27 @@ Then, run:
 bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/05-setup-theme.sh)"
 # ✅ No reboot needed
 ```
+
+### 1.3. Tweaks
+
+Some additional configurations you can apply, depending on your hardware, **after** all the provided installation scripts.
+
+#### 1.3.1. Nvidia Hardware-Acceleration for Mozilla Firefox
+
+If you have an Nvidia GPU and Mozilla Firefox installed as a Flatpak (as the current guide would suggest), use the following to finish configuring the browser to properly use hardware-acceleration:
+
+```bash
+flatpak override --user --env="EGL_PLATFORM=wayland" --env="LIBVA_DRIVER_NAME=nvidia" --env="MOZ_LOG=PlatformDecoderModule:5" org.mozilla.firefox
+```
+
+Once done, open the `about:config` page in Mozilla Firefox, and change the following parameters:
+
+| Key                          | Value                                                           |
+| ---------------------------- | --------------------------------------------------------------- |
+| `gfx.x11-egl.force-enabled`  | `true`                                                          |
+| `media.av1.enabled`          | `true` if you have an RTX series 30 or newer, `false` otherwise |
+| `media.ffmpeg.vaapi.enabled` | `true`                                                          |
+| `media.rdd-ffmpeg.enabled`   | `true`                                                          |
 
 ## 🔃 Automation
 
@@ -173,11 +196,12 @@ I did spent **A LOT** of time searching, experimenting and formatting my poor PC
 I would like to take a minute and warmly thank the following authors for their work and ideas, which greatly helped bring this guide to life.
 
 - [@Andrei Nevedomskii](https://github.com/monosoul) and his [Nvidia Kernel Module Installation Guide](https://blog.monosoul.dev/2022/05/17/automatically-sign-nvidia-kernel-module-in-fedora-36/)
-- [@Madaidans-Insecurities](https://github.com/madaidans-insecurities) and his [Linux Hardening Guide](https://madaidans-insecurities.github.io/guides/linux-hardening.html)
+- [@Madaidans Insecurities](https://github.com/madaidans-insecurities) and his [Linux Hardening Guide](https://madaidans-insecurities.github.io/guides/linux-hardening.html)
+- [@Stephen](https://github.com/elFarto) and his [Nvidia VA-API driver](https://github.com/elFarto/nvidia-vaapi-driver)
 - [@Thomas Crider](https://github.com/GloriousEggroll) and his [Nobara Project](https://nobaraproject.org/)
-- [@Vinceliuice](https://github.com/vinceliuice) for the Colloid [GTK](https://github.com/vinceliuice/Colloid-gtk-theme) and [icon & cursor](https://github.com/vinceliuice/Colloid-icon-theme) themes
+- [@Vince](https://github.com/vinceliuice) for the Colloid [GTK](https://github.com/vinceliuice/Colloid-gtk-theme) and [icon & cursor](https://github.com/vinceliuice/Colloid-icon-theme) themes
 - [The Linux Foundation IT](https://github.com/lfit) and its [Linux workstation security checklist](https://github.com/lfit/itpol/blob/master/linux-workstation-security.md)
-- The RPM Fusion team, and their [Nvidia Guide](https://rpmfusion.org/RPM%20Fusion)
+- The RPM Fusion team, and their [Nvidia Guide](https://rpmfusion.org/Howto/NVIDIA)
 - (probably more I forgot...)
 
 and of course the Fedora Team for such an amazing Linux distribution!
