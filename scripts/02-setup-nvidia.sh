@@ -125,9 +125,7 @@ dnf_package_install \
     xorg-x11-drv-nvidia \
     xorg-x11-drv-nvidia-cuda \
     xorg-x11-drv-nvidia-cuda-libs \
-    xorg-x11-drv-nvidia-cuda-libs.i686 \
     xorg-x11-drv-nvidia-libs \
-    xorg-x11-drv-nvidia-libs.i686 \
     xorg-x11-drv-nvidia-power
 
 sudo systemctl enable nvidia-{suspend,resume,hibernate} >$NO_OUTPUT 2>&1

@@ -79,8 +79,7 @@ dnf_package_install \
     kernel-modules-extra \
     initscripts \
     openssl \
-    openssl-libs \
-    openssl-libs.i686
+    openssl-libs
 
 sudo tee /etc/sysctl.conf >$NO_OUTPUT 2>&1 <<EOT
 ## Kernel Self-Protection

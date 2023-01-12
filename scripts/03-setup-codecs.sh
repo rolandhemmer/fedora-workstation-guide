@@ -65,45 +65,29 @@ sudo dnf config-manager --assumeyes --quiet --set-enable fedora-cisco-openh264 >
 dnf_package_install \
     ffmpeg \
     ffmpeg-libs \
-    ffmpeg-libs.i686 \
     flac-libs \
-    flac-libs.i686 \
     gstreamer1 \
     gstreamer1-libav \
     gstreamer1-plugin-openh264 \
     gstreamer1-plugins-bad-free \
-    gstreamer1-plugins-bad-free.i686 \
     gstreamer1-plugins-base \
-    gstreamer1-plugins-base.i686 \
     gstreamer1-plugins-good \
-    gstreamer1-plugins-good.i686 \
     gstreamer1-plugins-ugly-free \
-    gstreamer1-plugins-ugly-free.i686 \
     gstreamer1-vaapi \
-    gstreamer1.i686 \
     lame\* \
     libaom \
-    libaom.i686 \
     libasyncns \
-    libasyncns.i686 \
     libavdevice \
-    libavdevice.i686 \
     libexif \
-    libexif.i686 \
     libfreeaptx \
     libsndfile \
-    libsndfile.i686 \
     libva \
     libva-utils \
-    libva.i686 \
     libvorbis \
-    libvorbis.i686 \
     mozilla-openh264 \
     pipewire-codec-aptx \
     x264-libs \
-    x264-libs.i686 \
     x265-libs \
-    x265-libs.i686 \
     --exclude=gstreamer1-plugins-bad-free-devel \
     --exclude=lame-devel
 

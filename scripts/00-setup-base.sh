@@ -209,8 +209,7 @@ dnf_package_install \
     fwupd \
     hplip \
     numactl \
-    sane-backends-libs \
-    sane-backends-libs.i686
+    sane-backends-libs
 
 # The 'fwupdmgr' command exits with '1' (as failure) when no update is needed
 sudo fwupdmgr --assume-yes --force refresh >$NO_OUTPUT 2>&1 || true
