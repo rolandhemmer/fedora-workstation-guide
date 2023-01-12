@@ -100,8 +100,6 @@ dnf_package_install \
     libvorbis.i686 \
     mozilla-openh264 \
     pipewire-codec-aptx \
-    pulseaudio-libs \
-    pulseaudio-libs.i686 \
     x264-libs \
     x264-libs.i686 \
     x265-libs \
