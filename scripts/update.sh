@@ -102,8 +102,8 @@ parse_commandline() {
 
 print_help() {
     printf '%s\n\n' "Fedora Workstation Personal Update Script"
-    printf 'Usage: %s [-a|--all] [-s|--system] [-e|--extensions] [-t|--theme] [-l|--luks-partition <arg>] [-h|--help]\n' "$0"
-    printf '\t%s\t\t%s\n' "-a, --all" "Updates everything (system, extensions, and theme)"
+    printf 'Usage: %s [-a|--all] [-s|--system] [-t|--theme] [-h|--help]\n' "$0"
+    printf '\t%s\t\t%s\n' "-a, --all" "Updates everything (system and theme)"
     printf '\t%s\t\t%s\n' "-s, --system" "Updates only the system packages and applications"
     printf '\t%s\t\t%s\n' "-t, --theme" "Updates only the GNOME theme (shell, cursors, and icons)"
     printf '\t%s\t\t%s\n' "-h, --help" "Prints help"
