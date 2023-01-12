@@ -80,7 +80,7 @@ Then, run:
 bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/00-setup-base.sh)"
 # ➡️ Reboot when asked
 
-bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/01-setup-harden.sh)"
+bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/01-setup-hardening.sh)"
 # ➡️ Reboot when asked
 ```
 
