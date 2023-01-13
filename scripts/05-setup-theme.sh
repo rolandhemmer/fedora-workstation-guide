@@ -55,6 +55,8 @@ EOT
 
 log_progress "Installing terminal theme"
 
+# Install Powerline for Bash and Vim
+
 dnf_package_install \
     powerline \
     powerline-fonts \
@@ -81,6 +83,17 @@ EOT
 
 sudo cp ~/.bashrc /root/.bashrc >$NO_OUTPUT
 sudo cp ~/.vimrc /root/.vimrc >$NO_OUTPUT
+
+# Increase GNOME Terminal padding
+
+tee --append ~/.config/gtk-3.0/gtk.css >$NO_OUTPUT <<EOT
+VteTerminal,
+TerminalScreen,
+vte-terminal {
+    padding: 10px 10px 10px 10px;
+    -VteTerminal-inner-border: 10px 10px 10px 10px;
+}
+EOT
 
 log_success "Installing terminal theme"
 
