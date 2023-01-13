@@ -150,15 +150,18 @@ git_reset() {
     log_success "Updating and cleaning user applications"
 
     # ----------------------------------------------------------------
-    # Updating system packages
+    # Updating and cleaning system packages
     # ----------------------------------------------------------------
 
-    log_progress "Updating system packages"
+    log_progress "Updating and cleaning system packages"
 
-    sudo dnf upgrade --allowerasing --assumeyes --best --quiet --refresh >$NO_OUTPUT 2>&1
+    sudo dnf clean all --quiet >$NO_OUTPUT 2>&1
+    sudo dnf upgrade --allowerasing --assumeyes --best --quiet >$NO_OUTPUT 2>&1
+    sudo dnf autoremove --allowerasing --assumeyes --best --quiet >$NO_OUTPUT 2>&1
+
     sudo dracut --force --parallel --regenerate-all >$NO_OUTPUT 2>&1
 
-    log_success "Updating system packages"
+    log_success "Updating and cleaning system packages"
 
     # ----------------------------------------------------------------
     # Updating system drivers
