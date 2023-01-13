@@ -161,6 +161,9 @@ git_reset() {
 
     sudo dracut --force --parallel --regenerate-all >$NO_OUTPUT 2>&1
 
+    sudo journalctl --rotate >$NO_OUTPUT 2>&1
+    sudo journalctl --vacuum-time=1s >$NO_OUTPUT 2>&1
+
     log_success "Updating and cleaning system packages"
 
     # ----------------------------------------------------------------
