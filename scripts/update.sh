@@ -198,7 +198,6 @@ git_reset() {
 
     gsettings set org.gnome.nautilus.preferences default-folder-viewer "list-view"
     gsettings set org.gnome.nautilus.preferences show-hidden-files true
-    gsettings set org.gnome.nautilus.window-state sidebar-width 220
 
     gsettings set org.gtk.Settings.FileChooser show-hidden true
 
