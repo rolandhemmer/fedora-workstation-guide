@@ -49,11 +49,11 @@ ask_reboot() {
 }
 
 dnf_package_install() {
-    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT
+    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
 
 dnf_package_remove() {
-    sudo dnf remove --assumeyes --quiet $@ >$NO_OUTPUT
+    sudo dnf remove --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
 
 # ################################################################
@@ -116,7 +116,7 @@ log_success_alt "Enabling kernel module auto-signing"
 
 log_progress "Installing drivers"
 
-sudo dnf config-manager --set-enable rpmfusion-nonfree-nvidia-driver >$NO_OUTPUT
+sudo dnf config-manager --set-enable rpmfusion-nonfree-nvidia-driver >$NO_OUTPUT 2>&1
 
 dnf_package_install \
     akmod-nvidia \
@@ -133,12 +133,12 @@ dnf_package_install \
     xorg-x11-drv-nvidia-cuda-libs \
     xorg-x11-drv-nvidia-libs
 
-sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1' >$NO_OUTPUT
+sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1' >$NO_OUTPUT 2>&1
 
-echo "blacklist nouveau" | sudo tee /etc/modprobe.d/blacklist.conf >$NO_OUTPUT
-echo "options nvidia_drm modeset=1" | sudo tee /etc/modprobe.d/nvidia.conf >$NO_OUTPUT
+echo "blacklist nouveau" | sudo tee /etc/modprobe.d/blacklist.conf >$NO_OUTPUT 2>&1
+echo "options nvidia_drm modeset=1" | sudo tee /etc/modprobe.d/nvidia.conf >$NO_OUTPUT 2>&1
 
-sudo tee /etc/dracut.conf.d/nvidia.conf >$NO_OUTPUT <<EOT
+sudo tee /etc/dracut.conf.d/nvidia.conf >$NO_OUTPUT 2>&1 <<EOT
 add_drivers+=" nvidia nvidia_modeset nvidia_uvm nvidia_drm "
 install_items+=" /etc/modprobe.d/nvidia.conf "
 EOT

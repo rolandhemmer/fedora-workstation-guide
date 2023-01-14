@@ -45,7 +45,7 @@ ask_reboot() {
 }
 
 dnf_package_remove() {
-    sudo dnf remove --assumeyes --quiet $@ >$NO_OUTPUT
+    sudo dnf remove --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
 
 flatpak_install() {

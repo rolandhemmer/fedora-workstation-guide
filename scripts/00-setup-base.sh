@@ -45,15 +45,15 @@ ask_reboot() {
 }
 
 dnf_group_install() {
-    sudo dnf group install --assumeyes --quiet $@ >$NO_OUTPUT
+    sudo dnf group install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
 
 dnf_group_update() {
-    sudo dnf group update --assumeyes --quiet $@ >$NO_OUTPUT
+    sudo dnf group update --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
 
 dnf_package_install() {
-    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT
+    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
 
 flatpak_install() {
@@ -101,7 +101,7 @@ log_success "Configuring Git settings"
 
 log_progress "Configuring DNF settings"
 
-sudo tee /etc/dnf/dnf.conf >$NO_OUTPUT <<EOT
+sudo tee /etc/dnf/dnf.conf >$NO_OUTPUT 2>&1 <<EOT
 [main]
 best=True
 gpgcheck=1
@@ -149,8 +149,8 @@ log_success "Enabling the Fedora RPM Fusion repositories"
 
 log_progress "Updating system packages"
 
-sudo dnf clean --assumeyes --quiet all >$NO_OUTPUT
-sudo dnf upgrade --assumeyes --quiet --refresh >$NO_OUTPUT
+sudo dnf clean --assumeyes --quiet all >$NO_OUTPUT 2>&1
+sudo dnf upgrade --assumeyes --quiet --refresh >$NO_OUTPUT 2>&1
 
 dnf_package_install \
     htop \
@@ -175,8 +175,8 @@ log_success "Enabling Flatpak repositories"
 
 log_progress "Updating and cleaning system applications"
 
-sudo flatpak update --system --assumeyes >$NO_OUTPUT
-sudo flatpak uninstall --system --assumeyes --unused >$NO_OUTPUT
+sudo flatpak update --system --assumeyes >$NO_OUTPUT 2>&1
+sudo flatpak uninstall --system --assumeyes --unused >$NO_OUTPUT 2>&1
 
 log_success "Updating and cleaning system applications"
 
@@ -186,8 +186,8 @@ log_success "Updating and cleaning system applications"
 
 log_progress "Updating and cleaning user applications"
 
-flatpak update --user --assumeyes >$NO_OUTPUT
-flatpak uninstall --user --assumeyes --unused >$NO_OUTPUT
+flatpak update --user --assumeyes >$NO_OUTPUT 2>&1
+flatpak uninstall --user --assumeyes --unused >$NO_OUTPUT 2>&1
 
 flatpak override --user --reset
 flatpak override --user --device=dri

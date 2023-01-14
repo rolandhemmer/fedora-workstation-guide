@@ -30,7 +30,7 @@ log_success() {
 # ################################################################
 
 dnf_package_install() {
-    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT
+    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
 
 # ################################################################
@@ -62,7 +62,7 @@ dnf_package_install \
     powerline-fonts \
     vim-powerline
 
-tee --append ~/.bashrc >$NO_OUTPUT <<EOT
+tee --append ~/.bashrc >$NO_OUTPUT 2>&1 <<EOT
 if [ -f $(which powerline-daemon) ]; then
     powerline-daemon --quiet
     POWERLINE_BASH_CONTINUATION=1
@@ -71,7 +71,7 @@ if [ -f $(which powerline-daemon) ]; then
 fi
 EOT
 
-tee --append ~/.vimrc >$NO_OUTPUT <<EOT
+tee --append ~/.vimrc >$NO_OUTPUT 2>&1 <<EOT
 python3 from powerline.vim import setup as powerline_setup
 python3 powerline_setup()
 python3 del powerline_setup
@@ -81,12 +81,12 @@ set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusl
 set t_Co=256
 EOT
 
-sudo cp ~/.bashrc /root/.bashrc >$NO_OUTPUT
-sudo cp ~/.vimrc /root/.vimrc >$NO_OUTPUT
+sudo cp ~/.bashrc /root/.bashrc >$NO_OUTPUT 2>&1
+sudo cp ~/.vimrc /root/.vimrc >$NO_OUTPUT 2>&1
 
 # Increase GNOME Terminal padding
 
-tee --append ~/.config/gtk-3.0/gtk.css >$NO_OUTPUT <<EOT
+tee --append ~/.config/gtk-3.0/gtk.css >$NO_OUTPUT 2>&1 <<EOT
 VteTerminal,
 TerminalScreen,
 vte-terminal {
@@ -182,7 +182,7 @@ log_progress "Configuring desktop settings"
 dnf_package_install gnome-tweaks
 
 # Prevent GNOME Software results from showing up in the desktop GNOME search
-sudo tee --append /usr/share/gnome-shell/search-providers/org.gnome.Software-search-provider.ini >$NO_OUTPUT <<EOT
+sudo tee --append /usr/share/gnome-shell/search-providers/org.gnome.Software-search-provider.ini >$NO_OUTPUT 2>&1 <<EOT
 DefaultDisabled=true
 EOT
 

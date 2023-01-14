@@ -45,11 +45,11 @@ ask_reboot() {
 }
 
 dnf_group_install() {
-    sudo dnf group install --assumeyes --quiet $@ >$NO_OUTPUT
+    sudo dnf group install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
 
 dnf_package_install() {
-    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT
+    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
 
 # ################################################################
@@ -83,7 +83,7 @@ dnf_package_install \
     openssl \
     openssl-libs
 
-sudo tee /etc/sysctl.conf >$NO_OUTPUT <<EOT
+sudo tee /etc/sysctl.conf >$NO_OUTPUT 2>&1 <<EOT
 ## Kernel Self-Protection
 
 # Reduces buffer overflows attacks
@@ -156,7 +156,7 @@ fs.suid_dumpable=0
 
 EOT
 
-sudo sysctl -p >$NO_OUTPUT
+sudo sysctl -p >$NO_OUTPUT 2>&1
 
 log_success "Enabling kernel self-protection parameters"
 
@@ -191,8 +191,8 @@ log_progress "Enabling the Random Number Generator service"
 
 dnf_package_install rng-tools
 
-sudo systemctl start rngd >$NO_OUTPUT
-sudo systemctl enable rngd >$NO_OUTPUT
+sudo systemctl start rngd >$NO_OUTPUT 2>&1
+sudo systemctl enable rngd >$NO_OUTPUT 2>&1
 
 log_success "Enabling the Random Number Generator service"
 
@@ -205,7 +205,7 @@ log_progress "Enabling DNSSEC support"
 # 'mkdir' fails if the destination folder already exists
 sudo mkdir --parents /etc/systemd/resolved.conf.d/ || true
 
-sudo tee /etc/systemd/resolved.conf.d/dnssec.conf >$NO_OUTPUT <<EOT
+sudo tee /etc/systemd/resolved.conf.d/dnssec.conf >$NO_OUTPUT 2>&1 <<EOT
 [Resolve]
 DNSSEC=true
 EOT

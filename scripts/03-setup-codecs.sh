@@ -30,15 +30,15 @@ log_success() {
 # ################################################################
 
 dnf_group_install() {
-    sudo dnf group install --assumeyes --quiet $@ >$NO_OUTPUT
+    sudo dnf group install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
 
 dnf_group_update() {
-    sudo dnf group update --assumeyes --quiet $@ >$NO_OUTPUT
+    sudo dnf group update --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
 
 dnf_package_install() {
-    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT
+    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
 
 # ################################################################
@@ -59,7 +59,7 @@ EOT
 
 log_progress "Installing multimedia codecs"
 
-sudo dnf config-manager --assumeyes --quiet --set-enable fedora-cisco-openh264 >$NO_OUTPUT
+sudo dnf config-manager --assumeyes --quiet --set-enable fedora-cisco-openh264 >$NO_OUTPUT 2>&1
 
 dnf_package_install \
     ffmpeg \
