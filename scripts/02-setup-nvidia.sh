@@ -131,10 +131,7 @@ dnf_package_install \
     xorg-x11-drv-nvidia \
     xorg-x11-drv-nvidia-cuda \
     xorg-x11-drv-nvidia-cuda-libs \
-    xorg-x11-drv-nvidia-libs \
-    xorg-x11-drv-nvidia-power
-
-sudo systemctl enable nvidia-{suspend,resume,hibernate} >$NO_OUTPUT
+    xorg-x11-drv-nvidia-libs
 
 sudo grubby --update-kernel=ALL --args='nvidia-drm.modeset=1' >$NO_OUTPUT
 
