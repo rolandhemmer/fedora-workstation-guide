@@ -29,8 +29,12 @@ log_success() {
 # BASE METHODS
 # ################################################################
 
+dnf_group_install() {
+    sudo dnf group install --assumeyes --quiet $@ >$NO_OUTPUT
+}
+
 dnf_group_update() {
-    sudo dnf group update --assumeyes --quiet --with-optional $@ >$NO_OUTPUT
+    sudo dnf group update --assumeyes --quiet $@ >$NO_OUTPUT
 }
 
 dnf_package_install() {
@@ -84,7 +88,7 @@ dnf_package_install \
     --exclude=gstreamer1-plugins-bad-free-devel \
     --exclude=lame-devel
 
+dnf_group_install sound-and-video
 dnf_group_update multimedia
-dnf_group_update sound-and-video
 
 log_success "Installing multimedia codecs"

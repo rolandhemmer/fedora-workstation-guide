@@ -49,7 +49,7 @@ dnf_group_install() {
 }
 
 dnf_group_update() {
-    sudo dnf group update --assumeyes --quiet --with-optional $@ >$NO_OUTPUT
+    sudo dnf group update --assumeyes --quiet $@ >$NO_OUTPUT
 }
 
 dnf_package_install() {
