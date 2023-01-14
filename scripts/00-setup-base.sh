@@ -45,15 +45,15 @@ ask_reboot() {
 }
 
 dnf_group_install() {
-    sudo dnf group install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT
+    sudo dnf group install --assumeyes --quiet $@ >$NO_OUTPUT
 }
 
 dnf_group_update() {
-    sudo dnf group update --allowerasing --assumeyes --best --quiet --with-optional $@ >$NO_OUTPUT
+    sudo dnf group update --assumeyes --quiet --with-optional $@ >$NO_OUTPUT
 }
 
 dnf_package_install() {
-    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT
+    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT
 }
 
 flatpak_install() {
@@ -150,7 +150,7 @@ log_success "Enabling the Fedora RPM Fusion repositories"
 log_progress "Updating system packages"
 
 sudo dnf clean --assumeyes --quiet all >$NO_OUTPUT
-sudo dnf upgrade --allowerasing --assumeyes --best --quiet --refresh >$NO_OUTPUT
+sudo dnf upgrade --assumeyes --quiet --refresh >$NO_OUTPUT
 
 dnf_package_install \
     htop \

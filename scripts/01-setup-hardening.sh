@@ -45,11 +45,11 @@ ask_reboot() {
 }
 
 dnf_group_install() {
-    sudo dnf group install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT
+    sudo dnf group install --assumeyes --quiet $@ >$NO_OUTPUT
 }
 
 dnf_package_install() {
-    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT
+    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT
 }
 
 # ################################################################

@@ -156,8 +156,8 @@ git_reset() {
     log_progress "Updating and cleaning system packages"
 
     sudo dnf clean all --quiet >$NO_OUTPUT 2>&1
-    sudo dnf upgrade --allowerasing --assumeyes --best --quiet >$NO_OUTPUT 2>&1
-    sudo dnf autoremove --allowerasing --assumeyes --best --quiet >$NO_OUTPUT 2>&1
+    sudo dnf upgrade --assumeyes --quiet >$NO_OUTPUT 2>&1
+    sudo dnf autoremove --assumeyes --quiet >$NO_OUTPUT 2>&1
 
     sudo dracut --force --parallel --regenerate-all >$NO_OUTPUT 2>&1
 

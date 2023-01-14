@@ -30,11 +30,11 @@ log_success() {
 # ################################################################
 
 dnf_group_update() {
-    sudo dnf group update --allowerasing --assumeyes --best --quiet --with-optional $@ >$NO_OUTPUT
+    sudo dnf group update --assumeyes --quiet --with-optional $@ >$NO_OUTPUT
 }
 
 dnf_package_install() {
-    sudo dnf install --allowerasing --assumeyes --best --quiet $@ >$NO_OUTPUT
+    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT
 }
 
 # ################################################################
