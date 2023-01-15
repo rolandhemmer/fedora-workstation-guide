@@ -121,6 +121,7 @@ flatpak install --assumeyes --user flathub com.mattjakeman.ExtensionManager
 Then, open the GNOME Extension Manager, and install the following extensions:
 
 - Alphabetical App Grid
+- AppIndicator and KStatusNotifierItem Support
 - Blur my Shell
 - Dash to Dock
 - Hide Top Bar
