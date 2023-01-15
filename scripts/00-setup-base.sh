@@ -82,16 +82,25 @@ EOT
 
 log_progress "Configuring Git settings"
 
-git config --global commit.gpgsign true
-git config --global core.autocrlf input
-git config --global core.editor vim
-git config --global core.eol lf
-git config --global diff.colormoved zebra
-git config --global fetch.prune true
-git config --global http.maxrequestbuffer 128M
-git config --global http.postbuffer 512M
-git config --global pull.rebase true
-git config --global submodule.recurse true
+sudo tee ~/.gitconfig >$NO_OUTPUT 2>&1 <<EOT
+[commit]
+        gpgsign = true
+[core]
+        autocrlf = input
+        editor = vim
+        eol = lf
+[diff]
+        colormoved = zebra
+[fetch]
+        prune = true
+[http]
+        maxrequestbuffer = 128M
+        postbuffer = 512M
+[pull]
+        rebase = true
+[submodule]
+        recurse = true
+EOT
 
 log_success "Configuring Git settings"
 
