@@ -229,6 +229,15 @@ log_success "Configuring desktop theme"
 
 log_progress "Configuring desktop extensions"
 
+cd /usr/share/glib-2.0/schemas
+sudo wget --quiet "https://gitlab.gnome.org/GNOME/gnome-shell-extensions/-/raw/main/extensions/user-theme/org.gnome.shell.extensions.user-theme.gschema.xml"
+sudo wget --quiet "https://raw.githubusercontent.com/aunetx/blur-my-shell/master/schemas/org.gnome.shell.extensions.blur-my-shell.gschema.xml"
+sudo wget --quiet "https://raw.githubusercontent.com/MartinPL/Tray-Icons-Reloaded/master/schemas/org.gnome.shell.extensions.trayIconsReloaded.gschema.xml"
+sudo wget --quiet "https://raw.githubusercontent.com/micheleg/dash-to-dock/master/schemas/org.gnome.shell.extensions.dash-to-dock.gschema.xml"
+sudo wget --quiet "https://raw.githubusercontent.com/stuarthayhurst/alphabetical-grid-extension/master/extension/schemas/org.gnome.shell.extensions.AlphabeticalAppGrid.gschema.xml"
+sudo wget --quiet "https://raw.githubusercontent.com/tuxor1337/hidetopbar/master/schemas/org.gnome.shell.extensions.hidetopbar.gschema.xml"
+sudo glib-compile-schemas . >$NO_OUTPUT 2>&1
+
 gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-position "alphabetical"
 gsettings set org.gnome.shell.extensions.alphabetical-app-grid logging-enabled false
 gsettings set org.gnome.shell.extensions.alphabetical-app-grid sort-folder-contents true
