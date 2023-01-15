@@ -219,7 +219,6 @@ sudo fc-cache --really-force
 gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
 gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
 gsettings set org.gnome.desktop.interface icon-theme "Colloid-dark"
-gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 
 log_success "Configuring desktop theme"
 
@@ -254,7 +253,9 @@ gsettings set org.gnome.shell.extensions.blur-my-shell.applications enable-all f
 gsettings set org.gnome.shell.extensions.blur-my-shell.applications opacity 255
 gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur false
 gsettings set org.gnome.shell.extensions.blur-my-shell.hidetopbar compatibility false
+gsettings set org.gnome.shell.extensions.blur-my-shell.overview blur true
 gsettings set org.gnome.shell.extensions.blur-my-shell.overview style-components 0
+gsettings set org.gnome.shell.extensions.blur-my-shell.panel blur true
 gsettings set org.gnome.shell.extensions.blur-my-shell.panel brightness 1.0
 gsettings set org.gnome.shell.extensions.blur-my-shell.panel customize true
 gsettings set org.gnome.shell.extensions.blur-my-shell.panel override-background-dynamically true
@@ -286,6 +287,8 @@ gsettings set org.gnome.shell.extensions.hidetopbar mouse-sensitive false
 gsettings set org.gnome.shell.extensions.hidetopbar mouse-sensitive-fullscreen-window false
 gsettings set org.gnome.shell.extensions.hidetopbar mouse-triggers-overview true
 gsettings set org.gnome.shell.extensions.hidetopbar show-in-overview true
+
+gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 
 log_success "Configuring desktop extensions"
 
