@@ -161,6 +161,7 @@ Use the following command to add it to your installation:
 
 ```bash
 sudo curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/update.sh --output /usr/bin/update
+sudo chmod +x /usr/bin/update
 ```
 
 Once set up, run:
