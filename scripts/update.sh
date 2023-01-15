@@ -128,6 +128,22 @@ git_reset() {
 
 00_update_system() {
     # ----------------------------------------------------------------
+    # Configuring privacy settings
+    # ----------------------------------------------------------------
+
+    log_progress "Configuring privacy settings"
+
+    gsettings set org.gnome.desktop.privacy report-technical-problems false
+
+    sudo systemctl disable \
+        abrt-journal-core \
+        abrt-oops \
+        abrt-xorg \
+        abrtd >$NO_OUTPUT 2>&1
+
+    log_success "Configuring privacy settings"
+
+    # ----------------------------------------------------------------
     # Updating and cleaning system applications
     # ----------------------------------------------------------------
 

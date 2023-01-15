@@ -130,6 +130,22 @@ EOT
 log_success "Configuring DNF settings"
 
 # ----------------------------------------------------------------
+# Configuring privacy settings
+# ----------------------------------------------------------------
+
+log_progress "Configuring privacy settings"
+
+gsettings set org.gnome.desktop.privacy report-technical-problems false
+
+sudo systemctl disable \
+    abrt-journal-core \
+    abrt-oops \
+    abrt-xorg \
+    abrtd >$NO_OUTPUT 2>&1
+
+log_success "Configuring privacy settings"
+
+# ----------------------------------------------------------------
 # Enabling the Fedora RPM Fusion repositories
 # ----------------------------------------------------------------
 
@@ -153,10 +169,10 @@ dnf_group_update core
 log_success "Enabling the Fedora RPM Fusion repositories"
 
 # ----------------------------------------------------------------
-# Updating system packages
+# Updating and cleaning system packages
 # ----------------------------------------------------------------
 
-log_progress "Updating system packages"
+log_progress "Updating and cleaning system packages"
 
 sudo dnf clean --assumeyes --quiet all >$NO_OUTPUT 2>&1
 sudo dnf upgrade --assumeyes --quiet --refresh >$NO_OUTPUT 2>&1
@@ -165,7 +181,7 @@ dnf_package_install \
     htop \
     neofetch
 
-log_success "Updating system packages"
+log_success "Updating and cleaning system packages"
 
 # ----------------------------------------------------------------
 # Enabling Flatpak repositories
