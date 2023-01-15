@@ -44,6 +44,10 @@ ask_reboot() {
     done
 }
 
+dnf_package_install() {
+    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
+}
+
 dnf_package_remove() {
     sudo dnf remove --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
 }
@@ -73,7 +77,14 @@ EOT
 # ----------------------------------------------------------------
 
 log_progress "Installing Bleachbit"
-flatpak_install org.bleachbit.BleachBit
+
+# Using RPM version over Flatpak for root access and full-system cleaning.
+# If you prefer the Flatpak version, use:
+#
+# > flatpak_install org.bleachbit.BleachBit
+
+dnf_package_install bleachbit
+
 log_success "Installing Bleachbit"
 
 # ----------------------------------------------------------------
