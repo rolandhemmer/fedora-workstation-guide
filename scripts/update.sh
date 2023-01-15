@@ -293,6 +293,11 @@ git_reset() {
     gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
     gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
 
+    cd ~/.setup/tools/stylepak
+    git_reset
+
+    stylepak install-user >$NO_OUTPUT 2>&1
+
     log_success "Updating shell theme"
 
     # ----------------------------------------------------------------

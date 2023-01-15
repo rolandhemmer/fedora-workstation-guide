@@ -115,9 +115,6 @@ log_success "Installing desktop fonts"
 
 log_progress "Installing shell theme"
 
-flatpak override --user --filesystem=xdg-config/gtk-3.0
-flatpak override --user --filesystem=xdg-config/gtk-4.0
-
 mkdir --parents ~/.setup/shell 2>&1 || true
 
 dnf_package_install \
@@ -136,6 +133,19 @@ sudo ./install.sh \
     --libadwaita \
     --theme default \
     --tweaks rimless >$NO_OUTPUT 2>&1
+
+mkdir --parents ~/.setup/tools || true
+
+dnf_package_install \
+    libappstream-glib \
+    ostree
+
+cd ~/.setup/tools
+git clone --quiet "https://github.com/refi64/stylepak.git" stylepak >$NO_OUTPUT 2>&1 || true
+cd stylepak
+
+chmod +x stylepak
+sudo cp stylepak /usr/bin/
 
 log_success "Installing shell theme"
 
@@ -219,6 +229,8 @@ sudo fc-cache --really-force
 gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
 gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
 gsettings set org.gnome.desktop.interface icon-theme "Colloid-dark"
+
+stylepak install-user >$NO_OUTPUT 2>&1
 
 log_success "Configuring desktop theme"
 
