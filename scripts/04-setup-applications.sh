@@ -157,12 +157,17 @@ flatpak_install org.onlyoffice.desktopeditors
 log_success "Installing ONLYOFFICE"
 
 # ----------------------------------------------------------------
-# Installing Steam
+# Installing Steam and Proton tools
 # ----------------------------------------------------------------
 
-log_progress "Installing Steam"
-flatpak_install com.valvesoftware.Steam
-log_success "Installing Steam"
+log_progress "Installing Steam and Proton tools"
+
+flatpak_install \
+    com.github.Matoking.protontricks \
+    com.valvesoftware.Steam \
+    net.davidotek.pupgui2
+
+log_success "Installing Steam and Proton tools"
 
 # ----------------------------------------------------------------
 # Installing Visual Studio Codium
