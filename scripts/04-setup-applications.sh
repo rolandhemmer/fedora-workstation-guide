@@ -179,6 +179,14 @@ flatpak_install org.onlyoffice.desktopeditors
 log_success "Installing ONLYOFFICE"
 
 # ----------------------------------------------------------------
+# Installing pip (Python)
+# ----------------------------------------------------------------
+
+log_progress "Installing pip for Python"
+dnf_package_install python3-pip
+log_success "Installing pip for Python"
+
+# ----------------------------------------------------------------
 # Installing Steam and Proton tools
 # ----------------------------------------------------------------
 
