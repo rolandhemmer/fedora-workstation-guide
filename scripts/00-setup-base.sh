@@ -155,6 +155,7 @@ dnf_package_install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-r
 dnf_package_install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm --eval %fedora).noarch.rpm
 
 dnf_package_install \
+    dnf-plugins-core \
     fedora-repos \
     fedora-workstation-repositories \
     rpmfusion-free-appstream-data \

@@ -104,6 +104,28 @@ flatpak_install com.discordapp.Discord
 log_success "Installing Discord"
 
 # ----------------------------------------------------------------
+# Installing Docker
+# ----------------------------------------------------------------
+
+log_progress "Installing Docker"
+
+sudo dnf config-manager --assumeyes --quiet --add-repo \
+    https://download.docker.com/linux/fedora/docker-ce.repo >$NO_OUTPUT 2>&1
+
+dnf_package_install \
+    containerd.io \
+    docker-ce \
+    docker-ce-cli \
+    docker-compose-plugin
+
+sudo usermod --append --groups docker $USER >$NO_OUTPUT 2>&1
+
+sudo systemctl enable docker.service >$NO_OUTPUT 2>&1
+sudo systemctl enable containerd.service >$NO_OUTPUT 2>&1
+
+log_success "Installing Docker"
+
+# ----------------------------------------------------------------
 # Installing Fedora Media Writer
 # ----------------------------------------------------------------
 
