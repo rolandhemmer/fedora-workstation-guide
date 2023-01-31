@@ -57,6 +57,10 @@ On the very first reboot, after creating your account:
 - disable `Automatic Problem Reporting`
 - enable `Third-Party Repositories`
 
+<div dir='rtl'>
+  <a href="#-table-of-contents">⬆️ back to top</a>
+</div>
+
 ### 1.2. Available Scripts
 
 Then, use the following scripts, in the following order.  
@@ -86,6 +90,10 @@ bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemm
 # ➡️ Reboot when asked
 ```
 
+<div dir='rtl'>
+  <a href="#-table-of-contents">⬆️ back to top</a>
+</div>
+
 #### 1.2.2. Nvidia Drivers Installation
 
 If you have an Nvidia GPU, run:
@@ -98,6 +106,10 @@ bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemm
 ⚠️ A password will be asked during this step. This will allow the load of the Nvidia drivers and kernel modules even with Secure Boot enabled.  
 At reboot, choose `Enroll MOK`, `Continue`, `Yes`, and enter the selected password. Reboot when done.
 
+<div dir='rtl'>
+  <a href="#-table-of-contents">⬆️ back to top</a>
+</div>
+
 #### 1.2.3. Desktop Environment Configuration
 
 Finish the basic installation with:
@@ -109,6 +121,10 @@ bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemm
 bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/04-setup-applications.sh)"
 # ✅ No reboot needed
 ```
+
+<div dir='rtl'>
+  <a href="#-table-of-contents">⬆️ back to top</a>
+</div>
 
 #### 1.2.4. Desktop Theme Configuration
 
@@ -134,6 +150,10 @@ bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemm
 # ✅ No reboot needed
 ```
 
+<div dir='rtl'>
+  <a href="#-table-of-contents">⬆️ back to top</a>
+</div>
+
 ### 1.3. Tweaks
 
 Some additional configurations you can apply, depending on your hardware, **after** all the provided installation scripts.
@@ -154,6 +174,10 @@ Once done, open the `about:config` page in Mozilla Firefox, and change the follo
 | `media.av1.enabled`          | `true` if you have an RTX series 30 or newer, `false` otherwise |
 | `media.ffmpeg.vaapi.enabled` | `true`                                                          |
 | `media.rdd-ffmpeg.enabled`   | `true`                                                          |
+
+<div dir='rtl'>
+  <a href="#-table-of-contents">⬆️ back to top</a>
+</div>
 
 ## 🔃 Automation
 
@@ -180,6 +204,10 @@ update --all
 
 I recommend [setting up a CRON job](https://fedoramagazine.org/scheduling-tasks-with-cron/) calling this script to keep your system updated without effort.
 
+<div dir='rtl'>
+  <a href="#-table-of-contents">⬆️ back to top</a>
+</div>
+
 ## 📖 License
 
 This guide is published under the MIT license.  
@@ -190,6 +218,10 @@ Per this license, the use of the software and scripts downloaded from this repos
 Fedora and the Fedora logo are trademarks or registered trademarks of [Red Hat, Inc](https://www.redhat.com/en).  
 All other trademarks and copyrights are property of their respective owners and are only mentioned for informative purposes.
 
+<div dir='rtl'>
+  <a href="#-table-of-contents">⬆️ back to top</a>
+</div>
+
 ## 🤝 Thanks
 
 This humble guide is merely a compilation of what's existing out here already.  
@@ -198,7 +230,7 @@ I did spent **A LOT** of time searching, experimenting and formatting my poor PC
 I would like to take a minute and warmly thank the following authors for their work and ideas, which greatly helped bring this guide to life.
 
 - [@Andrei Nevedomskii](https://github.com/monosoul) and his [Nvidia Kernel Module Installation Guide](https://blog.monosoul.dev/2022/05/17/automatically-sign-nvidia-kernel-module-in-fedora-36/)
-- [@Madaidans Insecurities](https://github.com/madaidans-insecurities) and his [Linux Hardening Guide](https://madaidans-insecurities.github.io/guides/linux-hardening.html)
+- [@Madaidans Insecurities](https://github.com/madaidans-insecurities) and its [Linux Hardening Guide](https://madaidans-insecurities.github.io/guides/linux-hardening.html)
 - [@Stephen](https://github.com/elFarto) and his [Nvidia VA-API driver](https://github.com/elFarto/nvidia-vaapi-driver)
 - [@Thomas Crider](https://github.com/GloriousEggroll) and his [Nobara Project](https://nobaraproject.org/)
 - [@Vince](https://github.com/vinceliuice) for the Colloid [GTK](https://github.com/vinceliuice/Colloid-gtk-theme) and [icon & cursor](https://github.com/vinceliuice/Colloid-icon-theme) themes
@@ -207,3 +239,7 @@ I would like to take a minute and warmly thank the following authors for their w
 - (probably more I forgot...)
 
 and of course the Fedora Team for such an amazing Linux distribution!
+
+<div dir='rtl'>
+  <a href="#-table-of-contents">⬆️ back to top</a>
+</div>
