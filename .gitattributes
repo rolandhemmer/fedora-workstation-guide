@@ -1,10 +1,14 @@
+# ----------------------------------------------------------------
+# Global
+# ----------------------------------------------------------------
+
 # Auto detect text files and perform LF normalization
 * text=auto
 * text eol=lf
 
-###
-### The configuration above will handle all file types NOT found below
-###
+# ----------------------------------------------------------------
+# Details
+# ----------------------------------------------------------------
 
 # Audio
 *.kar binary
