@@ -1,78 +1,18 @@
 #!/bin/bash
 
-# ################################################################
-# FORMATTING
-# ################################################################
-
-export ECHO_BOLD="\033[1m"
-export ECHO_GREEN="\033[1;32m"
-export ECHO_RED="\033[1;31m"
-export ECHO_REPLACE="\033[1A\033[K"
-export ECHO_RESET="\033[0m"
-
-export NO_OUTPUT="/dev/null"
-
-handle_errors() {
-    echo -e "\n[ ${ECHO_RED}KO${ECHO_RESET} ] Script failed on line $1"
-    exit 1
-}
-
-log_progress() {
-    echo -e "[ .. ]\t$1"
-}
-
-log_success() {
-    echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
-}
+source common.sh
 
 # ################################################################
-# BASE METHODS
+# Main
 # ################################################################
 
-ask_reboot() {
-    while true; do
-        echo -e "\nA reboot is required to continue. Do you wish to reboot now? [Y/N]"
-        read yn
-        case $yn in
-        [Yy]*)
-            sudo reboot now
-            break
-            ;;
-        [Nn]*) exit ;;
-        *) echo "Please answer yes or no." ;;
-        esac
-    done
-}
-
-dnf_group_install() {
-    sudo dnf group install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
-}
-
-dnf_package_install() {
-    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
-}
-
-# ################################################################
-# MAIN
-# ################################################################
-
-trap 'handle_errors $LINENO' ERR
-sudo echo ""
-
-cat <<"EOT"
-    ________________  ____  ____  ___       _____ ______________  ______
-   / ____/ ____/ __ \/ __ \/ __ \/   |     / ___// ____/_  __/ / / / __ \
-  / /_  / __/ / / / / / / / /_/ / /| |     \__ \/ __/   / / / / / / /_/ /
- / __/ / /___/ /_/ / /_/ / _, _/ ___ |    ___/ / /___  / / / /_/ / ____/
-/_/   /_____/_____/\____/_/ |_/_/  |_|   /____/_____/ /_/  \____/_/
-
-EOT
+trap 'handle_errors $LINENO "$BASH_COMMAND"' ERR
+sudo echo -e "[ Fedora Workstation Installation Script ]\n"
 
 # ----------------------------------------------------------------
+
 # Enabling kernel self-protection parameters
-# ----------------------------------------------------------------
-
-log_progress "Enabling kernel self-protection parameters"
+log_step "Enabling kernel self-protection parameters"
 
 dnf_package_install \
     dracut-live \
@@ -83,7 +23,7 @@ dnf_package_install \
     openssl \
     openssl-libs
 
-sudo tee /etc/sysctl.conf >$NO_OUTPUT 2>&1 <<EOT
+sudo tee /etc/sysctl.conf >$OUTPUT_EMPTY 2>&1 <<EOT
 ## Kernel Self-Protection
 
 # Reduces buffer overflows attacks
@@ -156,15 +96,12 @@ fs.suid_dumpable=0
 
 EOT
 
-sudo sysctl -p >$NO_OUTPUT 2>&1
-
-log_success "Enabling kernel self-protection parameters"
+sudo sysctl -p >$OUTPUT_EMPTY 2>&1
 
 # ----------------------------------------------------------------
+
 # Enabling recommended boot parameters
-# ----------------------------------------------------------------
-
-log_progress "Enabling recommended boot parameters"
+log_step "Enabling recommended boot parameters"
 
 sudo grubby --update-kernel=ALL --args="debugfs=off init_on_alloc=1 init_on_free=1 lockdown=confidentiality loglevel=0 module.sig_enforce=1 page_alloc.shuffle=1 pti=on randomize_kstack_offset=on slab_nomerge spectre_v2=on spec_store_bypass_disable=on tsx=off tsx_async_abort=full,nosmt mds=full,nosmt l1tf=full,force nosmt=force kvm.nx_huge_pages=force vsyscall=none"
 
@@ -181,43 +118,33 @@ sudo grubby --update-kernel=ALL --args="debugfs=off init_on_alloc=1 init_on_free
 #   - `spectre_v2=on spec_store_bypass_disable=on tsx=off tsx_async_abort=full,nosmt mds=full,nosmt l1tf=full,force nosmt=force kvm.nx_huge_pages=force`: enables all built-in mitigations for all known CPU vulnerabilities (microcode updates should be installed to reduce performance impact).
 #   - `vsyscall=none`: disables vsyscalls (obsolete, and replaced by vDSO).
 
-log_success "Enabling recommended boot parameters"
-
 # ----------------------------------------------------------------
+
 # Enabling the Random Number Generator service
-# ----------------------------------------------------------------
-
-log_progress "Enabling the Random Number Generator service"
+log_step "Enabling the Random Number Generator service"
 
 dnf_package_install rng-tools
 
-sudo systemctl start rngd >$NO_OUTPUT 2>&1
-sudo systemctl enable rngd >$NO_OUTPUT 2>&1
-
-log_success "Enabling the Random Number Generator service"
+sudo systemctl start rngd >$OUTPUT_EMPTY 2>&1
+sudo systemctl enable rngd >$OUTPUT_EMPTY 2>&1
 
 # ----------------------------------------------------------------
+
 # Enabling DNSSEC support
-# ----------------------------------------------------------------
+log_step "Enabling DNSSEC support"
 
-log_progress "Enabling DNSSEC support"
-
-# 'mkdir' fails if the destination folder already exists
 sudo mkdir --parents /etc/systemd/resolved.conf.d/ || true
 
-sudo tee /etc/systemd/resolved.conf.d/dnssec.conf >$NO_OUTPUT 2>&1 <<EOT
+sudo tee /etc/systemd/resolved.conf.d/dnssec.conf >$OUTPUT_EMPTY 2>&1 <<EOT
 [Resolve]
 DNSSEC=true
 EOT
 
 sudo systemctl restart systemd-resolved
 
-log_success "Enabling DNSSEC support"
-
 # ################################################################
-# REBOOT
+# End
 # ################################################################
 
-echo -e "\n[ ${ECHO_BOLD}OK${ECHO_RESET} ]"
-
+log_success
 ask_reboot

@@ -1,44 +1,37 @@
 <div align="center">
   <br>
-  <br>
-  <br>
-  <br>
-  <img src="images/fedora-logo.png" alt="Fedora" width="450"/>
-  <br>
-  <br>
+  <img src="docs/fedora-logo.png" alt="Fedora" width="275"/>
   <br>
   <br>
 </div>
 
-# Fedora Workstation Installation Guide
+<div align="center">
 
-> *Installation guide and **personal** post-installation steps.*  
-> *The purpose of this document is to provide a clean, minimalist, secure, gaming-ready, Fedora setup.*
->
-> *Scripts are provided for your convenience, but all of them are open and -I hope- legible enough for you to update them at will.*  
-> *I've also added comments for the more complex parts, and to offer variants.*
-> *Hope you enjoy this guide.*  
->
-> *- R.*
+Installation guide and **personal** post-installation steps.  
+The purpose of this document is to provide a clean, minimalist, secure, gaming-ready, Fedora setup.
+
+These scripts, while trivially editable and configurable, are built from a **personal** point-of-view, and may not suit all use-cases or preferences.
+
+<br>
+<br>
+<br>
+</div>
 
 ## 📖 Table of Contents
 
-- [Fedora Workstation Installation Guide](#fedora-workstation-installation-guide)
-  - [📖 Table of Contents](#-table-of-contents)
-  - [⏩ Quick Start](#-quick-start)
-    - [1.1. Requirements](#11-requirements)
-    - [1.2. Available Scripts](#12-available-scripts)
-      - [1.2.1. Base Installation](#121-base-installation)
-      - [1.2.2. Nvidia Drivers Installation](#122-nvidia-drivers-installation)
-      - [1.2.3. Desktop Environment Configuration](#123-desktop-environment-configuration)
-      - [1.2.4. Desktop Theme Configuration](#124-desktop-theme-configuration)
-    - [1.3. Tweaks](#13-tweaks)
-      - [1.3.1. Nvidia Hardware-Acceleration for Mozilla Firefox](#131-nvidia-hardware-acceleration-for-mozilla-firefox)
-  - [🔃 Automation](#-automation)
-  - [📖 License](#-license)
-  - [🤝 Thanks](#-thanks)
+- [📖 Table of Contents](#-table-of-contents)
+- [🚀 Quick Start](#-quick-start)
+  - [1.1. Requirements](#11-requirements)
+  - [1.2. Available Scripts](#12-available-scripts)
+    - [1.2.1. Base Installation](#121-base-installation)
+    - [1.2.2. Nvidia Drivers Installation](#122-nvidia-drivers-installation)
+    - [1.2.3. Desktop Environment Configuration](#123-desktop-environment-configuration)
+    - [1.2.4. Desktop Theme Configuration](#124-desktop-theme-configuration)
+- [🔃 Automation](#-automation)
+- [🎓 License](#-license)
+- [🤝 Thanks](#-thanks)
 
-## ⏩ Quick Start
+## 🚀 Quick Start
 
 ### 1.1. Requirements
 
@@ -83,10 +76,10 @@ sudo hostnamectl set-hostname --static $static_hostname
 Then, run:
 
 ```bash
-bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/00-setup-base.sh)"
+./scripts/00-setup-base.sh
 # ➡️ Reboot when asked
 
-bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/01-setup-hardening.sh)"
+./scripts/01-setup-hardening.sh
 # ➡️ Reboot when asked
 ```
 
@@ -99,7 +92,7 @@ bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemm
 If you have an Nvidia GPU, run:
 
 ```bash
-bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/02-setup-nvidia.sh)"
+./scripts/02-setup-nvidia.sh
 # ➡️ Reboot when asked
 ```
 
@@ -115,10 +108,10 @@ At reboot, choose `Enroll MOK`, `Continue`, `Yes`, and enter the selected passwo
 Finish the basic installation with:
 
 ```bash
-bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/03-setup-codecs.sh)"
+./scripts/03-setup-codecs.sh
 # ✅ No reboot needed
 
-bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/04-setup-applications.sh)"
+./scripts/04-setup-applications.sh
 # ✅ No reboot needed
 ```
 
@@ -128,52 +121,25 @@ bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemm
 
 #### 1.2.4. Desktop Theme Configuration
 
-If you want to include a minimalist, flat, macOS-like GNOME theme, run:
+To include a minimalist, flat, and consistent GNOME theme, run:
 
 ```bash
 flatpak install --assumeyes --user flathub com.mattjakeman.ExtensionManager
 ```
 
-Then, open the GNOME Extension Manager, and install the following extensions:
+Then, open `Extension Manager`, and install the following extensions:
 
 - Alphabetical App Grid
 - AppIndicator and KStatusNotifierItem Support
-- Blur my Shell
 - Dash to Dock
-- Hide Top Bar
 - User Themes
 
 Then, run:
 
 ```bash
-bash -c "$(curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/05-setup-theme.sh)"
+./scripts/05-setup-theme.sh
 # ✅ No reboot needed
 ```
-
-<div dir='rtl'>
-  <a href="#-table-of-contents">⬆️ back to top</a>
-</div>
-
-### 1.3. Tweaks
-
-Some additional configurations you can apply, depending on your hardware, **after** all the provided installation scripts.
-
-#### 1.3.1. Nvidia Hardware-Acceleration for Mozilla Firefox
-
-If you have an Nvidia GPU and Mozilla Firefox installed as a Flatpak (as the current guide would suggest), use the following to finish configuring the browser to properly use hardware-acceleration:
-
-```bash
-flatpak override --user --env="EGL_PLATFORM=wayland" --env="LIBVA_DRIVER_NAME=nvidia" --env="MOZ_LOG=PlatformDecoderModule:5" org.mozilla.firefox
-```
-
-Once done, open the `about:config` page in Mozilla Firefox, and change the following parameters:
-
-| Key                          | Value                                                           |
-| ---------------------------- | --------------------------------------------------------------- |
-| `gfx.x11-egl.force-enabled`  | `true`                                                          |
-| `media.av1.enabled`          | `true` if you have an RTX series 30 or newer, `false` otherwise |
-| `media.ffmpeg.vaapi.enabled` | `true`                                                          |
-| `media.rdd-ffmpeg.enabled`   | `true`                                                          |
 
 <div dir='rtl'>
   <a href="#-table-of-contents">⬆️ back to top</a>
@@ -182,10 +148,10 @@ Once done, open the `about:config` page in Mozilla Firefox, and change the follo
 ## 🔃 Automation
 
 A script is provided to simplify all update chores (RPM, Flatpaks, firmware, etc.), and/or refresh the GNOME theme as well if needed.  
-Use the following command to add it to your installation:
+Use the following command to install it:
 
 ```bash
-sudo curl --silent --location https://raw.githubusercontent.com/rolandhemmer/fedora-workstation-guide/main/scripts/update.sh --output /usr/bin/update
+sudo cp ./scripts/update.sh /usr/bin/update
 sudo chmod +x /usr/bin/update
 ```
 
@@ -202,21 +168,19 @@ update --all
 # to do both
 ```
 
-I recommend [setting up a CRON job](https://fedoramagazine.org/scheduling-tasks-with-cron/) calling this script to keep your system updated without effort.
+[Setting up a CRON job](https://fedoramagazine.org/scheduling-tasks-with-cron/) calling this script is recommended, to keep your system updated without effort.
 
 <div dir='rtl'>
   <a href="#-table-of-contents">⬆️ back to top</a>
 </div>
 
-## 📖 License
+## 🎓 License
 
 This guide is published under the MIT license.  
 See the [LICENSE.md](LICENSE.md) file for the full license text.
 
-Per this license, the use of the software and scripts downloaded from this repository is done **at your own discretion and risk**.
-
-Fedora and the Fedora logo are trademarks or registered trademarks of [Red Hat, Inc](https://www.redhat.com/en).  
-All other trademarks and copyrights are property of their respective owners and are only mentioned for informative purposes.
+Per this license, the use of the software and scripts downloaded from this repository is done **at your own discretion and risk**.  
+All logos, trademarks, and copyrights are property of their respective owners and are only mentioned for informative purposes.
 
 <div dir='rtl'>
   <a href="#-table-of-contents">⬆️ back to top</a>
@@ -233,9 +197,8 @@ I would like to take a minute and warmly thank the following authors for their w
 - [@Madaidans Insecurities](https://github.com/madaidans-insecurities) and its [Linux Hardening Guide](https://madaidans-insecurities.github.io/guides/linux-hardening.html)
 - [@Stephen](https://github.com/elFarto) and his [Nvidia VA-API driver](https://github.com/elFarto/nvidia-vaapi-driver)
 - [@Thomas Crider](https://github.com/GloriousEggroll) and his [Nobara Project](https://nobaraproject.org/)
-- [@Vince](https://github.com/vinceliuice) for the Colloid [GTK](https://github.com/vinceliuice/Colloid-gtk-theme) and [icon & cursor](https://github.com/vinceliuice/Colloid-icon-theme) themes
 - [The Linux Foundation IT](https://github.com/lfit) and its [Linux workstation security checklist](https://github.com/lfit/itpol/blob/master/linux-workstation-security.md)
-- The RPM Fusion team, and their [Nvidia Guide](https://rpmfusion.org/Howto/NVIDIA)
+- The RPM Fusion team and their [Nvidia Guide](https://rpmfusion.org/Howto/NVIDIA)
 - (probably more I forgot...)
 
 and of course the Fedora Team for such an amazing Linux distribution!

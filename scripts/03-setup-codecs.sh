@@ -1,65 +1,20 @@
 #!/bin/bash
 
-# ################################################################
-# FORMATTING
-# ################################################################
-
-export ECHO_BOLD="\033[1m"
-export ECHO_GREEN="\033[1;32m"
-export ECHO_RED="\033[1;31m"
-export ECHO_REPLACE="\033[1A\033[K"
-export ECHO_RESET="\033[0m"
-
-export NO_OUTPUT="/dev/null"
-
-handle_errors() {
-    echo -e "\n[ ${ECHO_RED}KO${ECHO_RESET} ] Script failed on line $1"
-    exit 1
-}
-
-log_progress() {
-    echo -e "[ .. ]\t$1"
-}
-
-log_success() {
-    echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
-}
+source common.sh
 
 # ################################################################
-# BASE METHODS
+# Main
 # ################################################################
 
-dnf_group_install() {
-    sudo dnf group install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
-}
+trap 'handle_errors $LINENO "$BASH_COMMAND"' ERR
+sudo echo -e "[ Fedora Workstation Installation Script ]\n"
 
-dnf_group_update() {
-    sudo dnf group update --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
-}
+# ----------------------------------------------------------------
 
-dnf_package_install() {
-    sudo dnf install --assumeyes --quiet $@ >$NO_OUTPUT 2>&1
-}
+# Installing multimedia codecs
+log_step "Installing multimedia codecs"
 
-# ################################################################
-# MAIN
-# ################################################################
-
-trap 'handle_errors $LINENO' ERR
-sudo echo ""
-
-cat <<"EOT"
-    ________________  ____  ____  ___       _____ ______________  ______
-   / ____/ ____/ __ \/ __ \/ __ \/   |     / ___// ____/_  __/ / / / __ \
-  / /_  / __/ / / / / / / / /_/ / /| |     \__ \/ __/   / / / / / / /_/ /
- / __/ / /___/ /_/ / /_/ / _, _/ ___ |    ___/ / /___  / / / /_/ / ____/
-/_/   /_____/_____/\____/_/ |_/_/  |_|   /____/_____/ /_/  \____/_/
-
-EOT
-
-log_progress "Installing multimedia codecs"
-
-sudo dnf config-manager --assumeyes --quiet --set-enable fedora-cisco-openh264 >$NO_OUTPUT 2>&1
+sudo dnf config-manager --assumeyes --quiet --set-enable fedora-cisco-openh264 >$OUTPUT_EMPTY 2>&1
 
 dnf_package_install \
     ffmpeg \
@@ -91,4 +46,8 @@ dnf_package_install \
 dnf_group_install sound-and-video
 dnf_group_update multimedia
 
-log_success "Installing multimedia codecs"
+# ################################################################
+# End
+# ################################################################
+
+log_success

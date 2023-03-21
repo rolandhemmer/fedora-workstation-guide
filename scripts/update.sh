@@ -1,33 +1,31 @@
 #!/bin/bash
-#
 
 # ################################################################
-# FORMATTING
+# Formatting
 # ################################################################
 
-export ECHO_BOLD="\033[1m"
-export ECHO_GREEN="\033[1;32m"
-export ECHO_RED="\033[1;31m"
-export ECHO_REPLACE="\033[1A\033[K"
-export ECHO_RESET="\033[0m"
-
-export NO_OUTPUT="/dev/null"
+OUTPUT_BOLD="tput bold"
+OUTPUT_EMPTY="/dev/null"
+OUTPUT_ERROR="tput setaf 1"
+OUTPUT_RESET="tput sgr0"
+OUTPUT_SUCCESS="tput setaf 2"
+OUTPUT_WARNING="tput setaf 3"
 
 handle_errors() {
-    echo -e "\n[ ${ECHO_RED}KO${ECHO_RESET} ] Script failed on line $1"
+    echo -e "\n$($OUTPUT_ERROR)Error:$($OUTPUT_RESET) command '$2' failed (line $1)"
     exit 1
 }
 
-log_progress() {
-    echo -e "[ .. ]\t$1"
+log_step() {
+    echo "-- $1"
 }
 
 log_success() {
-    echo -e "${ECHO_REPLACE}[ ${ECHO_GREEN}OK${ECHO_RESET} ]\t$1"
+    echo -e "\n$($OUTPUT_SUCCESS)Done!$($OUTPUT_RESET)"
 }
 
 # ################################################################
-# ARGUMENT PARSING
+# Argument Parsing
 # ################################################################
 
 _arg_all="off"
@@ -101,7 +99,7 @@ parse_commandline() {
 }
 
 print_help() {
-    printf '%s\n\n' "Fedora Workstation Personal Update Script"
+    printf '%s\n\n' "Fedora Workstation Update Script"
     printf 'Usage: %s [-a|--all] [-s|--system] [-t|--theme] [-h|--help]\n' "$0"
     printf '\t%s\t\t%s\n' "-a, --all" "Updates everything (system and theme)"
     printf '\t%s\t\t%s\n' "-s, --system" "Updates only the system packages and applications"
@@ -110,28 +108,14 @@ print_help() {
 }
 
 # ################################################################
-# BASE METHODS
-# ################################################################
-
-git_reset() {
-    git clean -dx --force >$NO_OUTPUT 2>&1 || true
-    git checkout . >$NO_OUTPUT 2>&1
-    git fetch --all --prune --prune-tags --tags >$NO_OUTPUT 2>&1
-    git remote prune origin >$NO_OUTPUT 2>&1
-    git pull --rebase >$NO_OUTPUT 2>&1
-    git gc --aggressive --prune=now >$NO_OUTPUT 2>&1
-}
-
-# ################################################################
-# UPDATE METHODS
+# Update Methods
 # ################################################################
 
 00_update_system() {
     # ----------------------------------------------------------------
-    # Configuring privacy settings
-    # ----------------------------------------------------------------
 
-    log_progress "Configuring privacy settings"
+    # Configuring privacy settings
+    log_step "Configuring privacy settings"
 
     gsettings set org.gnome.desktop.privacy report-technical-problems false
 
@@ -139,68 +123,55 @@ git_reset() {
         abrt-journal-core \
         abrt-oops \
         abrt-xorg \
-        abrtd >$NO_OUTPUT 2>&1
-
-    log_success "Configuring privacy settings"
+        abrtd >$OUTPUT_EMPTY 2>&1
 
     # ----------------------------------------------------------------
-    # Updating and cleaning system applications
-    # ----------------------------------------------------------------
 
-    log_progress "Updating and cleaning system applications"
-
-    sudo flatpak update --system --assumeyes >$NO_OUTPUT 2>&1
-    sudo flatpak uninstall --system --assumeyes --unused >$NO_OUTPUT 2>&1
-
-    log_success "Updating and cleaning system applications"
-
-    # ----------------------------------------------------------------
-    # Updating and cleaning user applications
-    # ----------------------------------------------------------------
-
-    log_progress "Updating and cleaning user applications"
-
-    flatpak update --user --assumeyes >$NO_OUTPUT 2>&1
-    flatpak uninstall --user --assumeyes --unused >$NO_OUTPUT 2>&1
-
-    log_success "Updating and cleaning user applications"
-
-    # ----------------------------------------------------------------
     # Updating and cleaning system packages
-    # ----------------------------------------------------------------
+    log_step "Updating and cleaning system packages"
 
-    log_progress "Updating and cleaning system packages"
+    sudo dnf clean all --quiet >$OUTPUT_EMPTY 2>&1
+    sudo dnf upgrade --assumeyes --quiet >$OUTPUT_EMPTY 2>&1
+    sudo dnf autoremove --assumeyes --quiet >$OUTPUT_EMPTY 2>&1
 
-    sudo dnf clean all --quiet >$NO_OUTPUT 2>&1
-    sudo dnf upgrade --assumeyes --quiet >$NO_OUTPUT 2>&1
-    sudo dnf autoremove --assumeyes --quiet >$NO_OUTPUT 2>&1
+    sudo dracut --force --parallel --regenerate-all >$OUTPUT_EMPTY 2>&1
 
-    sudo dracut --force --parallel --regenerate-all >$NO_OUTPUT 2>&1
+    sudo journalctl --rotate >$OUTPUT_EMPTY 2>&1
+    sudo journalctl --vacuum-time=1s >$OUTPUT_EMPTY 2>&1
 
-    sudo journalctl --rotate >$NO_OUTPUT 2>&1
-    sudo journalctl --vacuum-time=1s >$NO_OUTPUT 2>&1
-
-    log_success "Updating and cleaning system packages"
+    sudo fc-cache --really-force
 
     # ----------------------------------------------------------------
+
     # Updating system drivers
+    log_step "Updating system drivers"
+
+    sudo fwupdmgr --assume-yes --force refresh >$OUTPUT_EMPTY 2>&1 || true
+    sudo fwupdmgr --assume-yes --force get-updates >$OUTPUT_EMPTY 2>&1 || true
+
     # ----------------------------------------------------------------
 
-    log_progress "Updating system drivers"
+    # Updating and cleaning system applications
+    log_step "Updating and cleaning system applications"
 
-    # The 'fwupdmgr' command exits with '1' (as failure) when no update is needed
-    sudo fwupdmgr --assume-yes --force refresh >$NO_OUTPUT 2>&1 || true
-    sudo fwupdmgr --assume-yes --force get-updates >$NO_OUTPUT 2>&1 || true
+    sudo flatpak update --system --assumeyes >$OUTPUT_EMPTY 2>&1
+    sudo flatpak uninstall --system --assumeyes --unused >$OUTPUT_EMPTY 2>&1
 
-    log_success "Updating system drivers"
+    # ----------------------------------------------------------------
+
+    # Updating and cleaning user applications
+    log_step "Updating and cleaning user applications"
+
+    flatpak update --user --assumeyes >$OUTPUT_EMPTY 2>&1
+    flatpak uninstall --user --assumeyes --unused >$OUTPUT_EMPTY 2>&1
+
 }
 
 01_update_theme() {
     # ----------------------------------------------------------------
-    # Configuring desktop settings
-    # ----------------------------------------------------------------
 
-    log_progress "Configuring desktop settings"
+    # Configuring GNOME desktop settings
+    log_step "Configuring GNOME desktop settings"
 
     gsettings set org.gnome.desktop.calendar show-weekdate true
     gsettings set org.gnome.desktop.interface clock-show-date true
@@ -215,150 +186,93 @@ git_reset() {
     gsettings set org.gnome.nautilus.preferences default-folder-viewer "list-view"
     gsettings set org.gnome.nautilus.preferences show-hidden-files true
 
+    gsettings set org.gtk.gtk4.Settings.FileChooser show-hidden true
     gsettings set org.gtk.Settings.FileChooser show-hidden true
 
-    log_success "Configuring desktop settings"
-
-    # ----------------------------------------------------------------
-    # Configuring desktop extensions
     # ----------------------------------------------------------------
 
-    log_progress "Configuring desktop extensions"
+    # Configuring GNOME desktop extensions
+    log_step "Configuring GNOME desktop extensions"
 
-    gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-position "alphabetical"
+    cd /usr/share/glib-2.0/schemas
+
+    sudo wget \
+        --output-document="org.gnome.shell.extensions.dash-to-dock.gschema.xml" \
+        --quiet \
+        "https://raw.githubusercontent.com/micheleg/dash-to-dock/master/schemas/org.gnome.shell.extensions.dash-to-dock.gschema.xml"
+
+    sudo wget \
+        --output-document="org.gnome.shell.extensions.user-theme.gschema.xml" \
+        --quiet \
+        "https://gitlab.gnome.org/GNOME/gnome-shell-extensions/-/raw/main/extensions/user-theme/org.gnome.shell.extensions.user-theme.gschema.xml"
+
+    sudo wget \
+        --output-document="org.gnome.shell.extensions.AlphabeticalAppGrid.gschema.xml" \
+        --quiet \
+        "https://raw.githubusercontent.com/stuarthayhurst/alphabetical-grid-extension/master/extension/schemas/org.gnome.shell.extensions.AlphabeticalAppGrid.gschema.xml"
+
+    sudo glib-compile-schemas . >$OUTPUT_EMPTY 2>&1
+
+    gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-position "start"
     gsettings set org.gnome.shell.extensions.alphabetical-app-grid logging-enabled false
     gsettings set org.gnome.shell.extensions.alphabetical-app-grid sort-folder-contents true
 
-    gsettings set org.gnome.shell.extensions.blur-my-shell brightness 1.0
-    gsettings set org.gnome.shell.extensions.blur-my-shell color-and-noise false
-    gsettings set org.gnome.shell.extensions.blur-my-shell hacks-level 1
-    gsettings set org.gnome.shell.extensions.blur-my-shell sigma 200
-    gsettings set org.gnome.shell.extensions.blur-my-shell.appfolder customize false
-    gsettings set org.gnome.shell.extensions.blur-my-shell.applications blur false
-    gsettings set org.gnome.shell.extensions.blur-my-shell.applications blur-on-overview false
-    gsettings set org.gnome.shell.extensions.blur-my-shell.applications customize false
-    gsettings set org.gnome.shell.extensions.blur-my-shell.applications enable-all false
-    gsettings set org.gnome.shell.extensions.blur-my-shell.applications opacity 255
-    gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock blur false
-    gsettings set org.gnome.shell.extensions.blur-my-shell.hidetopbar compatibility false
-    gsettings set org.gnome.shell.extensions.blur-my-shell.overview style-components 0
-    gsettings set org.gnome.shell.extensions.blur-my-shell.panel brightness 1.0
-    gsettings set org.gnome.shell.extensions.blur-my-shell.panel customize true
-    gsettings set org.gnome.shell.extensions.blur-my-shell.panel override-background-dynamically true
-    gsettings set org.gnome.shell.extensions.blur-my-shell.panel sigma 0
-    gsettings set org.gnome.shell.extensions.blur-my-shell.panel unblur-in-overview true
-    gsettings set org.gnome.shell.extensions.blur-my-shell.screenshot blur false
-
     gsettings set org.gnome.shell.extensions.dash-to-dock apply-custom-theme false
-    gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 0.0
+    gsettings set org.gnome.shell.extensions.dash-to-dock background-color 'rgb(34,34,34)'
+    gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 1.0
     gsettings set org.gnome.shell.extensions.dash-to-dock click-action "minimize"
-    gsettings set org.gnome.shell.extensions.dash-to-dock custom-background-color false
+    gsettings set org.gnome.shell.extensions.dash-to-dock custom-background-color true
     gsettings set org.gnome.shell.extensions.dash-to-dock custom-theme-customize-running-dots true
-    gsettings set org.gnome.shell.extensions.dash-to-dock custom-theme-running-dots-border-color 'rgb(36,36,36)'
+    gsettings set org.gnome.shell.extensions.dash-to-dock custom-theme-running-dots-border-color 'rgb(34,34,34)'
+    gsettings set org.gnome.shell.extensions.dash-to-dock custom-theme-running-dots-color 'rgb(255,255,255)'
     gsettings set org.gnome.shell.extensions.dash-to-dock custom-theme-shrink true
-    gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 42
+    gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 36
     gsettings set org.gnome.shell.extensions.dash-to-dock disable-overview-on-startup true
-    gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
+    gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed true
     gsettings set org.gnome.shell.extensions.dash-to-dock height-fraction 1.0
-    gsettings set org.gnome.shell.extensions.dash-to-dock intellihide-mode "ALL_WINDOWS"
     gsettings set org.gnome.shell.extensions.dash-to-dock running-indicator-style "DOTS"
     gsettings set org.gnome.shell.extensions.dash-to-dock show-mounts-only-mounted false
     gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode "FIXED"
 
-    gsettings set org.gnome.shell.extensions.hidetopbar enable-active-window true
-    gsettings set org.gnome.shell.extensions.hidetopbar enable-intellihide true
-    gsettings set org.gnome.shell.extensions.hidetopbar hot-corner true
-    gsettings set org.gnome.shell.extensions.hidetopbar keep-round-corners true
-    gsettings set org.gnome.shell.extensions.hidetopbar mouse-sensitive false
-    gsettings set org.gnome.shell.extensions.hidetopbar mouse-sensitive-fullscreen-window false
-    gsettings set org.gnome.shell.extensions.hidetopbar mouse-triggers-overview true
-    gsettings set org.gnome.shell.extensions.hidetopbar show-in-overview true
-
-    log_success "Configuring desktop extensions"
-
-    # ----------------------------------------------------------------
-    # Configuring desktop fonts
+    gsettings set org.gnome.shell.extensions.user-theme name "Yaru-blue-dark"
     # ----------------------------------------------------------------
 
-    log_progress "Configuring desktop fonts"
+    # Updating GNOME shell theme
+    log_step "Updating GNOME shell theme"
 
-    gsettings set org.gnome.desktop.interface document-font-name "Roboto 11"
-    gsettings set org.gnome.desktop.interface font-name "Roboto 11"
-    gsettings set org.gnome.desktop.interface monospace-font-name "Roboto Mono 11"
-    gsettings set org.gnome.desktop.wm.preferences titlebar-font "Roboto 11"
+    gsettings set org.gnome.desktop.interface cursor-theme "Yaru"
+    gsettings set org.gnome.desktop.interface gtk-theme "Yaru-blue-dark"
+    gsettings set org.gnome.desktop.interface icon-theme "Yaru-blue-dark"
+    gsettings set org.gnome.desktop.sound theme-name "Yaru"
 
-    sudo fc-cache --really-force
+    if [[ ! $(cat /usr/share/themes/Yaru-blue-dark/gnome-shell/gnome-shell.css | grep "THEME OVERRIDE") ]]; then
+        sudo tee --append /usr/share/themes/Yaru-blue-dark/gnome-shell/gnome-shell.css >$OUTPUT_EMPTY 2>&1 <<EOT
 
-    log_success "Configuring desktop fonts"
+/* THEME OVERRIDE */
+#panel,
+#panel:overview { background-color: rgb(34,34,34); }
+EOT
+    fi
 
-    # ----------------------------------------------------------------
-    # Updating shell theme
-    # ----------------------------------------------------------------
+    sudo wget \
+        --output-document="/usr/bin/stylepak" \
+        --quiet \
+        "https://raw.githubusercontent.com/refi64/stylepak/master/stylepak"
 
-    log_progress "Updating shell theme"
+    sudo chmod +x /usr/bin/stylepak
 
-    cd ~/.setup/shell/Colloid
-    git_reset
-
-    sudo ./install.sh \
-        --color dark \
-        --libadwaita \
-        --theme default \
-        --tweaks rimless >$NO_OUTPUT 2>&1
-
-    gsettings set org.gnome.desktop.interface gtk-theme "Colloid-Dark"
-    gsettings set org.gnome.shell.extensions.user-theme name "Colloid-Dark"
-
-    cd ~/.setup/tools/stylepak
-    git_reset
-
-    stylepak install-user >$NO_OUTPUT 2>&1
-
-    log_success "Updating shell theme"
-
-    # ----------------------------------------------------------------
-    # Updating icon theme
-    # ----------------------------------------------------------------
-
-    log_progress "Updating icon theme"
-
-    cd ~/.setup/icons/Colloid
-    git_reset
-
-    sudo ./install.sh \
-        --scheme default \
-        --theme default >$NO_OUTPUT 2>&1
-
-    gsettings set org.gnome.desktop.interface icon-theme "Colloid-dark"
-
-    log_success "Updating icon theme"
-
-    # ----------------------------------------------------------------
-    # Updating cursor theme
-    # ----------------------------------------------------------------
-
-    log_progress "Updating cursor theme"
-
-    cd ~/.setup/cursors/Colloid/cursors
-    git_reset
-
-    sudo ./install.sh >$NO_OUTPUT 2>&1
-
-    gsettings set org.gnome.desktop.interface cursor-theme "Colloid-cursors"
-
-    log_success "Updating cursor theme"
+    flatpak remove --assumeyes --user org.gtk.Gtk3theme.Yaru-blue-dark >$OUTPUT_EMPTY 2>&1 || true
+    stylepak install-user >$OUTPUT_EMPTY 2>&1
 }
 
 # ################################################################
-# MAIN
+# Main
 # ################################################################
 
+trap 'handle_errors $LINENO "$BASH_COMMAND"' ERR
+sudo echo -e "[ Fedora Workstation Update Script ]\n"
+
 parse_commandline "$@"
-
-trap 'handle_errors $LINENO' ERR
-sudo echo ""
-
-neofetch
 
 if [ ${_arg_all} = "on" ]; then
     _arg_system="on"
@@ -377,4 +291,4 @@ if [ ${_arg_system} = "off" ] && [ ${_arg_theme} = "off" ]; then
     print_help
 fi
 
-echo -e "\n[ ${ECHO_BOLD}OK${ECHO_RESET} ]"
+log_success
