@@ -11,21 +11,6 @@ sudo echo -e "[ Fedora Workstation Installation Script ]\n"
 
 # ----------------------------------------------------------------
 
-# Configuring shell settings
-log_step "Configuring shell settings"
-
-export HISTFILESIZE=999999
-export HISTSIZE=999999
-export HISTTIMEFORMAT="%F %T "
-
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
-
-mkdir $HOME/Workspace >$OUTPUT_EMPTY 2>&1 || true
-mkdir $HOME/.local/bin >$OUTPUT_EMPTY 2>&1 || true
-
-# ----------------------------------------------------------------
-
 # Configuring Git settings
 log_step "Configuring Git settings"
 
