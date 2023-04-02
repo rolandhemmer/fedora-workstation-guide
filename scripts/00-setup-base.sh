@@ -131,6 +131,9 @@ dnf_group_install \
 
 dnf_package_install \
     \*-firmware \
+    --exclude=*nvidia*
+
+dnf_package_install \
     foomatic \
     fwupd \
     hplip \

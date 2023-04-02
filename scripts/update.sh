@@ -134,7 +134,8 @@ print_help() {
     sudo dnf upgrade --assumeyes --quiet >$OUTPUT_EMPTY 2>&1
     sudo dnf autoremove --assumeyes --quiet >$OUTPUT_EMPTY 2>&1
 
-    sudo dracut --force --parallel --regenerate-all >$OUTPUT_EMPTY 2>&1
+    sudo akmods --force >$OUTPUT_EMPTY 2>&1
+    sudo dracut --force >$OUTPUT_EMPTY 2>&1
 
     sudo journalctl --rotate >$OUTPUT_EMPTY 2>&1
     sudo journalctl --vacuum-time=1s >$OUTPUT_EMPTY 2>&1

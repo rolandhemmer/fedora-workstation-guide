@@ -85,6 +85,11 @@ dnf_package_install python3-pip
 # Installing Steam and Proton tools
 log_step "Installing Steam and Proton tools"
 
+dnf_package_install \
+    vulkan \
+    vulkan-loader \
+    vulkan-tools
+
 flatpak_install \
     com.github.Matoking.protontricks \
     com.valvesoftware.Steam \
