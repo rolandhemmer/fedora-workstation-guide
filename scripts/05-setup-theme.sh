@@ -99,14 +99,29 @@ stylepak install-user >$OUTPUT_EMPTY 2>&1
 
 # ----------------------------------------------------------------
 
+# Configuring GNOME update settings
+log_step "Configuring GNOME update settings"
+
+## Disable the gnome-software shell search provider
+sudo tee --append /usr/share/gnome-shell/search-providers/org.gnome.Software-search-provider.ini >$OUTPUT_EMPTY 2>&1 <<EOT
+DefaultDisabled=true
+EOT
+
+## Disable gnome-software automatically downloading updates
+sudo tee --append /usr/share/glib-2.0/schemas/org.gnome.software.gschema.override >$OUTPUT_EMPTY 2>&1 <<EOT
+[org.gnome.software]
+download-updates=false
+EOT
+
+## Do not start gnome-software session service at boot
+sudo rm --force /etc/xdg/autostart/gnome-software-service.desktop
+
+# ----------------------------------------------------------------
+
 # Configuring GNOME desktop settings
 log_step "Configuring GNOME desktop settings"
 
 dnf_package_install gnome-tweaks
-
-sudo tee --append /usr/share/gnome-shell/search-providers/org.gnome.Software-search-provider.ini >$OUTPUT_EMPTY 2>&1 <<EOT
-DefaultDisabled=true
-EOT
 
 gsettings set org.gnome.desktop.calendar show-weekdate true
 gsettings set org.gnome.desktop.interface clock-show-date true
