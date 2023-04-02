@@ -23,15 +23,13 @@ dnf_package_install \
     gstreamer1 \
     gstreamer1-libav \
     gstreamer1-plugin-openh264 \
-    gstreamer1-plugins-bad-free \
-    gstreamer1-plugins-base \
-    gstreamer1-plugins-good \
-    gstreamer1-plugins-ugly-free \
+    gstreamer1-plugins-{bad-\*,base,good-\*,ugly,ugly-free} \
     gstreamer1-vaapi \
     lame\* \
     libaom \
     libasyncns \
     libavdevice \
+    libdvdcss \
     libexif \
     libfreeaptx \
     libsndfile \
@@ -44,7 +42,10 @@ dnf_package_install \
     --exclude=lame-devel
 
 dnf_group_install sound-and-video
-dnf_group_update multimedia
+
+dnf_group_update \
+    multimedia \
+    --with-optional
 
 # ################################################################
 # End
