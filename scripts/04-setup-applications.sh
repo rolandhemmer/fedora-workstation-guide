@@ -35,27 +35,6 @@ flatpak_install com.discordapp.Discord
 
 # ----------------------------------------------------------------
 
-# Installing Docker
-log_step "Installing Docker"
-
-sudo dnf config-manager --assumeyes --quiet --add-repo \
-    https://download.docker.com/linux/fedora/docker-ce.repo >$OUTPUT_EMPTY 2>&1
-
-dnf_package_install \
-    containerd.io \
-    docker-ce \
-    docker-ce-cli \
-    docker-compose-plugin
-
-sudo usermod --append --groups docker $USER >$OUTPUT_EMPTY 2>&1
-
-sudo systemctl enable \
-    containerd.service \
-    docker.service \
-    >$OUTPUT_EMPTY 2>&1
-
-# ----------------------------------------------------------------
-
 # Installing Fedora Media Writer
 log_step "Installing Fedora Media Writer"
 
@@ -73,12 +52,6 @@ flatpak_install com.github.tchx84.Flatseal
 # Installing ONLYOFFICE
 log_step "Installing ONLYOFFICE"
 flatpak_install org.onlyoffice.desktopeditors
-
-# ----------------------------------------------------------------
-
-# Installing pip (Python)
-log_step "Installing pip for Python"
-dnf_package_install python3-pip
 
 # ----------------------------------------------------------------
 
