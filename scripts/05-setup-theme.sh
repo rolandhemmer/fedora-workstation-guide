@@ -144,24 +144,22 @@ gsettings set org.gtk.Settings.FileChooser show-hidden true
 # Configuring GNOME desktop extensions
 log_step "Configuring GNOME desktop extensions"
 
-cd /usr/share/glib-2.0/schemas
-
 sudo wget \
-    --output-document="org.gnome.shell.extensions.dash-to-dock.gschema.xml" \
+    --output-document="/usr/share/glib-2.0/schemas/org.gnome.shell.extensions.dash-to-dock.gschema.xml" \
     --quiet \
     "https://raw.githubusercontent.com/micheleg/dash-to-dock/master/schemas/org.gnome.shell.extensions.dash-to-dock.gschema.xml"
 
 sudo wget \
-    --output-document="org.gnome.shell.extensions.user-theme.gschema.xml" \
+    --output-document="/usr/share/glib-2.0/schemas/org.gnome.shell.extensions.user-theme.gschema.xml" \
     --quiet \
     "https://gitlab.gnome.org/GNOME/gnome-shell-extensions/-/raw/main/extensions/user-theme/org.gnome.shell.extensions.user-theme.gschema.xml"
 
 sudo wget \
-    --output-document="org.gnome.shell.extensions.AlphabeticalAppGrid.gschema.xml" \
+    --output-document="/usr/share/glib-2.0/schemas/org.gnome.shell.extensions.AlphabeticalAppGrid.gschema.xml" \
     --quiet \
     "https://raw.githubusercontent.com/stuarthayhurst/alphabetical-grid-extension/master/extension/schemas/org.gnome.shell.extensions.AlphabeticalAppGrid.gschema.xml"
 
-sudo glib-compile-schemas . >$OUTPUT_EMPTY 2>&1
+sudo glib-compile-schemas /usr/share/glib-2.0/schemas >$OUTPUT_EMPTY 2>&1
 
 gsettings set org.gnome.shell.extensions.alphabetical-app-grid folder-order-position "start"
 gsettings set org.gnome.shell.extensions.alphabetical-app-grid logging-enabled false
