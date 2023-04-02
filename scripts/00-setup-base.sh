@@ -103,7 +103,9 @@ dnf_package_install \
     rpmfusion-nonfree-release \
     rpmfusion-nonfree-release-tainted
 
-dnf_group_update core
+dnf_group_update \
+    core \
+    --with-optional
 
 # ----------------------------------------------------------------
 
@@ -127,7 +129,8 @@ log_step "Updating system drivers"
 dnf_group_install \
     hardware-support \
     networkmanager-submodules \
-    printing
+    printing \
+    --with-optional
 
 dnf_package_install \
     \*-firmware \
